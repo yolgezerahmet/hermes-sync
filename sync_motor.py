@@ -726,6 +726,25 @@ def cmd_push(cfg, node=None):
     else:
         new, changed, deleted, local = detect_changes(cfg)
 
+    # AKILLI GATE: kernel node'da kod değiştiyse önce build doğrula
+    affected_kernel = (node in (None, "kernel")) and bool(new or changed)
+    if affected_kernel and "kernel" in cfg["dirs"]:
+        log.info("Kernel değişikliği tespit — build gate çalışıyor...")
+        if not verify_build(cfg):
+            log.error("Build FAIL — bozuk kod eşitlenmiyor! "
+                      "Hata düzeltilmeden push YAPILMAYACAK.")
+            # Manifest'e build_break kaydı (farkındalık)
+            mf = load_manifest(cfg)
+            mf["build_break"] = {
+                "time": datetime.now().isoformat(),
+                "machine": cfg["machine"],
+                "new": len(new), "changed": len(changed),
+            }
+            save_manifest(cfg, mf)
+            return  # PUSH DURDURULDU — veri bütünlüğü korundu
+        else:
+            log.info("Build PASS — kod sağlıklı, push devam")
+
     if not new and not changed and not deleted:
         log.info("Değişiklik yok — push atlandı")
     else:
@@ -1035,7 +1054,9 @@ def gdrive_pull_latest(cfg, node):
 
 
 def verify_build(cfg):
-    """Kernel pull sonrası build doğrulama — Cumulus kritik."""
+    """Kernel pull sonrası build doğrulama — Cumulus kritik.
+    PIPE BUG: 'make | tail' make RC'sini yutuyor → çıktı dosyaya yaz,
+    RC doğrudan make'ten alınır."""
     kernel_cfg = cfg["dirs"].get("kernel")
     if not kernel_cfg:
         return True
@@ -1048,10 +1069,18 @@ def verify_build(cfg):
         if not os.path.exists(os.path.join(pexp, "Makefile")):
             continue
         log.info(f"Build doğrulama: {pexp}")
-        out, rc = run_cmd(f'cd "{pexp}" && make clean && make 2>&1 | tail -3',
-                          timeout=300)
-        if rc != 0:
-            log.error(f"Build BAŞARISIZ: {pexp}")
+        # RC'yi doğrudan make'ten al — pipe YOK
+        out, rc = run_cmd(
+            f'cd "{pexp}" && make clean >/dev/null 2>&1 && '
+            f'make >/tmp/sync_motor_build.log 2>&1; echo "RC=$?"',
+            timeout=300)
+        # Son satırda RC=... var
+        rc_line = [l for l in out.splitlines() if l.startswith("RC=")]
+        build_rc = int(rc_line[-1].split("=")[1]) if rc_line else -1
+        if build_rc != 0:
+            log.error(f"Build BAŞARISIZ: {pexp} (RC={build_rc})")
+            tail = "\n".join(out.splitlines()[-5:])
+            log.error(f"Son çıktı: {tail[:200]}")
             return False
         log.info(f"Build PASS: {pexp}")
         break  # İlk geçerli dizin yeterli
