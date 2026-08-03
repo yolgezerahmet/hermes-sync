@@ -309,6 +309,8 @@ def scan_directory(label, dir_cfg):
     Çoklu yol desteği: dir_cfg['paths'] veya tek 'path'.
     GÜVENLİK: .env, *.key, token içeren dosyalar ASLA kapsama alınmaz.
     Dönen: {relpath: {sha, size, mtime, machine}}
+    Çoklu yol çakışması: aynı göreli yol iki kökte varsa → çakışma
+    uyarısı loglanır, son kökün kaydı KULLANILMAZ (veri kaybı önlemi).
     """
     # Çoklu yol veya tek yol
     paths = dir_cfg.get("paths") or [dir_cfg["path"]]
@@ -320,6 +322,9 @@ def scan_directory(label, dir_cfg):
     SECRET_PATTERNS = (".env", ".env.", "*.key", "*.pem", "*.p12",
                        "id_rsa", "id_ed25519", "*.token", "secrets",
                        "credentials", "service-account", "*-sa-key")
+    # GÜVENLİK: hassas dizin adları — yol bileşeninden reddedilir
+    SECRET_DIRS = ("secrets", "credentials", "service-account",
+                   ".aws", ".ssh", "private", "keys", "tokens")
 
     def is_secret(fname):
         import fnmatch
@@ -333,7 +338,9 @@ def scan_directory(label, dir_cfg):
             continue
 
         for root, dirs, files in os.walk(base):
-            dirs[:] = [d for d in dirs if not should_exclude_dir(d, exclude_dirs)]
+            dirs[:] = [d for d in dirs
+                       if not should_exclude_dir(d, exclude_dirs)
+                       and d.lower() not in SECRET_DIRS]
             for fname in files:
                 # GÜVENLİK: secret dosyaları atla
                 if is_secret(fname):
@@ -351,7 +358,19 @@ def scan_directory(label, dir_cfg):
                 if not matches_glob(fpath, include):
                     continue
                 rel = os.path.relpath(fpath, base)
-                inventory[f"{label}/{rel}"] = {
+                key = f"{label}/{rel}"
+                # Çoklu yol çakışması: aynı anahtar zaten varsa
+                if key in inventory:
+                    # SHA aynıysa → aynı içerik, sorun yok (sessiz)
+                    # SHA farklıysa → GERÇEK çakışma (uyar + ilki koru)
+                    existing_sha = inventory[key].get("sha")
+                    new_sha = sha256_file(fpath)
+                    if existing_sha != new_sha:
+                        log.debug(f"Çoklu yol farkı: {key} iki kökte "
+                                  f"FARKLI içerik — ilki korunuyor "
+                                  f"(worktree + ana repo farklı branch)")
+                    continue
+                inventory[key] = {
                     "sha": sha256_file(fpath),
                     "size": stat.st_size,
                     "mtime": int(stat.st_mtime),
@@ -421,11 +440,20 @@ def gh_available():
     return rc == 0
 
 
-def run_cmd(cmd, timeout=60):
-    """Shell komutu çalıştır — (stdout, returncode)."""
+def run_cmd(cmd, timeout=60, shell=False):
+    """
+    Komut çalıştır — (stdout, returncode).
+    Güvenlik: shell=True KAPALI — komut enjeksiyonuna karşı.
+    shell=True gereken pipe komutları için shell=True AÇIKÇA verilir
+    ve giriş değerleri config'den (kullanıcının kendi dosyası) gelir.
+    """
     try:
-        r = subprocess.run(cmd, shell=True, capture_output=True,
-                           text=True, timeout=timeout)
+        if shell:
+            r = subprocess.run(cmd, shell=True, capture_output=True,
+                               text=True, timeout=timeout)
+        else:
+            r = subprocess.run(cmd.split(), capture_output=True,
+                               text=True, timeout=timeout)
         return r.stdout.strip(), r.returncode
     except subprocess.TimeoutExpired:
         return "timeout", -1
@@ -435,13 +463,18 @@ def run_cmd(cmd, timeout=60):
 
 def gh_ensure_repo(cfg):
     repo = cfg["github"]["repo"]
-    out, rc = run_cmd(f"gh repo view {repo} 2>&1 | head -2")
-    if rc == 0 and "not found" not in out.lower() and out:
+    # PIPE YOK: gh RC doğrudan alınır (pipe RC'yi yutuyordu)
+    # shell=True: --jq .name + 2>&1 .split() ile parçalanıyor
+    out, rc = run_cmd(
+        f"gh repo view {repo} --json name --jq .name 2>&1",
+        timeout=30, shell=True)
+    if rc == 0 and out and "not found" not in out.lower():
         log.info(f"GitHub repo hazır: {repo}")
         return True
     out, rc = run_cmd(
         f"gh repo create {repo} --private "
-        f"--description 'Cumulus H1-H2 senkronizasyon merkezi'")
+        f"--description 'Hermes Sync manifest merkezi'",
+        timeout=30, shell=True)
     if rc == 0:
         log.info(f"GitHub repo oluşturuldu: {repo}")
         return True
@@ -622,7 +655,7 @@ def gdrive_snapshot(cfg, node=None):
         out, rc = run_cmd(
             f'cd "{base_expanded}" && find . {excl_find} '
             f'\\( {find_cmd} \\) -type f 2>/dev/null | head -5000 | '
-            f'tar -czf "{pkg}" -T - 2>/dev/null', timeout=120)
+            f'tar -czf "{pkg}" -T - 2>/dev/null', timeout=120, shell=True)
         if rc != 0 or not os.path.exists(pkg) or os.path.getsize(pkg) == 0:
             log.warning(f"{label}: paket oluşturulamadı "
                         f"(rc={rc}, boyut={os.path.exists(pkg) and os.path.getsize(pkg)})")
@@ -632,7 +665,7 @@ def gdrive_snapshot(cfg, node=None):
         target = f"{cfg['gdrive']['versioned_dir']}/{label}/{ts}"
         out, rc = run_cmd(
             f'rclone copy "{pkg}" "{target}" --ignore-checksum '
-            f'--no-traverse', timeout=180)
+            f'--no-traverse', timeout=180, shell=True)
         if rc == 0:
             sz = os.path.getsize(pkg) // 1024
             results[label] = f"{target} ({sz}KB)"
@@ -857,7 +890,7 @@ def cmd_share(cfg, node, target_user):
     dst_root = f"gdrive:hermes-sync/{target_user}/shared"
     out, rc = run_cmd(
         f'rclone copy "{src_root}/{node}/" "{dst_root}/{node}/" '
-        f'--ignore-checksum --no-traverse', timeout=180)
+        f'--ignore-checksum --no-traverse', timeout=180, shell=True)
     if rc == 0:
         log.info(f"Node paylaşıldı: {node} → {target_user}/shared/{node}")
         log.info(f"Hedef kullanıcı çeker: sync_motor.py pull --from-shared {node}")
@@ -883,7 +916,7 @@ def cmd_nodes(cfg):
         if gd and rclone_available():
             out, rc = run_cmd(
                 f'rclone lsd {cfg["gdrive"]["versioned_dir"]}/{label} '
-                f'2>/dev/null | wc -l', timeout=30)
+                f'2>/dev/null | wc -l', timeout=30, shell=True)
             ver_count = out.strip() if rc == 0 else "?"
         print(f"  {'🟢' if exists else '🔴'} {label:12s} "
               f"{'GDrive:'+str(ver_count)+' ver' if gd else 'lokal'}")
@@ -974,7 +1007,7 @@ def gdrive_pull_latest(cfg, node):
     # En son versiyon klasörünü bul
     out, rc = run_cmd(
         f'rclone lsd {cfg["gdrive"]["versioned_dir"]}/{node} '
-        f'2>/dev/null | tail -1', timeout=30)
+        f'2>/dev/null | tail -1', timeout=30, shell=True)
     if rc != 0 or not out:
         log.info(f"{node}: GDrive'da versiyon yok")
         return False
@@ -988,7 +1021,8 @@ def gdrive_pull_latest(cfg, node):
     pkg = f"/tmp/sync_pull_{node}.tar.gz"
     out, rc = run_cmd(
         f'rclone copy {cfg["gdrive"]["versioned_dir"]}/{node}/{latest}/ '
-        f'/tmp/sync_pull_{node}/ --ignore-checksum --no-traverse', timeout=180)
+        f'/tmp/sync_pull_{node}/ --ignore-checksum --no-traverse',
+        timeout=180, shell=True)
     if rc != 0:
         log.error(f"{node}: GDrive pull başarısız")
         return False
@@ -1073,7 +1107,7 @@ def verify_build(cfg):
         out, rc = run_cmd(
             f'cd "{pexp}" && make clean >/dev/null 2>&1 && '
             f'make >/tmp/sync_motor_build.log 2>&1; echo "RC=$?"',
-            timeout=300)
+            timeout=300, shell=True)
         # Son satırda RC=... var
         rc_line = [l for l in out.splitlines() if l.startswith("RC=")]
         build_rc = int(rc_line[-1].split("=")[1]) if rc_line else -1
