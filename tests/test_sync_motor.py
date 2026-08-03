@@ -12,6 +12,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -51,8 +52,17 @@ class TestMachineDetect(unittest.TestCase):
         self.assertEqual(sm.detect_machine("H2-Windows-RTX5070Ti"), "H2")
 
     def test_unknown_linux(self):
-        # Linux'ta bilinmeyen hostname → H1 fallback
-        self.assertEqual(sm.detect_machine("bilinmeyen-server"), "H1")
+        # Ortam bağımsız: os.name mock'lanır (H2'de Windows'ta da deterministik)
+        with mock.patch("sync_motor.os.name", "posix"):
+            self.assertEqual(sm.detect_machine("bilinmeyen-server"), "H1")
+
+    def test_unknown_windows(self):
+        # Windows'ta bilinmeyen hostname → H2 fallback
+        with mock.patch("sync_motor.os.name", "nt"):
+            self.assertEqual(sm.detect_machine("bilinmeyen-pc"), "H2")
+
+    def test_openclaw(self):
+        self.assertEqual(sm.detect_machine("openclaw"), "OPENCLAW")
 
 
 class TestScan(unittest.TestCase):
