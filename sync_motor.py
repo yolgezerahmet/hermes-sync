@@ -109,14 +109,18 @@ log = logging.getLogger("sync_motor")
 # ═══════════════════════════════════════════════════════════════
 
 DEFAULT_CONFIG = {
+    "identity": {
+        "user_id": "cumulusnet",      # GDrive alanı: gdrive:hermes-sync/<user_id>/
+        "machine_id": "",             # boş = otomatik (hostname)
+    },
     "github": {
         "repo": "yolgezerahmet/cumulus-sync",
         "branch": "main",
         "manifest_file": "sync_manifest.json",
     },
     "gdrive": {
-        "root": "gdrive:cumulusos-backups",
-        "versioned_dir": "gdrive:cumulusos-backups/versiyonlu",
+        "root": "gdrive:hermes-sync",      # EVRENSEL: her kullanıcı kendi alanında
+        "versioned_dir": "gdrive:hermes-sync/cumulusnet/versiyonlu",
     },
     "network": {
         "h1_http": "http://100.92.2.47:9090",
@@ -185,6 +189,14 @@ DEFAULT_CONFIG = {
             "max_size_kb": 1024,
             "gdrive": True,
         },
+        "hermes-full": {
+            "path": "~/.hermes",
+            "include": ["*.yaml", "*.yml", "*.json", "*.md", "*.py", "*.sh"],
+            "exclude_dirs": ["cache", "logs", "audio_cache", "models",
+                             "venv", "__pycache__", "state", "kanban"],
+            "max_size_kb": 2048,
+            "gdrive": True,
+        },
     },
     "state": {
         "manifest_local": "~/.hermes/state/sync_motor_manifest.json",
@@ -233,6 +245,19 @@ def load_config(path=None):
     # Makine tespiti
     cfg["machine"] = detect_machine()
     cfg["is_h1"] = cfg["machine"] == "H1"
+
+    # Kimlik: user_id + machine_id (GDrive yolu buna bağlı)
+    user_id = cfg.get("identity", {}).get("user_id", "default")
+    machine_id = cfg.get("identity", {}).get("machine_id", "")
+    if not machine_id:
+        machine_id = (os.uname().nodename if os.name != "nt"
+                      else os.environ.get("COMPUTERNAME", "unknown"))
+        machine_id = machine_id.replace(" ", "_").lower()
+        cfg["identity"]["machine_id"] = machine_id
+    # GDrive versiyonlu yol: gdrive:hermes-sync/<user_id>/<machine_id>/versiyonlu
+    cfg["gdrive"]["versioned_dir"] = (
+        f"gdrive:hermes-sync/{user_id}/{machine_id}/versiyonlu")
+    cfg["gdrive"]["user_root"] = f"gdrive:hermes-sync/{user_id}"
 
     # Windows'ta dizin yollarını çevir
     if os.name == "nt":
@@ -762,6 +787,65 @@ def detect_changes_node(cfg, node):
     return new, changed, deleted, local
 
 
+def cmd_add_node(cfg, name, path, include="*", max_kb=1024):
+    """
+    Yeni node ekle — config.json'a yazar. Node sayısı SINIRSIZ.
+    Kullanım: python3 sync_motor.py add-node docs --path ~/docs --include "*.md"
+    """
+    import json as _json
+    config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                               "config.json")
+    # Mevcut config'i yükle (varsa)
+    user_cfg = {}
+    if os.path.exists(config_path):
+        try:
+            with open(config_path) as f:
+                user_cfg = _json.load(f)
+        except Exception:
+            user_cfg = {}
+
+    # Node ekle
+    dirs = user_cfg.setdefault("dirs", {})
+    if name in dirs:
+        log.warning(f"Node zaten var: {name} (güncelleniyor)")
+    dirs[name] = {
+        "path": os.path.expanduser(path),
+        "include": include.split(",") if isinstance(include, str) else include,
+        "exclude_dirs": [".git", "build", "__pycache__"],
+        "max_size_kb": max_kb,
+        "gdrive": True,
+    }
+
+    with open(config_path, "w") as f:
+        _json.dump(user_cfg, f, indent=2, ensure_ascii=False)
+    log.info(f"Node eklendi: {name} → {path} (config.json)")
+    log.info("Şimdi: python3 sync_motor.py push --node " + name)
+
+
+def cmd_share(cfg, node, target_user):
+    """
+    Node'u başka kullanıcıyla PAYLAŞ — GDrive'a kopyalar.
+    A kullanıcısının node'u → gdrive:hermes-sync/<target_user>/shared/<node>/
+    Kullanım: python3 sync_motor.py share kernel --to ahmet
+    """
+    import shutil as _shutil
+    if node not in cfg["dirs"]:
+        log.error(f"Bilinmeyen node: {node}")
+        return
+
+    # En son versiyonu paylaşım alanına kopyala
+    src_root = cfg["gdrive"]["versioned_dir"]
+    dst_root = f"gdrive:hermes-sync/{target_user}/shared"
+    out, rc = run_cmd(
+        f'rclone copy "{src_root}/{node}/" "{dst_root}/{node}/" '
+        f'--ignore-checksum --no-traverse', timeout=180)
+    if rc == 0:
+        log.info(f"Node paylaşıldı: {node} → {target_user}/shared/{node}")
+        log.info(f"Hedef kullanıcı çeker: sync_motor.py pull --from-shared {node}")
+    else:
+        log.error(f"Paylaşım başarısız: {out[:100]}")
+
+
 def cmd_nodes(cfg):
     """Tüm node'ları + GDrive versiyon geçmişini listele."""
     print("\n  📦 NODE'LAR")
@@ -1082,12 +1166,23 @@ def main(argv=None):
     parser.add_argument("komut", nargs="?", default="status",
                         choices=["status", "push", "pull", "both",
                                  "conflicts", "init", "select", "nodes",
-                                 "version"])
+                                 "add-node", "share", "version"])
+    parser.add_argument("hedef", nargs="?",
+                        help="add-node: node adı | share: node adı")
     parser.add_argument("--config", default=None,
                         help="config.json yolu")
     parser.add_argument("--node", default=None,
                         help="sadece belirli node'u eşitle (kernel, patent, "
-                             "scripts, pcb, hermes)")
+                             "scripts, pcb, hermes, openclaw... veya add-node "
+                             "ile eklenen herhangi biri)")
+    parser.add_argument("--path", default=None,
+                        help="add-node: yeni node dizini")
+    parser.add_argument("--include", default="*",
+                        help="add-node: dahil edilecek pattern (örn: *.md,*.txt)")
+    parser.add_argument("--max-kb", type=int, default=1024,
+                        help="add-node: maksimum dosya boyutu KB")
+    parser.add_argument("--to", default=None,
+                        help="share: hedef kullanıcı")
     parser.add_argument("-v", "--verbose", action="store_true",
                         help="debug log")
     parser.add_argument("--no-color", action="store_true",
@@ -1127,6 +1222,19 @@ def main(argv=None):
         cmd_nodes(cfg)
     elif args.komut == "select":
         cmd_select(cfg)
+    elif args.komut == "add-node":
+        node_name = args.hedef or args.node
+        if not node_name or not args.path:
+            print("Kullanım: sync_motor.py add-node <ad> --path <dizin> "
+                  "[--include '*.md,*.txt'] [--max-kb 1024]")
+            return 1
+        cmd_add_node(cfg, node_name, args.path, args.include, args.max_kb)
+    elif args.komut == "share":
+        node_name = args.hedef or args.node
+        if not node_name or not args.to:
+            print("Kullanım: sync_motor.py share <node> --to <kullanıcı>")
+            return 1
+        cmd_share(cfg, node_name, args.to)
 
     return 0
 
