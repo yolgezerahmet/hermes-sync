@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Yapılandırma (kişisel)
+config.json
+
+# Durum / log
+*.log
+sync_motor_manifest.json
+
+# İşletim sistemi
+.DS_Store
+Thumbs.db
+
+# Geçici
+/tmp/
+*.tmp
