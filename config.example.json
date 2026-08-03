@@ -1,46 +1,60 @@
 {
+  "identity": {
+    "user_id": "kullanici-adi",
+    "machine_id": ""
+  },
   "github": {
-    "repo": "yolgezerahmet/cumulus-sync",
+    "repo": "kullanici-adi/hermes-sync-manifest",
     "branch": "main",
     "manifest_file": "sync_manifest.json"
   },
   "gdrive": {
-    "root": "gdrive:cumulusos-backups",
-    "versioned_dir": "gdrive:cumulusos-backups/versiyonlu"
+    "root": "gdrive:hermes-sync",
+    "versioned_dir": "gdrive:hermes-sync/kullanici-adi/versiyonlu"
   },
   "network": {
-    "h1_http": "http://100.92.2.47:9090",
-    "h2_http": "http://100.76.82.46:9090",
+    "h1_http": "",
+    "h2_http": "",
     "timeout_s": 10
   },
   "machines": {
-    "h1_hostnames": ["CumulusNET-Hermes-1", "hal-server-801964"],
-    "h2_hostnames": ["H2-Windows-RTX5077Ti", "H2-Windows"]
+    "h1_hostnames": [],
+    "h2_hostnames": [],
+    "openclaw_hostnames": ["openclaw"]
   },
   "dirs": {
-    "kernel": {
-      "path": "/root/.config/superpowers/worktrees/cumulusos/canonical-full-product-gates",
+    "hermes": {
+      "path": "~/.hermes",
+      "include": ["*.yaml", "*.yml", "*.json", "*.md", "*.py", "*.sh"],
+      "exclude_dirs": ["cache", "logs", "audio_cache", "state",
+                       "profiles", "models", "venv", "__pycache__",
+                       "kanban", "plugins", "agents", "backups",
+                       "sessions", "skills", "scripts"],
+      "max_size_kb": 1024,
+      "gdrive": true
+    },
+    "hermes-full": {
+      "path": "~/.hermes",
+      "include": ["*.yaml", "*.yml", "*.json", "*.md", "*.py", "*.sh"],
+      "exclude_dirs": ["cache", "logs", "audio_cache", "models",
+                       "venv", "__pycache__", "state", "kanban"],
+      "max_size_kb": 2048,
+      "gdrive": true
+    },
+    "openclaw": {
+      "path": "~/.openclaw",
+      "include": ["*.md", "*.json", "*.yaml", "*.yml", "*.py"],
+      "exclude_dirs": ["cache", "logs", "sessions", "workspace",
+                       "skills", "scripts", "__pycache__", "models"],
+      "max_size_kb": 1024,
+      "gdrive": true
+    },
+    "proje": {
+      "path": "~/projeler/ornek",
       "include": ["*.c", "*.h", "*.md", "Makefile"],
       "exclude_dirs": [".git", "build", "__pycache__"],
-      "max_size_kb": 512
-    },
-    "patent": {
-      "path": "/root/patent_docs",
-      "include": ["*.md", "*.txt"],
-      "exclude_dirs": [".git"],
-      "max_size_kb": 512
-    },
-    "scripts": {
-      "path": "/root/.hermes/scripts",
-      "include": ["*.py", "*.sh", "*.ps1", "*.md"],
-      "exclude_dirs": ["__pycache__"],
-      "max_size_kb": 512
-    },
-    "pcb": {
-      "path": "/root/pcb/projects",
-      "include": ["*.kicad_sch", "*.kicad_pcb", "*.md", "*BOM*"],
-      "exclude_dirs": [".git", "production", "gerber"],
-      "max_size_kb": 2048
+      "max_size_kb": 512,
+      "gdrive": true
     }
   },
   "state": {
