@@ -126,6 +126,7 @@ DEFAULT_CONFIG = {
     "machines": {
         "h1_hostnames": ["CumulusNET-Hermes-1", "hal-server-801964"],
         "h2_hostnames": ["H2-Windows-RTX5070Ti"],
+        "openclaw_hostnames": ["openclaw"],
     },
     "dirs": {
         "kernel": {
@@ -176,6 +177,14 @@ DEFAULT_CONFIG = {
             "max_size_kb": 2048,
             "gdrive": True,
         },
+        "openclaw": {
+            "path": "~/.openclaw",
+            "include": ["*.md", "*.json", "*.yaml", "*.yml", "*.py"],
+            "exclude_dirs": ["cache", "logs", "sessions", "workspace",
+                             "skills", "scripts", "__pycache__", "models"],
+            "max_size_kb": 1024,
+            "gdrive": True,
+        },
     },
     "state": {
         "manifest_local": "~/.hermes/state/sync_motor_manifest.json",
@@ -185,7 +194,7 @@ DEFAULT_CONFIG = {
 
 
 def detect_machine(hostname=None):
-    """H1 mi H2 mi? hostname + OS kombinasyonu ile."""
+    """H1 mi H2 mi OpenClaw mu? hostname + OS kombinasyonu ile."""
     hostname = hostname or (os.uname().nodename if os.name != "nt"
                             else os.environ.get("COMPUTERNAME", ""))
     hn = hostname.lower()
@@ -196,6 +205,9 @@ def detect_machine(hostname=None):
     for h2 in DEFAULT_CONFIG["machines"]["h2_hostnames"]:
         if h2.lower() in hn:
             return "H2"
+    for oc in DEFAULT_CONFIG["machines"].get("openclaw_hostnames", []):
+        if oc.lower() in hn:
+            return "OPENCLAW"
     # OS fallback
     return "H2" if os.name == "nt" else "H1"
 
@@ -224,9 +236,10 @@ def load_config(path=None):
 
     # Windows'ta dizin yollarını çevir
     if os.name == "nt":
-        cfg["dirs"]["kernel"]["path"] = r"C:\cumulusos"
+        cfg["dirs"]["kernel"]["paths"] = [r"C:\cumulusos"]
         cfg["dirs"]["patent"]["path"] = r"C:\ProjectCumulus"
         cfg["dirs"]["scripts"]["path"] = str(Path.home() / ".hermes" / "scripts")
+        cfg["dirs"]["openclaw"]["path"] = str(Path.home() / ".openclaw")
 
     # Yol genişlet (~ → home)
     for k in ("manifest_local", "logfile"):
