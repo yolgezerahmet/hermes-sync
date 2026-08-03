@@ -129,9 +129,12 @@ DEFAULT_CONFIG = {
     },
     "dirs": {
         "kernel": {
-            "path": "/root/.config/superpowers/worktrees/cumulusos/canonical-full-product-gates",
+            "paths": [
+                "/root/.config/superpowers/worktrees/cumulusos/canonical-full-product-gates",
+                "/root/cumulusos"
+            ],
             "include": ["*.c", "*.h", "*.md", "Makefile"],
-            "exclude_dirs": [".git", "build", "__pycache__"],
+            "exclude_dirs": [".git", "build", "__pycache__", ".backup", ".sync_backup"],
             "max_size_kb": 512,
             "gdrive": True,
         },
@@ -265,39 +268,57 @@ def should_exclude_dir(dirname, exclude_dirs):
 def scan_directory(label, dir_cfg):
     """
     Bir dizini tara; include pattern + boyut filtresi uygula.
+    Çoklu yol desteği: dir_cfg['paths'] veya tek 'path'.
+    GÜVENLİK: .env, *.key, token içeren dosyalar ASLA kapsama alınmaz.
     Dönen: {relpath: {sha, size, mtime, machine}}
     """
-    base = dir_cfg["path"]
-    if not os.path.isdir(base):
-        log.debug(f"{label}: dizin yok — {base}")
-        return {}
-
+    # Çoklu yol veya tek yol
+    paths = dir_cfg.get("paths") or [dir_cfg["path"]]
     include = dir_cfg.get("include", ["*"])
     exclude_dirs = dir_cfg.get("exclude_dirs", [])
     max_bytes = dir_cfg.get("max_size_kb", 512) * 1024
 
+    # GÜVENLİK: hassas dosya kalıpları — asla manifest'e girmez
+    SECRET_PATTERNS = (".env", ".env.", "*.key", "*.pem", "*.p12",
+                       "id_rsa", "id_ed25519", "*.token", "secrets",
+                       "credentials", "service-account", "*-sa-key")
+
+    def is_secret(fname):
+        import fnmatch
+        return any(fnmatch.fnmatch(fname, p) for p in SECRET_PATTERNS)
+
     inventory = {}
-    for root, dirs, files in os.walk(base):
-        dirs[:] = [d for d in dirs if not should_exclude_dir(d, exclude_dirs)]
-        for fname in files:
-            fpath = os.path.join(root, fname)
-            try:
-                stat = os.stat(fpath)
-            except OSError:
-                continue
-            # Boyut filtresi
-            if stat.st_size > max_bytes:
-                continue
-            # Pattern filtresi
-            if not matches_glob(fpath, include):
-                continue
-            rel = os.path.relpath(fpath, base)
-            inventory[f"{label}/{rel}"] = {
-                "sha": sha256_file(fpath),
-                "size": stat.st_size,
-                "mtime": int(stat.st_mtime),
-                "machine": detect_machine(),
-            }
+    for base in paths:
+        base = os.path.expanduser(base)
+        if not os.path.isdir(base):
+            log.debug(f"{label}: dizin yok — {base}")
+            continue
+
+        for root, dirs, files in os.walk(base):
+            dirs[:] = [d for d in dirs if not should_exclude_dir(d, exclude_dirs)]
+            for fname in files:
+                # GÜVENLİK: secret dosyaları atla
+                if is_secret(fname):
+                    log.debug(f"Güvenlik: {fname} atlandı")
+                    continue
+                fpath = os.path.join(root, fname)
+                try:
+                    stat = os.stat(fpath)
+                except OSError:
+                    continue
+                # Boyut filtresi
+                if stat.st_size > max_bytes:
+                    continue
+                # Pattern filtresi
+                if not matches_glob(fpath, include):
+                    continue
+                rel = os.path.relpath(fpath, base)
+                inventory[f"{label}/{rel}"] = {
+                    "sha": sha256_file(fpath),
+                    "size": stat.st_size,
+                    "mtime": int(stat.st_mtime),
+                    "machine": detect_machine(),
+                }
     return inventory
 
 
@@ -534,9 +555,16 @@ def gdrive_snapshot(cfg, node=None):
         dir_cfg = cfg["dirs"].get(label)
         if not dir_cfg or not dir_cfg.get("gdrive", False):
             continue
-        base = os.path.expanduser(dir_cfg["path"])
-        if not os.path.isdir(base):
-            log.debug(f"{label}: dizin yok — {base}")
+        # Çoklu yol desteği
+        paths = dir_cfg.get("paths") or [dir_cfg.get("path", "")]
+        base = None
+        for p in paths:
+            pexp = os.path.expanduser(p)
+            if os.path.isdir(pexp):
+                base = pexp
+                break
+        if not base:
+            log.debug(f"{label}: dizin yok")
             continue
 
         # Node başına ayrı paket — include pattern'leri ile (tar değil)
@@ -631,13 +659,15 @@ def list_conflicts(cfg):
     """Tüm yapılandırılmış dizinlerde .conflict.* dosyalarını bul."""
     found = []
     for label, dir_cfg in cfg["dirs"].items():
-        base = dir_cfg["path"]
-        if not os.path.isdir(base):
-            continue
-        for root, dirs, files in os.walk(base):
-            for f in files:
-                if ".conflict." in f:
-                    found.append(os.path.join(root, f))
+        paths = dir_cfg.get("paths") or [dir_cfg.get("path", "")]
+        for p in paths:
+            base = os.path.expanduser(p)
+            if not os.path.isdir(base):
+                continue
+            for root, dirs, files in os.walk(base):
+                for f in files:
+                    if ".conflict." in f:
+                        found.append(os.path.join(root, f))
     return found
 
 
@@ -723,8 +753,14 @@ def cmd_nodes(cfg):
     """Tüm node'ları + GDrive versiyon geçmişini listele."""
     print("\n  📦 NODE'LAR")
     for label, dir_cfg in cfg["dirs"].items():
-        base = os.path.expanduser(dir_cfg["path"])
-        exists = os.path.isdir(base)
+        paths = dir_cfg.get("paths") or [dir_cfg.get("path", "")]
+        base = None
+        for p in paths:
+            pexp = os.path.expanduser(p)
+            if os.path.isdir(pexp):
+                base = pexp
+                break
+        exists = bool(base)
         gd = dir_cfg.get("gdrive", False)
         # GDrive versiyon sayısı
         ver_count = "?"
@@ -743,9 +779,14 @@ def cmd_select(cfg):
     print("\n  🎯 NODE SEÇİMİ")
     labels = list(cfg["dirs"].keys())
     for i, label in enumerate(labels, 1):
-        base = os.path.expanduser(cfg["dirs"][label]["path"])
-        exists = "🟢" if os.path.isdir(base) else "🔴"
-        print(f"  [{i}] {exists} {label}")
+        dir_cfg = cfg["dirs"][label]
+        paths = dir_cfg.get("paths") or [dir_cfg.get("path", "")]
+        exists = False
+        for p in paths:
+            if os.path.isdir(os.path.expanduser(p)):
+                exists = True
+                break
+        print(f"  [{i}] {'🟢' if exists else '🔴'} {label}")
     print(f"  [0] TÜMÜ")
     print(f"  [q] Çık")
 
@@ -805,6 +846,121 @@ def cmd_status(cfg):
     print("═" * 60 + "\n")
 
 
+def gdrive_pull_latest(cfg, node):
+    """
+    GDrive'dan node'un EN SON versiyonunu çek ve doğrula.
+    Non-destructive: hedef dizine yazar ama çakışan dosyalar .conflict.TS.
+    """
+    if not rclone_available():
+        log.warning("rclone yok — GDrive pull atlandı")
+        return False
+
+    # En son versiyon klasörünü bul
+    out, rc = run_cmd(
+        f'rclone lsd {cfg["gdrive"]["versioned_dir"]}/{node} '
+        f'2>/dev/null | tail -1', timeout=30)
+    if rc != 0 or not out:
+        log.info(f"{node}: GDrive'da versiyon yok")
+        return False
+    # En son timestamp klasörü
+    latest = out.split()[-1]
+    if not latest or not latest.replace("_", "").isdigit():
+        log.warning(f"{node}: geçersiz versiyon klasörü: {latest}")
+        return False
+
+    # Paketi çek
+    pkg = f"/tmp/sync_pull_{node}.tar.gz"
+    out, rc = run_cmd(
+        f'rclone copy {cfg["gdrive"]["versioned_dir"]}/{node}/{latest}/ '
+        f'/tmp/sync_pull_{node}/ --ignore-checksum --no-traverse', timeout=180)
+    if rc != 0:
+        log.error(f"{node}: GDrive pull başarısız")
+        return False
+
+    # Paketi aç (hedef dizine, çakışma korumalı)
+    dir_cfg = cfg["dirs"].get(node)
+    paths = dir_cfg.get("paths") or [dir_cfg.get("path", "")]
+    target = None
+    for p in paths:
+        if os.path.isdir(os.path.expanduser(p)):
+            target = os.path.expanduser(p)
+            break
+    if not target:
+        log.warning(f"{node}: hedef dizin yok")
+        return False
+
+    pkg_file = f"/tmp/sync_pull_{node}/{node}.tar.gz"
+    if not os.path.exists(pkg_file):
+        # Rclone dosya adını korudu
+        import glob
+        found = glob.glob(f"/tmp/sync_pull_{node}/*.tar.gz")
+        pkg_file = found[0] if found else None
+    if not pkg_file:
+        log.warning(f"{node}: paket bulunamadı")
+        return False
+
+    # Aç — çakışanları koru
+    import tarfile
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    try:
+        with tarfile.open(pkg_file, "r:gz") as tf:
+            for member in tf.getmembers():
+                if not member.isfile():
+                    continue
+                # Göreli yol — ./ önekini kaldır
+                name = member.name.lstrip("./")
+                if not name:
+                    continue
+                dest = os.path.join(target, name)
+                # Çakışma kontrolü: hedef var + farklı içerik
+                if os.path.exists(dest):
+                    src = tf.extractfile(member)
+                    if src:
+                        content = src.read()
+                        local_content = open(dest, "rb").read()
+                        if content != local_content:
+                            # Çakışma — yerel korunur
+                            conflict = f"{dest}.conflict.{ts}"
+                            log.warning(f"Çakışma: {name} → {conflict}")
+                            continue  # yereli koru, uzak yazılmaz
+                # Güvenli yaz
+                dest_dir = os.path.dirname(dest)
+                os.makedirs(dest_dir, exist_ok=True)
+                src = tf.extractfile(member)
+                if src:
+                    with open(dest, "wb") as f:
+                        f.write(src.read())
+        log.info(f"{node}: GDrive {latest} çekildi (çakışma korumalı)")
+        return True
+    except Exception as e:
+        log.error(f"{node}: paket açılamadı: {e}")
+        return False
+
+
+def verify_build(cfg):
+    """Kernel pull sonrası build doğrulama — Cumulus kritik."""
+    kernel_cfg = cfg["dirs"].get("kernel")
+    if not kernel_cfg:
+        return True
+    paths = kernel_cfg.get("paths") or [kernel_cfg.get("path", "")]
+    for p in paths:
+        pexp = os.path.expanduser(p)
+        if not os.path.isdir(pexp):
+            continue
+        # Makefile var mı?
+        if not os.path.exists(os.path.join(pexp, "Makefile")):
+            continue
+        log.info(f"Build doğrulama: {pexp}")
+        out, rc = run_cmd(f'cd "{pexp}" && make clean && make 2>&1 | tail -3',
+                          timeout=300)
+        if rc != 0:
+            log.error(f"Build BAŞARISIZ: {pexp}")
+            return False
+        log.info(f"Build PASS: {pexp}")
+        break  # İlk geçerli dizin yeterli
+    return True
+
+
 def cmd_pull(cfg):
     print(f"\n  🔄 PULL — {cfg['machine']}")
     remote = gh_fetch_manifest(cfg)
@@ -842,15 +998,32 @@ def cmd_pull(cfg):
         print(f"    ... +{len(to_pull)+len(conflicts)-15} daha")
 
     # Gerçek dosya transferi: kernel için git pull öner
-    if cfg["dirs"]["kernel"]["path"]:
+    kernel_cfg = cfg["dirs"].get("kernel", {})
+    kernel_paths = kernel_cfg.get("paths") or [kernel_cfg.get("path", "")]
+    if any(os.path.isdir(os.path.expanduser(p)) for p in kernel_paths):
         log.info("Kernel dosyaları için: git pull "
                  "(repo: yolgezerahmet/cumulusos)")
+
+    # GDrive'dan en son versiyonları çek (non-destructive)
+    log.info("GDrive versiyon çekme...")
+    pulled = 0
+    for label in cfg["dirs"]:
+        if cfg["dirs"][label].get("gdrive", False):
+            if gdrive_pull_latest(cfg, label):
+                pulled += 1
+    if pulled:
+        log.info(f"GDrive: {pulled} node güncellendi")
 
     # Manifest'e pull zamanı yaz
     mf = load_manifest(cfg)
     mf["last_pull"] = datetime.now().isoformat()
     mf["remote_known"] = remote.get("last_sync")
     save_manifest(cfg, mf)
+
+    # Kernel pull sonrası build doğrulama (Cumulus kritik)
+    if pulled or to_pull:
+        log.info("Build doğrulama...")
+        verify_build(cfg)
 
 
 def cmd_conflicts(cfg):
