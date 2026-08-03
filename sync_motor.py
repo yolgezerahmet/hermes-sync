@@ -469,8 +469,19 @@ def gh_fetch_manifest(cfg):
         url, headers={"Authorization": f"Bearer {token}",
                       "User-Agent": "sync-motor"})
     try:
-        with urllib.request.urlopen(req, timeout=20) as resp:
+        with urllib.request.urlopen(req, timeout=30) as resp:
             data = json.loads(resp.read().decode())
+        # Büyük manifest için content boş olabilir (GitHub 1MB API limiti)
+        # → download_url (raw) ile çek, auth gerekmez (private ise token)
+        dl_url = data.get("download_url")
+        if dl_url:
+            req2 = urllib.request.Request(
+                dl_url, headers={"Authorization": f"Bearer {token}",
+                                 "User-Agent": "sync-motor"})
+            with urllib.request.urlopen(req2, timeout=60) as resp2:
+                content = resp2.read().decode()
+            return json.loads(content)
+        # Fallback: content base64 (küçük manifest)
         content = base64.b64decode(data["content"]).decode()
         return json.loads(content)
     except urllib.error.HTTPError as e:
