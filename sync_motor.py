@@ -52,7 +52,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-__version__ = "1.3.0"
+__version__ = "1.4.0"
 __author__ = "CumulusNET Engineering"
 __license__ = "MIT"
 
@@ -746,9 +746,10 @@ def list_conflicts(cfg):
 # KOMUTLAR
 # ═══════════════════════════════════════════════════════════════
 
-def cmd_push(cfg, node=None):
+def cmd_push(cfg, node=None, dry_run=False):
     print(f"\n  🔄 PUSH — {cfg['machine']}"
-          + (f" [node: {node}]" if node else " [tüm node'lar]"))
+          + (f" [node: {node}]" if node else " [tüm node'lar]")
+          + (" [DRY-RUN]" if dry_run else ""))
     if node and node not in cfg["dirs"]:
         log.error(f"Bilinmeyen node: {node} — mevcut: {list(cfg['dirs'].keys())}")
         return
@@ -758,6 +759,19 @@ def cmd_push(cfg, node=None):
         new, changed, deleted, local = detect_changes_node(cfg, node)
     else:
         new, changed, deleted, local = detect_changes(cfg)
+
+    # DRY-RUN: ne yapılacağını göster, hiçbir şeye dokunma (v1.4)
+    if dry_run:
+        print(f"  DRY-RUN: {len(new)} yeni, {len(changed)} değişen, "
+              f"{len(deleted)} silinen push edilecek")
+        for f in (new + changed)[:10]:
+            print(f"    + {f}")
+        if len(new) + len(changed) > 10:
+            print(f"    ... ve {len(new)+len(changed)-10} dosya daha")
+        for f in deleted[:10]:
+            print(f"    - {f}")
+        print("  DRY-RUN: manifest, GitHub ve GDrive'a HİÇBİR ŞEY yazılmadı")
+        return
 
     # AKILLI GATE: kernel node'da kod değiştiyse önce build doğrula
     affected_kernel = (node in (None, "kernel")) and bool(new or changed)
@@ -1213,6 +1227,65 @@ def cmd_conflicts(cfg):
           f"otomatik çözüm: incele ve manuel birleştir")
 
 
+def cmd_doctor(cfg):
+    """Ortam sağlık kontrolü: bağımlılıklar + yapılandırma + bağlantılar (v1.4)."""
+    import shutil
+    ok = True
+    print("\n  🩺 DOCTOR — Ortam Sağlık Kontrolü\n")
+
+    # 1. Bağımlılıklar
+    for tool in ("rclone", "git", "gh", "python3"):
+        found = shutil.which(tool) is not None
+        print(f"  {'✅' if found else '❌'} {tool}: {'mevcut' if found else 'YOK'}")
+        if tool in ("rclone", "git") and not found:
+            ok = False
+
+    # 2. Yapılandırma — node dizinleri
+    dirs = cfg.get("dirs", {})
+    print(f"\n  📁 Node'lar ({len(dirs)}):")
+    for name, d in dirs.items():
+        path = d.get("path", "")
+        paths = d.get("paths") or []
+        targets = ([path] if path else []) + list(paths)
+        if not targets:
+            print(f"  ❌ {name}: yol tanımsız")
+            ok = False
+            continue
+        for t in targets:
+            exists = os.path.isdir(os.path.expanduser(t))
+            print(f"  {'✅' if exists else '❌'} {name}: {t}")
+            if not exists:
+                ok = False
+
+    # 3. GDrive remote
+    out, rc = run_cmd("rclone listremotes", timeout=30, shell=True)
+    gdrive = "gdrive:" in (out or "")
+    print(f"\n  {'✅' if gdrive else '❌'} GDrive remote (rclone): "
+          f"{'tanımlı' if gdrive else 'YOK'}")
+    if not gdrive:
+        ok = False
+
+    # 4. GitHub repo erişimi
+    repo = cfg.get("github", {}).get("repo", "")
+    if repo:
+        if not repo.startswith(("http://", "https://", "git@")):
+            repo_url = f"https://github.com/{repo}.git"
+        else:
+            repo_url = repo
+        out2, rc2 = run_cmd(f"git ls-remote {repo_url} HEAD", timeout=30, shell=True)
+        print(f"  {'✅' if rc2 == 0 else '❌'} GitHub repo: {repo}")
+        if rc2 != 0:
+            ok = False
+        # gh auth durumu (private repo için)
+        gh_out, gh_rc = run_cmd("gh auth status", timeout=15, shell=True)
+        gh_ok = gh_rc == 0
+        print(f"  {'✅' if gh_ok else '⚠️'} gh auth: "
+              f"{'oturum açık' if gh_ok else 'yok — private repo için gerekli'}")
+
+    print(f"\n  SONUÇ: {'✅ SAĞLIKLI' if ok else '❌ SORUN VAR'}")
+    return 0 if ok else 1
+
+
 def cmd_init(cfg):
     print("\n  🚀 INIT — İlk Kurulum")
     if gh_available() and gh_ensure_repo(cfg):
@@ -1243,7 +1316,7 @@ def main(argv=None):
     parser.add_argument("komut", nargs="?", default="status",
                         choices=["status", "push", "pull", "both",
                                  "conflicts", "init", "select", "nodes",
-                                 "add-node", "share", "version"])
+                                 "add-node", "share", "doctor", "version"])
     parser.add_argument("hedef", nargs="?",
                         help="add-node: node adı | share: node adı")
     parser.add_argument("--config", default=None,
@@ -1262,6 +1335,8 @@ def main(argv=None):
                         help="share: hedef kullanıcı")
     parser.add_argument("-v", "--verbose", action="store_true",
                         help="debug log")
+    parser.add_argument("--dry-run", action="store_true",
+                        help="push/both: ne yapılacağını göster, HİÇBİR ŞEY yazma (v1.4)")
     parser.add_argument("--no-color", action="store_true",
                         help="renksiz çıktı")
     args = parser.parse_args(argv)
@@ -1285,12 +1360,15 @@ def main(argv=None):
     if args.komut == "status":
         cmd_status(cfg)
     elif args.komut == "push":
-        cmd_push(cfg, node=args.node)
+        cmd_push(cfg, node=args.node, dry_run=args.dry_run)
     elif args.komut == "pull":
         cmd_pull(cfg)
     elif args.komut == "both":
-        cmd_push(cfg, node=args.node)
-        cmd_pull(cfg)
+        cmd_push(cfg, node=args.node, dry_run=args.dry_run)
+        if not args.dry_run:
+            cmd_pull(cfg)
+    elif args.komut == "doctor":
+        return cmd_doctor(cfg)
     elif args.komut == "conflicts":
         cmd_conflicts(cfg)
     elif args.komut == "init":

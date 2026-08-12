@@ -55,6 +55,12 @@ python3 sync_motor.py pull            # merkezden çek (çakışmasız)
 python3 sync_motor.py select          # interaktif node seçimi
 python3 sync_motor.py nodes           # node listesi + versiyonlar
 python3 sync_motor.py conflicts       # çakışmaları listele
+python3 sync_motor.py doctor          # ortam sağlığı (bağımlılık + bağlantı) — v1.4
+python3 sync_motor.py version         # sürüm
+
+# Güvenli önizleme (v1.4): ne yapılacağını göster, HİÇBİR ŞEY yazma
+python3 sync_motor.py push --dry-run
+python3 sync_motor.py both --dry-run
 
 # Sınırsız node ekleme:
 python3 sync_motor.py add-node proje-x --path ~/projeler/proje-x \
