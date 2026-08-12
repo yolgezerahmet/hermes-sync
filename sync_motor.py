@@ -1021,7 +1021,8 @@ def gdrive_pull_latest(cfg, node):
     pkg = f"/tmp/sync_pull_{node}.tar.gz"
     out, rc = run_cmd(
         f'rclone copy {cfg["gdrive"]["versioned_dir"]}/{node}/{latest}/ '
-        f'/tmp/sync_pull_{node}/ --ignore-checksum --no-traverse',
+        f'/tmp/sync_pull_{node}/ --ignore-checksum --no-traverse '
+        f'--drive-acknowledge-abuse',
         timeout=180, shell=True)
     if rc != 0:
         log.error(f"{node}: GDrive pull başarısız")
@@ -1054,7 +1055,11 @@ def gdrive_pull_latest(cfg, node):
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     try:
         with tarfile.open(pkg_file, "r:gz") as tf:
-            for member in tf.getmembers():
+            # SEKANSİYEL iterasyon: gzip akışı tek geçişte açılır.
+            # Eski kod getmembers() + rastgele extractfile() yapıyordu;
+            # gzip geriye seek desteklemediği için her üye baştan
+            # açılıyordu → 420MB/5000 dosyalık arşivde O(n²) → saatlerce %100 CPU.
+            for member in tf:
                 if not member.isfile():
                     continue
                 # Göreli yol — ./ önekini kaldır
@@ -1064,15 +1069,24 @@ def gdrive_pull_latest(cfg, node):
                 dest = os.path.join(target, name)
                 # Çakışma kontrolü: hedef var + farklı içerik
                 if os.path.exists(dest):
+                    # Önce BOYUT: farklıysa içerik okumaya gerek yok (hızlı yol)
+                    if os.path.getsize(dest) != member.size:
+                        conflict = f"{dest}.conflict.{ts}"
+                        shutil.copy2(dest, conflict)
+                        log.warning(f"Çakışma: {name} → {conflict}")
+                        continue  # yereli koru, uzak yazılmaz
                     src = tf.extractfile(member)
                     if src:
                         content = src.read()
                         local_content = open(dest, "rb").read()
-                        if content != local_content:
-                            # Çakışma — yerel korunur
-                            conflict = f"{dest}.conflict.{ts}"
-                            log.warning(f"Çakışma: {name} → {conflict}")
-                            continue  # yereli koru, uzak yazılmaz
+                        if content == local_content:
+                            # İçerik AYNI — yeniden yazmaya gerek yok (hızlı yol)
+                            continue
+                        # Çakışma — yerel korunur, kopya .conflict.TS ile saklanır
+                        conflict = f"{dest}.conflict.{ts}"
+                        shutil.copy2(dest, conflict)
+                        log.warning(f"Çakışma: {name} → {conflict}")
+                        continue  # yereli koru, uzak yazılmaz
                 # Güvenli yaz
                 dest_dir = os.path.dirname(dest)
                 os.makedirs(dest_dir, exist_ok=True)
