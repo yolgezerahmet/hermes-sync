@@ -20,40 +20,120 @@
   "machines": {
     "h1_hostnames": [],
     "h2_hostnames": [],
-    "openclaw_hostnames": ["openclaw"]
+    "openclaw_hostnames": [
+      "openclaw"
+    ]
   },
   "dirs": {
     "hermes": {
       "path": "~/.hermes",
-      "include": ["*.yaml", "*.yml", "*.json", "*.md", "*.py", "*.sh"],
-      "exclude_dirs": ["cache", "logs", "audio_cache", "state",
-                       "profiles", "models", "venv", "__pycache__",
-                       "kanban", "plugins", "agents", "backups",
-                       "sessions", "skills", "scripts"],
+      "include": [
+        "*.yaml",
+        "*.yml",
+        "*.json",
+        "*.md",
+        "*.py",
+        "*.sh"
+      ],
+      "exclude_dirs": [
+        "cache",
+        "logs",
+        "audio_cache",
+        "state",
+        "profiles",
+        "models",
+        "venv",
+        "__pycache__",
+        "kanban",
+        "plugins",
+        "agents",
+        "backups",
+        "sessions",
+        "skills",
+        "scripts"
+      ],
       "max_size_kb": 1024,
       "gdrive": true
     },
     "hermes-full": {
       "path": "~/.hermes",
-      "include": ["*.yaml", "*.yml", "*.json", "*.md", "*.py", "*.sh"],
-      "exclude_dirs": ["cache", "logs", "audio_cache", "models",
-                       "venv", "__pycache__", "state", "kanban"],
+      "include": [
+        "*.yaml",
+        "*.yml",
+        "*.json",
+        "*.md",
+        "*.py",
+        "*.sh"
+      ],
+      "exclude_dirs": [
+        "cache",
+        "logs",
+        "audio_cache",
+        "models",
+        "venv",
+        "__pycache__",
+        "state",
+        "kanban"
+      ],
       "max_size_kb": 2048,
       "gdrive": true
     },
     "openclaw": {
       "path": "~/.openclaw",
-      "include": ["*.md", "*.json", "*.yaml", "*.yml", "*.py"],
-      "exclude_dirs": ["cache", "logs", "sessions", "workspace",
-                       "skills", "scripts", "__pycache__", "models"],
+      "include": [
+        "*.md",
+        "*.json",
+        "*.yaml",
+        "*.yml",
+        "*.py"
+      ],
+      "exclude_dirs": [
+        "cache",
+        "logs",
+        "sessions",
+        "workspace",
+        "skills",
+        "scripts",
+        "__pycache__",
+        "models"
+      ],
       "max_size_kb": 1024,
       "gdrive": true
     },
     "proje": {
       "path": "~/projeler/ornek",
-      "include": ["*.c", "*.h", "*.md", "Makefile"],
-      "exclude_dirs": [".git", "build", "__pycache__"],
+      "include": [
+        "*.c",
+        "*.h",
+        "*.md",
+        "Makefile"
+      ],
+      "exclude_dirs": [
+        ".git",
+        "build",
+        "__pycache__"
+      ],
       "max_size_kb": 512,
+      "gdrive": true
+    },
+    "hermes-sessions": {
+      "path": "~/.hermes/agent-share/sessions",
+      "include": [
+        "*.md"
+      ],
+      "exclude_dirs": [],
+      "max_size_kb": 1024,
+      "gdrive": true
+    },
+    "hermes-profile": {
+      "path": "~/.hermes/agent-share/profile",
+      "include": [
+        "*.yaml",
+        "*.json",
+        "*.md"
+      ],
+      "exclude_dirs": [],
+      "max_size_kb": 1024,
       "gdrive": true
     }
   },
