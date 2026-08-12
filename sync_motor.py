@@ -52,7 +52,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-__version__ = "1.4.0"
+__version__ = "1.6.0"
 __author__ = "CumulusNET Engineering"
 __license__ = "MIT"
 
@@ -196,6 +196,74 @@ DEFAULT_CONFIG = {
                              "venv", "__pycache__", "state", "kanban"],
             "max_size_kb": 2048,
             "gdrive": True,
+        },
+    },
+    # AKILLI KURULUM KATALOĞU (v1.6):
+    # - check: araç varlık kontrolü (HERHANGİ BİRİ kuruluysa "kurulu" sayılır)
+    # - gpu: True ise GPU öncelikli — öneri listesinde öne alınır ve GPU'suz
+    #   makinelere kurulum ÖNERİLMEZ (kaynak kontrolü)
+    # - min_cpus/min_ram_gb/min_disk_gb: kurulum için asgari kaynak eşikleri
+    # - install: onay sonrası çalıştırılacak kurulum komutu (kendi config'inizden
+    #   gelir; kabuk operatörleri için string form kullanılır — run_cmd shell=True)
+    # Kurulum ASLA otomatik değildir: 'propose' öneri sunar, 'apply --yes' (veya
+    # interaktif onay) sonrası çalışır. Üzerine yazma YOKTUR (zaten kuruluysa RED).
+    "tools": {
+        "cuda-toolkit": {
+            "check": ["nvcc", "/usr/local/cuda/bin/nvcc"],
+            "gpu": True, "min_ram_gb": 8, "min_disk_gb": 25, "min_cpus": 4,
+            "desc": "NVIDIA CUDA toolkit — GPU hesaplama (vLLM/torch)",
+            "install": ("curl -fsSL https://developer.download.nvidia.com/compute/"
+                        "cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb "
+                        "-o /tmp/cuda-keyring.deb && sudo dpkg -i /tmp/cuda-keyring.deb "
+                        "&& sudo apt-get update && sudo apt-get -y install cuda-toolkit-12-8"),
+        },
+        "vllm": {
+            "check": ["vllm"],
+            "gpu": True, "min_ram_gb": 16, "min_disk_gb": 30, "min_cpus": 4,
+            "desc": "vLLM — yüksek verimli LLM serving (GPU zorunlu)",
+            "install": "pip install vllm",
+        },
+        "ollama": {
+            "check": ["ollama"],
+            "gpu": False, "min_ram_gb": 8, "min_disk_gb": 20, "min_cpus": 2,
+            "desc": "Ollama — yerel LLM runtime (CPU/GPU)",
+            "install": "curl -fsSL https://ollama.com/install.sh | sh",
+        },
+        "docker": {
+            "check": ["docker"],
+            "gpu": False, "min_ram_gb": 4, "min_disk_gb": 10, "min_cpus": 2,
+            "desc": "Docker — konteyner runtime (nRF SDK dahil)",
+            "install": "curl -fsSL https://get.docker.com | sh",
+        },
+        "zephyr-sdk": {
+            "check": ["west"],
+            "gpu": False, "min_ram_gb": 4, "min_disk_gb": 15, "min_cpus": 2,
+            "desc": "Zephyr/NCS build zinciri (west)",
+            "install": "pip install west",
+        },
+        "kicad-cli": {
+            "check": ["kicad-cli"],
+            "gpu": False, "min_ram_gb": 2, "min_disk_gb": 3, "min_cpus": 2,
+            "desc": "KiCad komut satırı — PCB DRC/ERC/üretim",
+            "install": "sudo apt-get -y install kicad",
+        },
+        "arm-none-eabi-gcc": {
+            "check": ["arm-none-eabi-gcc"],
+            "gpu": False, "min_ram_gb": 1, "min_disk_gb": 1, "min_cpus": 1,
+            "desc": "ARM gömülü derleyici (Cortex-M)",
+            "install": "sudo apt-get -y install gcc-arm-none-eabi",
+        },
+        "qemu-system-arm": {
+            "check": ["qemu-system-arm"],
+            "gpu": False, "min_ram_gb": 1, "min_disk_gb": 1, "min_cpus": 1,
+            "desc": "QEMU ARM emülasyonu",
+            "install": "sudo apt-get -y install qemu-system-arm",
+        },
+        "ns3": {
+            "check": ["ns3"],
+            "gpu": False, "min_ram_gb": 2, "min_disk_gb": 2, "min_cpus": 2,
+            "desc": "ns-3 ağ simülatörü",
+            "install": "sudo apt-get -y install ns3",
         },
     },
     "state": {
@@ -459,6 +527,156 @@ def run_cmd(cmd, timeout=60, shell=False):
         return "timeout", -1
     except Exception as e:
         return str(e), -1
+
+
+# ═══════════════════════════════════════════════════════════════
+# AKILLI KURULUM — KAYNAK FARKINDALIĞI (v1.6)
+# ═══════════════════════════════════════════════════════════════
+# Felsefe: eşitleme SIRASINDA hiçbir kurulum otomatik yapılmaz.
+# Kaynak node'da kurulu araçlar, hedef node için ÖNERİ olarak sunulur;
+# öneri CPU/GPU/RAM/disk kaynak kontrolünden geçer. Kullanıcı onayı
+# (apply --yes veya interaktif) sonrası kurulur. Üzerine yazma YOKTUR.
+
+def resource_probe():
+    """Yerel kaynakları ölç: CPU çekirdek, RAM (GB), disk boş (GB), GPU.
+
+    GPU tespiti: nvidia-smi → lspci (VGA/3D/Display sınıfı) → vulkaninfo.
+    Hiçbiri yoksa gpu=False. Ölçülemeyen değer 0 döner (fail-closed:
+    'bilinmiyor' yerine 'yetersiz' kabul edilir → kurulum önerilmez).
+    """
+    res = {
+        "cpus": os.cpu_count() or 0,
+        "ram_gb": 0.0,
+        "disk_gb": 0.0,
+        "gpu": False,       # genel GPU (lspci/vulkan dahil)
+        "nvidia": False,    # NVIDIA GPU (nvidia-smi doğrulanmış — CUDA için şart)
+        "gpu_name": None,
+    }
+    # RAM — Linux /proc/meminfo; macOS sysctl; Windows GlobalMemoryStatusEx
+    try:
+        if os.path.exists("/proc/meminfo"):
+            with open("/proc/meminfo") as f:
+                for line in f:
+                    if line.startswith("MemTotal:"):
+                        res["ram_gb"] = round(int(line.split()[1]) / 1024 / 1024, 1)
+                        break
+        elif os.name == "posix":
+            out, rc = run_cmd("sysctl -n hw.memsize", timeout=5)
+            if rc == 0 and out.isdigit():
+                res["ram_gb"] = round(int(out) / 1e9, 1)
+        elif os.name == "nt":
+            import ctypes
+            class _MS(ctypes.Structure):
+                _fields_ = [("dwLength", ctypes.c_ulong),
+                            ("dwMemoryLoad", ctypes.c_ulong),
+                            ("ullTotalPhys", ctypes.c_ulonglong),
+                            ("ullAvailPhys", ctypes.c_ulonglong),
+                            ("ullTotalPageFile", ctypes.c_ulonglong),
+                            ("ullAvailPageFile", ctypes.c_ulonglong),
+                            ("ullTotalVirtual", ctypes.c_ulonglong),
+                            ("ullAvailVirtual", ctypes.c_ulonglong),
+                            ("ullAvailExtendedVirtual", ctypes.c_ulonglong)]
+            ms = _MS()
+            ms.dwLength = ctypes.sizeof(_MS)
+            ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(ms))
+            res["ram_gb"] = round(ms.ullTotalPhys / 1e9, 1)
+    except Exception:
+        pass
+    # Disk — kullanıcı ev dizininin birimi (bulunamazsa kök)
+    try:
+        res["disk_gb"] = round(shutil.disk_usage(
+            os.path.expanduser("~")).free / 1e9, 1)
+    except Exception:
+        try:
+            res["disk_gb"] = round(shutil.disk_usage("/").free / 1e9, 1)
+        except Exception:
+            pass
+    # GPU
+    try:
+        out, rc = run_cmd(
+            "nvidia-smi --query-gpu=name --format=csv,noheader", timeout=10)
+        if rc == 0 and out:
+            res["gpu"] = True
+            res["nvidia"] = True
+            res["gpu_name"] = out.splitlines()[0].strip()[:60]
+        else:
+            out2, rc2 = run_cmd(
+                "lspci 2>/dev/null | grep -iE 'vga|3d|display'",
+                timeout=10, shell=True)
+            if rc2 == 0 and out2:
+                res["gpu"] = True
+                res["gpu_name"] = out2.splitlines()[0].strip()[:60]
+            else:
+                out3, rc3 = run_cmd("vulkaninfo --summary", timeout=10)
+                if rc3 == 0 and out3:
+                    res["gpu"] = True
+                    res["gpu_name"] = "vulkan"
+    except Exception:
+        pass
+    return res
+
+
+def tool_installed(tool_cfg):
+    """Araç kurulu mu? check listesindeki HERHANGİ BİRİ bulunursa 'kurulu'."""
+    checks = tool_cfg.get("check") or []
+    if not checks:
+        return False
+    for c in checks:
+        if shutil.which(c):
+            return True
+    return False
+
+
+def scan_tools(cfg):
+    """Config'teki tools kataloğunu tara → {ad: kurulum durumu}."""
+    tools = cfg.get("tools", {})
+    state = {}
+    for name, t in tools.items():
+        state[name] = {
+            "installed": tool_installed(t),
+            "gpu": bool(t.get("gpu", False)),
+            "min_ram_gb": t.get("min_ram_gb", 0),
+            "min_disk_gb": t.get("min_disk_gb", 0),
+            "min_cpus": t.get("min_cpus", 1),
+        }
+    return state
+
+
+def propose_install(tool_name, tool_cfg, local_res, local_tools, remote_tools):
+    """Uzak node'da kurulu bir aracı bu makineye kurmayı değerlendir.
+
+    Dönüş: (durum, mesaj)
+      ALREADY            — zaten kurulu (kurma — üzerine asla yazma)
+      NOT_ON_SOURCE      — kaynak node'da kurulu değil (öneri yok)
+      GPU_MISSING        — GPU gerekli, bu makinede GPU yok
+      DISK_INSUFFICIENT  — boş disk min_disk_gb'dan az
+      RAM_INSUFFICIENT   — RAM min_ram_gb'dan az
+      CPU_INSUFFICIENT   — çekirdek sayısı min_cpus'tan az
+      INSTALLABLE        — kaynaklar yeterli, kurulabilir (öneri)
+    """
+    local_inst = bool(local_tools.get(tool_name, {}).get("installed", False))
+    if local_inst:
+        return "ALREADY", "zaten kurulu"
+    remote_inst = bool(remote_tools.get(tool_name, {}).get("installed", False))
+    if not remote_inst:
+        return "NOT_ON_SOURCE", "kaynak node'da kurulu değil"
+
+    if tool_cfg.get("gpu") and not local_res.get("nvidia"):
+        return "GPU_MISSING", "NVIDIA GPU gerekli — bu makinede CUDA uyumlu GPU yok"
+    min_disk = float(tool_cfg.get("min_disk_gb", 0) or 0)
+    free_disk = float(local_res.get("disk_gb", 0) or 0)
+    if free_disk < min_disk:
+        return ("DISK_INSUFFICIENT",
+                f"boş disk {free_disk:.1f}GB < {min_disk:.0f}GB gerekli")
+    min_ram = float(tool_cfg.get("min_ram_gb", 0) or 0)
+    ram = float(local_res.get("ram_gb", 0) or 0)
+    if ram < min_ram:
+        return "RAM_INSUFFICIENT", f"RAM {ram:.1f}GB < {min_ram:.0f}GB gerekli"
+    min_cpus = int(tool_cfg.get("min_cpus", 1) or 1)
+    cpus = int(local_res.get("cpus", 0) or 0)
+    if cpus < min_cpus:
+        return "CPU_INSUFFICIENT", f"CPU {cpus} < {min_cpus} gerekli"
+    return "INSTALLABLE", "kurulabilir"
 
 
 def gh_ensure_repo(cfg):
@@ -811,6 +1029,13 @@ def cmd_push(cfg, node=None, dry_run=False):
         mf["files"] = local
         mf["last_sync"] = datetime.now().isoformat()
         mf["machine"] = cfg["machine"]
+
+    # AKILLI (v1.6): push sırasında kaynak + araç durumunu manifest'e ekle.
+    # Karşı node 'pull' + 'propose' ile bunları okur; kurulum önerisi
+    # CPU/GPU/RAM/disk kontrolünden geçirilir. Kurulum ASLA otomatik değil.
+    mf["resources"] = resource_probe()
+    mf["tools_state"] = scan_tools(cfg)
+    mf["probe_time"] = datetime.now().isoformat()
     save_manifest(cfg, mf)
 
     if gh_available():
@@ -1227,6 +1452,156 @@ def cmd_conflicts(cfg):
           f"otomatik çözüm: incele ve manuel birleştir")
 
 
+def cmd_probe(cfg):
+    """Yerel kaynakları ve kurulu araçları ölç; manifest'e yaz (push ile paylaşılır)."""
+    res = resource_probe()
+    tools = scan_tools(cfg)
+    mf = load_manifest(cfg)
+    mf["resources"] = res
+    mf["tools_state"] = tools
+    mf["probe_time"] = datetime.now().isoformat()
+    save_manifest(cfg, mf)
+
+    print("\n  🧭 PROBE — Yerel Kaynaklar ve Araçlar\n")
+    gpu_line = str(res["gpu_name"]) if res["gpu"] else "YOK"
+    print(f"  CPU : {res['cpus']} çekirdek")
+    print(f"  RAM : {res['ram_gb']:.1f} GB")
+    print(f"  DISK: {res['disk_gb']:.1f} GB boş")
+    nvidia_tag = " | NVIDIA VAR" if res.get("nvidia") else " | NVIDIA YOK"
+    print(f"  GPU : {gpu_line}{nvidia_tag}")
+    print("\n  Kurulu araçlar (katalog):")
+    for name, t in sorted(tools.items()):
+        mark = "✅" if t["installed"] else "⬜"
+        gpu_tag = " [GPU]" if t["gpu"] else ""
+        print(f"    {mark} {name}{gpu_tag}")
+    print("\n  Manifest'e yazıldı — 'push' ile karşı node'a gider.")
+    return 0
+
+
+def cmd_propose(cfg):
+    """Karşı node'un kurulu araçlarını KAYNAK KONTROLLÜ öneri olarak sun.
+
+    GPU öncelikli: GPU gerektiren araçlar listede öne alınır; GPU'suz
+    makinede GPU zorunlu araçlar 'kaynak engelli' bölümüne düşer.
+    Kurulum burada HİÇBİR ŞEY yapmaz — sadece öneri listesi basar.
+    """
+    mf = load_manifest(cfg)
+    remote_tools = mf.get("tools_state", {})
+    remote_res = mf.get("resources", {})
+    if not remote_tools:
+        print("\n  💡 ÖNERİ — uzak node manifest'inde araç durumu YOK.\n"
+              "  Karşı node'da önce 'probe' + 'push', sonra burada 'pull' "
+              "çalıştırın.")
+        return 0
+    local_res = resource_probe()
+    local_tools = scan_tools(cfg)
+
+    print("\n  💡 ÖNERİ — Kaynak Kontrollü Kurulum Önerileri\n")
+    print(f"  Bu makine : CPU {local_res['cpus']} | RAM {local_res['ram_gb']:.1f}GB "
+          f"| DISK {local_res['disk_gb']:.1f}GB | "
+          f"GPU {'VAR' if local_res['gpu'] else 'YOK'}")
+    print(f"  Kaynak node: CPU {remote_res.get('cpus','?')} | "
+          f"RAM {remote_res.get('ram_gb','?')}GB | "
+          f"GPU {'VAR' if remote_res.get('gpu') else 'YOK'}")
+
+    results = []
+    for name, t in cfg.get("tools", {}).items():
+        status, msg = propose_install(name, t, local_res, local_tools,
+                                      remote_tools)
+        if status in ("ALREADY", "NOT_ON_SOURCE"):
+            continue
+        results.append((name, status, msg, bool(t.get("gpu"))))
+
+    # GPU öncelikli sıralama: INSTALLABLE önce (GPU olanlar içinde ilk),
+    # sonra kaynak engelliler; aynı grup içinde GPU olanlar öne gelir.
+    pri = {"INSTALLABLE": 0, "GPU_MISSING": 1, "DISK_INSUFFICIENT": 2,
+           "RAM_INSUFFICIENT": 3, "CPU_INSUFFICIENT": 4}
+    results.sort(key=lambda r: (pri.get(r[1], 5), 0 if r[3] else 1, r[0]))
+
+    installable = [r for r in results if r[1] == "INSTALLABLE"]
+    blocked = [r for r in results if r[1] != "INSTALLABLE"]
+
+    print("\n  ✅ KURULABİLİR (kaynaklar yeterli):")
+    if not installable:
+        print("    (yok — karşı node'da kurulu ekstra araç bulunmuyor)")
+    for name, status, msg, gpu in installable:
+        tag = " [GPU-ÖNCELİKLİ]" if gpu else ""
+        print(f"    ▶ {name}{tag}")
+        print(f"      {cfg['tools'][name].get('desc','-')}")
+        print(f"      kur: {cfg['tools'][name].get('install','(tanımsız)')}")
+    print("\n  ⚠️  KAYNAK ENGELLİ (bu makinede önerilmez — neden):")
+    if not blocked:
+        print("    (yok)")
+    reason = {"GPU_MISSING": "GPU yok", "DISK_INSUFFICIENT": "disk yetmez",
+              "RAM_INSUFFICIENT": "RAM yetmez",
+              "CPU_INSUFFICIENT": "CPU yetmez"}
+    for name, status, msg, gpu in blocked:
+        print(f"    ⛔ {name} [{reason.get(status, status)}]: {msg}")
+    print("\n  Kurmak için: sync_motor.py apply --tool <ad> [--yes]")
+    return 0
+
+
+def cmd_apply(cfg, tool_name, yes=False):
+    """Önerilen bir aracı KULLANICI ONAYI SONRASI kur. Non-destructive.
+
+    Kurallar:
+      - zaten kuruluysa RED (üzerine asla yazma)
+      - kaynak yetersizse RED (GPU yok / disk / RAM / CPU)
+      - --yes yoksa interaktif onay istenir; onay yoksa HİÇBİR ŞEY çalışmaz
+      - kurulum komutu config'ten gelir (kullanıcının kendi kataloğu)
+    """
+    tools = cfg.get("tools", {})
+    if tool_name not in tools:
+        print(f"\n  ❌ Bilinmeyen araç: {tool_name} — katalog: {list(tools)}")
+        return 1
+    t = tools[tool_name]
+
+    # 1) Zaten kurulu mu? → RED (non-destructive garantisi)
+    if tool_installed(t):
+        print(f"\n  ⛔ {tool_name} ZATEN KURULU — kurulum reddedildi "
+              "(üzerine yazılmaz).")
+        return 1
+
+    # 2) Kaynak kontrolü — uzak durum gerekmez: bu makine yeterli mi?
+    res = resource_probe()
+    local_tools = scan_tools(cfg)
+    fake_remote = {tool_name: {"installed": True}}
+    status, msg = propose_install(tool_name, t, res, local_tools, fake_remote)
+    if status in ("GPU_MISSING", "DISK_INSUFFICIENT", "RAM_INSUFFICIENT",
+                  "CPU_INSUFFICIENT"):
+        print(f"\n  ⛔ {tool_name} kurulamaz — {msg}")
+        return 1
+
+    # 3) Komutu göster, onay al
+    inst = t.get("install", "")
+    print(f"\n  🔧 KURULUM: {tool_name}")
+    print(f"    açıklama   : {t.get('desc','-')}")
+    print(f"    gereksinim : {t.get('min_ram_gb',0)}GB RAM | "
+          f"{t.get('min_disk_gb',0)}GB disk | "
+          f"CPU {t.get('min_cpus',1)}+ | "
+          f"GPU={'gerekli' if t.get('gpu') else 'gerekmez'}")
+    print(f"    komut      : {inst}")
+    if not inst:
+        print("  ❌ install komutu tanımsız — kurulum yapılamaz.")
+        return 1
+    if not yes:
+        try:
+            ans = input("  Onaylıyor musunuz? [e/Evet / h/Hayır] ").strip().lower()
+        except EOFError:
+            ans = ""
+        if ans not in ("e", "evet", "y", "yes"):
+            print("  Kurulum İPTAL — hiçbir şey değiştirilmedi (non-destructive).")
+            return 1
+    print("  Kurulum başlıyor...")
+    out, rc = run_cmd(inst, timeout=600, shell=True)
+    if rc != 0:
+        print(f"  ❌ Kurulum BAŞARISIZ (rc={rc}):\n    {str(out)[-400:]}")
+        return 1
+    print(f"  ✅ {tool_name} kuruldu.\n    {str(out)[-200:]}")
+    cmd_probe(cfg)   # durumu tazele (manifest'e yazar)
+    return 0
+
+
 def cmd_doctor(cfg):
     """Ortam sağlık kontrolü: bağımlılıklar + yapılandırma + bağlantılar (v1.4)."""
     import shutil
@@ -1316,7 +1691,8 @@ def main(argv=None):
     parser.add_argument("komut", nargs="?", default="status",
                         choices=["status", "push", "pull", "both",
                                  "conflicts", "init", "select", "nodes",
-                                 "add-node", "share", "doctor", "version"])
+                                 "add-node", "share", "doctor", "version",
+                                 "probe", "propose", "apply"])
     parser.add_argument("hedef", nargs="?",
                         help="add-node: node adı | share: node adı")
     parser.add_argument("--config", default=None,
@@ -1337,6 +1713,10 @@ def main(argv=None):
                         help="debug log")
     parser.add_argument("--dry-run", action="store_true",
                         help="push/both: ne yapılacağını göster, HİÇBİR ŞEY yazma (v1.4)")
+    parser.add_argument("--tool", default=None,
+                        help="apply: kurulacak araç adı (katalogdan)")
+    parser.add_argument("--yes", action="store_true",
+                        help="apply: onay sormadan kur (varsayılan: interaktif onay)")
     parser.add_argument("--no-color", action="store_true",
                         help="renksiz çıktı")
     args = parser.parse_args(argv)
@@ -1369,6 +1749,15 @@ def main(argv=None):
             cmd_pull(cfg)
     elif args.komut == "doctor":
         return cmd_doctor(cfg)
+    elif args.komut == "probe":
+        return cmd_probe(cfg)
+    elif args.komut == "propose":
+        return cmd_propose(cfg)
+    elif args.komut == "apply":
+        if not args.tool:
+            print("Kullanım: sync_motor.py apply --tool <ad> [--yes]")
+            return 1
+        return cmd_apply(cfg, args.tool, yes=args.yes)
     elif args.komut == "conflicts":
         cmd_conflicts(cfg)
     elif args.komut == "init":

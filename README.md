@@ -68,7 +68,40 @@ python3 sync_motor.py add-node proje-x --path ~/projeler/proje-x \
 
 # Node paylaşma (başka kullanıcıya):
 python3 sync_motor.py share kernel --to arkadas
+
+# === AKILLI KURULUM — Kaynak Farkındalıklı Öneri (v1.6) ===
+# Felsefe: eşitleme SIRASINDA hiçbir kurulum otomatik yapılmaz.
+# CPU/GPU/RAM/disk kontrolünden geçen ÖNERİ sunulur, onay sonrası kurulur.
+
+python3 sync_motor.py probe                # yerel kaynaklar + kurulu araçlar
+                                           # (manifest'e yazar, push ile gider)
+python3 sync_motor.py push                 # kaynak + araç durumunu otomatik taşır
+python3 sync_motor.py propose              # karşı node'un kurulu araçları → öneri
+                                           # (GPU öncelikli; engel nedeniyle ayrım)
+python3 sync_motor.py apply --tool ollama  # interaktif onay ile kur
+python3 sync_motor.py apply --tool vllm --yes   # onaysız kur (yine de RED:
+                                           # zaten kuruluysa / kaynak yetmezse)
 ```
+
+## Akıllı Kurulum (v1.6)
+
+Eşitleme sırasında karşı node'da kurulu olan GPU/CPU yoğun araçları
+**otomatik kurmaz** — kaynak kontrolünden geçirilmiş **öneri** olarak sunar:
+
+1. `probe` → yerel CPU/RAM/disk/GPU ölçülür, kurulu araçlar katalogdan
+   taranır, manifest'e yazılır (push ile karşı node'a gider)
+2. `propose` → karşı node'da kurulu, sizde olmayan araçlar değerlendirilir:
+   - ✅ **KURULABİLİR** — kaynaklar yeterli (GPU araçlar öncelikli listelenir)
+   - ⛔ **KAYNAK ENGELLİ** — nedenle birlikte: `GPU yok` (NVIDIA/CUDA
+     gerekliyse), `disk yetmez`, `RAM yetmez`, `CPU yetmez`
+3. `apply --tool <ad>` → kurulum komutu gösterilir, **interaktif onay**
+   alınır (veya `--yes`); onay yoksa HİÇBİR ŞEY çalışmaz
+
+**Non-destructive garantileri:** zaten kuruluysa RED; kaynak yetersizse RED;
+kurulum asla mevcut dosyanın üzerine yazmaz. Araç kataloğu `config.json`
+içindeki `tools` bölümünden gelir — her araç için `check` (varlık komutu),
+`gpu` (NVIDIA/CUDA zorunlu mu), `min_ram_gb`/`min_disk_gb`/`min_cpus`
+(eşikler) ve `install` (onay sonrası çalışacak komut) tanımlanır.
 
 ## Node Yapılandırması
 

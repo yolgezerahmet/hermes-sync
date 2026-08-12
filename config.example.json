@@ -137,6 +137,89 @@
       "gdrive": true
     }
   },
+  "tools": {
+    "cuda-toolkit": {
+      "check": ["nvcc", "/usr/local/cuda/bin/nvcc"],
+      "gpu": true,
+      "min_ram_gb": 8,
+      "min_disk_gb": 25,
+      "min_cpus": 4,
+      "desc": "NVIDIA CUDA toolkit — GPU hesaplama (vLLM/torch)",
+      "install": "curl -fsSL https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb -o /tmp/cuda-keyring.deb && sudo dpkg -i /tmp/cuda-keyring.deb && sudo apt-get update && sudo apt-get -y install cuda-toolkit-12-8"
+    },
+    "vllm": {
+      "check": ["vllm"],
+      "gpu": true,
+      "min_ram_gb": 16,
+      "min_disk_gb": 30,
+      "min_cpus": 4,
+      "desc": "vLLM — yüksek verimli LLM serving (GPU zorunlu)",
+      "install": "pip install vllm"
+    },
+    "ollama": {
+      "check": ["ollama"],
+      "gpu": false,
+      "min_ram_gb": 8,
+      "min_disk_gb": 20,
+      "min_cpus": 2,
+      "desc": "Ollama — yerel LLM runtime (CPU/GPU)",
+      "install": "curl -fsSL https://ollama.com/install.sh | sh"
+    },
+    "docker": {
+      "check": ["docker"],
+      "gpu": false,
+      "min_ram_gb": 4,
+      "min_disk_gb": 10,
+      "min_cpus": 2,
+      "desc": "Docker — konteyner runtime (nRF SDK dahil)",
+      "install": "curl -fsSL https://get.docker.com | sh"
+    },
+    "zephyr-sdk": {
+      "check": ["west"],
+      "gpu": false,
+      "min_ram_gb": 4,
+      "min_disk_gb": 15,
+      "min_cpus": 2,
+      "desc": "Zephyr/NCS build zinciri (west)",
+      "install": "pip install west"
+    },
+    "kicad-cli": {
+      "check": ["kicad-cli"],
+      "gpu": false,
+      "min_ram_gb": 2,
+      "min_disk_gb": 3,
+      "min_cpus": 2,
+      "desc": "KiCad komut satırı — PCB DRC/ERC/üretim",
+      "install": "sudo apt-get -y install kicad"
+    },
+    "arm-none-eabi-gcc": {
+      "check": ["arm-none-eabi-gcc"],
+      "gpu": false,
+      "min_ram_gb": 1,
+      "min_disk_gb": 1,
+      "min_cpus": 1,
+      "desc": "ARM gömülü derleyici (Cortex-M)",
+      "install": "sudo apt-get -y install gcc-arm-none-eabi"
+    },
+    "qemu-system-arm": {
+      "check": ["qemu-system-arm"],
+      "gpu": false,
+      "min_ram_gb": 1,
+      "min_disk_gb": 1,
+      "min_cpus": 1,
+      "desc": "QEMU ARM emülasyonu",
+      "install": "sudo apt-get -y install qemu-system-arm"
+    },
+    "ns3": {
+      "check": ["ns3"],
+      "gpu": false,
+      "min_ram_gb": 2,
+      "min_disk_gb": 2,
+      "min_cpus": 2,
+      "desc": "ns-3 ağ simülatörü",
+      "install": "sudo apt-get -y install ns3"
+    }
+  },
   "state": {
     "manifest_local": "~/.hermes/state/sync_motor_manifest.json",
     "logfile": "~/.hermes/state/sync_motor.log"
