@@ -1,5 +1,39 @@
 # CHANGELOG — Cumulus Sync Motoru / Hermes Sync
 
+## [1.6.0] — 2026-08-13
+
+### Eklenen — AKILLI KURULUM (Kaynak Farkındalıklı Öneri)
+- `probe` komutu: yerel CPU/RAM/disk/GPU kaynaklarını ölçer (nvidia-smi →
+  lspci → vulkaninfo), tools kataloğunu tarar, manifest'e `resources` +
+  `tools_state` yazar → push ile karşı node'a gider
+- `propose` komutu: karşı node'da kurulu araçları KAYNAK KONTROLLÜ öneri
+  listesine çevirir. GPU öncelikli sıralama; NVIDIA GPU'suz makinede CUDA
+  zorunlu araçlar engelliye düşer; disk/RAM/CPU eşikleri denetlenir
+  (DISK_INSUFFICIENT / RAM_INSUFFICIENT / CPU_INSUFFICIENT / GPU_MISSING)
+- `apply --tool <ad> [--yes]` komutu: onay sonrası kurulum. Non-destructive
+  garantileri: zaten kuruluysa RED (üzerine asla yazma), kaynak yetersizse
+  RED, `--yes` yoksa interaktif onay (reddedilirse HİÇBİR ŞEY çalışmaz)
+- Config `tools` kataloğu: check/gpu/min_ram_gb/min_disk_gb/min_cpus/install
+  alanları (cuda-toolkit, vllm, ollama, docker, zephyr-sdk, kicad-cli,
+  arm-none-eabi-gcc, qemu-system-arm, ns3)
+- `push` artık kaynak + araç durumunu manifest'e otomatik ekler (eşitleme
+  sırasında akıllılık; kurulum asla otomatik değildir)
+
+### Düzeltilen
+- GPU tespiti iki katmanlı: genel GPU (lspci/vulkan) ayrı, NVIDIA/CUDA
+  (nvidia-smi) ayrı — virtio/VGA gibi CUDA uyumsuz GPU'lar CUDA araçlarını
+  önerilmez yapar (fail-closed)
+
+## [1.5.0] — 2026-08-12
+
+### Eklenen — Hermes Agent Eşitleri
+- `hermes-sessions` node: bir ajanın oturum bilgisi (PROJECT_STATE + kapanış
+  özeti, `scripts/hermes_session_digest.py`) eşlere paylaşılır — diğer ajan
+  çekip öğrenir
+- `hermes-profile` node: config + cron + plugin manifest (SECRETS hariç)
+- `validate_skills.py`: skill aktarım kapısı — SKILL.md varlığı + frontmatter +
+  references bütünlüğü (kicad skill'inde 4 kırık referans yakaladı)
+
 ## [1.4.0] — 2026-08-13
 
 ### Eklenen
