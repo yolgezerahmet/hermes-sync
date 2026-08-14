@@ -87,8 +87,27 @@ def setup_logging(level=logging.INFO, logfile=None):
     root.setLevel(level)
     root.handlers.clear()
 
+    # GPT-5.6 P1 (15 Ağu): token/secret log redaction — çıktıya sızmasın
+    import re as _re
+    _SENSITIVE_PATTERNS = [_re.compile(r"ghp_[A-Za-z0-9_]{30,}"),
+                           _re.compile(r"github_pat_[A-Za-z0-9_]{20,}"),
+                           _re.compile(r"(?i)(token|secret|password)=\S+")]
+
+    class RedactFilter(logging.Filter):
+        def filter(self, record):
+            try:
+                msg = record.getMessage()
+                for pat in _SENSITIVE_PATTERNS:
+                    msg = pat.sub("[REDACTED]", msg)
+                record.msg = msg
+                record.args = ()
+            except Exception:
+                pass
+            return True
+
     console = logging.StreamHandler(sys.stdout)
     console.setFormatter(ColoredFormatter("%(levelname)-8s %(message)s"))
+    console.addFilter(RedactFilter())
     root.addHandler(console)
 
     if logfile:
@@ -96,6 +115,7 @@ def setup_logging(level=logging.INFO, logfile=None):
         fh = logging.FileHandler(logfile, encoding="utf-8")
         fh.setFormatter(logging.Formatter(
             "%(asctime)s [%(levelname)s] %(message)s"))
+        fh.addFilter(RedactFilter())
         root.addHandler(fh)
 
     return root
@@ -393,10 +413,31 @@ def scan_directory(label, dir_cfg):
     # GÜVENLİK: hassas dizin adları — yol bileşeninden reddedilir
     SECRET_DIRS = ("secrets", "credentials", "service-account",
                    ".aws", ".ssh", "private", "keys", "tokens")
+    # GPT-5.6 P0 (15 Ağu): İÇERİK taraması — dosya adı filtresi yetmez;
+    # riskli adaylarda token/anahtar pattern'leri taranır (≤64KB, performans)
+    CONTENT_SCAN_NAMES = ("config.json", "settings.yaml", "settings.yml",
+                          "tokens.db", "rclone.conf", "backup.tar",
+                          "credentials.txt", "secrets.txt", "token.db")
+    CONTENT_PATTERNS = (b"BEGIN PRIVATE KEY", b"BEGIN OPENSSH PRIVATE KEY",
+                        b"ghp_", b"github_pat_", b"AKIA[0-9A-Z]{16}",
+                        b"xox[baprs]-", b"sk-[A-Za-z0-9]{20,}",
+                        b"-----BEGIN")
 
     def is_secret(fname):
         import fnmatch
         return any(fnmatch.fnmatch(fname, p) for p in SECRET_PATTERNS)
+
+    def content_scan(fpath, fname):
+        """Yalnızca riskli aday isimlerinde içerik taraması (performans korunur)."""
+        base_name = os.path.basename(fname).lower()
+        if base_name not in CONTENT_SCAN_NAMES:
+            return False
+        try:
+            with open(fpath, "rb") as f:
+                head = f.read(65536)
+            return any(p in head for p in CONTENT_PATTERNS)
+        except OSError:
+            return False
 
     inventory = {}
     for base in paths:
@@ -410,11 +451,11 @@ def scan_directory(label, dir_cfg):
                        if not should_exclude_dir(d, exclude_dirs)
                        and d.lower() not in SECRET_DIRS]
             for fname in files:
-                # GÜVENLİK: secret dosyaları atla
-                if is_secret(fname):
-                    log.debug(f"Güvenlik: {fname} atlandı")
-                    continue
                 fpath = os.path.join(root, fname)
+                # GÜVENLİK: secret dosyaları atla (ad + İÇERİK taraması)
+                if is_secret(fname) or content_scan(fpath, fname):
+                    log.debug(f"Güvenlik: {fname} atlandı (ad veya içerik)")
+                    continue
                 try:
                     stat = os.stat(fpath)
                 except OSError:
@@ -472,6 +513,11 @@ def load_manifest(cfg):
 
 
 def save_manifest(cfg, mf):
+    # GPT-5.6 P1 (15 Ağu): manifest meta — rollback/replay koruması başlangıcı
+    mf.setdefault("schema", 2)
+    mf["machine_id"] = detect_machine()
+    mf["created_at"] = datetime.now().isoformat()
+    mf["generation"] = int(mf.get("generation", 0)) + 1
     path = cfg["state"]["manifest_local"]
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     tmp = path + ".tmp"
@@ -1291,7 +1337,25 @@ def gdrive_pull_latest(cfg, node):
 
     # Aç — çakışanları koru
     import tarfile
-    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")  # µs — aynı isim çakışmaz
+    src_machine = detect_machine()
+
+    def _safe_target(root, name):
+        """GPT-5.6 P0: tar member path'i node kökünden kaçamaz."""
+        root_abs = os.path.abspath(root)
+        candidate = os.path.abspath(os.path.join(root_abs, name))
+        if candidate != root_abs and not candidate.startswith(root_abs + os.sep):
+            raise ValueError(f"güvenlik: path kök dışına kaçıyor: {name}")
+        return candidate
+
+    def _write_conflict(dest, src_machine):
+        """Atomik çakışma kopyası — yarım dosya yazılmaz."""
+        conflict = f"{dest}.conflict.{ts}.{src_machine}"
+        tmp = conflict + ".tmp"
+        shutil.copy2(dest, tmp)
+        os.replace(tmp, conflict)
+        return conflict
+
     try:
         with tarfile.open(pkg_file, "r:gz") as tf:
             # SEKANSİYEL iterasyon: gzip akışı tek geçişte açılır.
@@ -1305,13 +1369,12 @@ def gdrive_pull_latest(cfg, node):
                 name = member.name.lstrip("./")
                 if not name:
                     continue
-                dest = os.path.join(target, name)
+                dest = _safe_target(target, name)
                 # Çakışma kontrolü: hedef var + farklı içerik
                 if os.path.exists(dest):
                     # Önce BOYUT: farklıysa içerik okumaya gerek yok (hızlı yol)
                     if os.path.getsize(dest) != member.size:
-                        conflict = f"{dest}.conflict.{ts}"
-                        shutil.copy2(dest, conflict)
+                        conflict = _write_conflict(dest, src_machine)
                         log.warning(f"Çakışma: {name} → {conflict}")
                         continue  # yereli koru, uzak yazılmaz
                     src = tf.extractfile(member)
@@ -1322,8 +1385,7 @@ def gdrive_pull_latest(cfg, node):
                             # İçerik AYNI — yeniden yazmaya gerek yok (hızlı yol)
                             continue
                         # Çakışma — yerel korunur, kopya .conflict.TS ile saklanır
-                        conflict = f"{dest}.conflict.{ts}"
-                        shutil.copy2(dest, conflict)
+                        conflict = _write_conflict(dest, src_machine)
                         log.warning(f"Çakışma: {name} → {conflict}")
                         continue  # yereli koru, uzak yazılmaz
                 # Güvenli yaz
