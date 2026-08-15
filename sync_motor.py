@@ -41,7 +41,14 @@ Geliştiren: CumulusNET Mühendislik — 2026
 """
 
 import argparse
-import fcntl
+try:
+    import fcntl
+except ImportError:      # Windows (H2): fcntl yok → msvcrt ile lock
+    fcntl = None
+    try:
+        import msvcrt
+    except ImportError:
+        msvcrt = None
 import hashlib
 import json
 import logging
@@ -55,7 +62,7 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 
-__version__ = "1.6.4"
+__version__ = "1.6.5"
 __author__ = "CumulusNET Engineering"
 __license__ = "MIT"
 
@@ -1881,7 +1888,8 @@ MUTATING_CMDS = {"push", "pull", "both", "backup", "rollback",
 def acquire_lock():
     """Aynı anda yalnız bir sync işlemi GDrive/GitHub'a yazsın.
 
-    fcntl.flock(LOCK_EX|LOCK_NB): ikinci koşu anında RED alır (beklemez).
+    Linux: fcntl.flock(LOCK_EX|LOCK_NB) — ikinci koşu anında RED.
+    Windows: msvcrt.locking — dosyanın ilk baytını kilitler.
     Dönüş: fd (kilit sahibi) veya None (başka sync aktif).
     """
     try:
@@ -1889,7 +1897,21 @@ def acquire_lock():
     except OSError:
         return None
     try:
-        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        if fcntl is not None:
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        elif msvcrt is not None:
+            fd.seek(0)
+            fd.write("\0")
+            fd.flush()
+            msvcrt.locking(fd.fileno(), msvcrt.LK_NBLCK, 1)
+            fd.seek(0)
+        else:
+            # kilit desteği yok — yalnızca pid dosyası (en iyi çaba)
+            if os.path.exists(MOTOR_LOCK) and os.path.getsize(MOTOR_LOCK) > 0:
+                pid = open(MOTOR_LOCK).read().split()[0]
+                if pid.isdigit() and os.path.exists(f"/proc/{pid}"):
+                    return None
+        fd.seek(0, 2)
         fd.write(f"{os.getpid()} {datetime.now().isoformat()}\n")
         fd.flush()
         return fd

@@ -12,6 +12,7 @@ import json, os, subprocess, sys, urllib.parse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 MOTOR = "/root/cumulus-sync-motor/sync_motor.py"
+COORD = "/root/cumulus-sync-motor/sync_coordinator.py"
 HUB = os.environ.get("SYNC_WEB_HUB", "gdrive:cumulusos-backups/versiyonlu")
 
 def _sh(cmd, timeout=120):
@@ -76,13 +77,21 @@ def api_status():
     cf = conflicts()
     lr = last_run_summary()
     data = {"nodes": [], "conflicts": len(cf), "conflict_files": cf[:10],
-            "son_kosu": lr}
+            "son_kosu": lr, "machines": []}
     for n in nodes:
         vs = _ver_cache.get(n, [])   # cache-only — /api/versions tazeler (hız)
         data["nodes"].append({
             "node": n, "last_push": lp.get(n, None),
             "versions": len(vs), "latest": vs[-1] if vs else None,
         })
+    # çoklu makine durumu — sync_coordinator çıktısı (hızlı, 60s cache)
+    ok, out, _ = _sh(["python3", COORD, "status", "--json"], timeout=90)
+    if ok:
+        try:
+            c = json.loads(out)
+            data["machines"] = c.get("machines", [])
+        except Exception:
+            pass
     rec = []
     if cf:
         rec.append(f"ÇÖZ: {len(cf)} çakışma — sync_motor.py conflicts ile incele")
