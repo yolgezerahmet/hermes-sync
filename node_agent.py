@@ -151,10 +151,23 @@ def tempfile_dir() -> str:
     return tempfile.mkdtemp(prefix="nodeagent_")
 
 # ── Eylemler ──────────────────────────────────────────────────
+def motor_version() -> str:
+    """sync_motor.py sürümü — eski sürümler --skip-unchanged/backup bilmez."""
+    try:
+        rc, out, err = run([sys.executable, str(MOTOR), "version"], timeout=60)
+        if rc == 0 and "v" in out:
+            return out.strip().split("v")[-1]
+    except Exception:
+        pass
+    return "0.0"
+
 def run_sync() -> tuple:
-    """Eşitle: both --skip-unchanged (H2 kapalıysa push yine yapılır)."""
-    print("  🔄 EŞİTLE: sync_motor both --skip-unchanged")
-    rc, out, err = motor("both", "--skip-unchanged", timeout=1200)
+    """Eşitle: both (--skip-unchanged yalnız v1.6.2+; eski sürümler desteklemez)."""
+    ver = motor_version()
+    use_delta = _ver_tuple(ver) >= (1, 6, 2)
+    args = ["both", "--skip-unchanged"] if use_delta else ["both"]
+    print(f"  🔄 EŞİTLE: sync_motor {' '.join(args)}  (motor v{ver})")
+    rc, out, err = motor(*args, timeout=1200)
     if rc == 0:
         print("  ✅ eşitleme tamam")
     else:
@@ -162,8 +175,18 @@ def run_sync() -> tuple:
         print(f"    çıktı son: {out.strip()[-300:]}")
     return rc, out, err
 
+def _ver_tuple(v: str) -> tuple:
+    try:
+        parts = v.split(".")
+        return tuple(int(p) for p in parts[:3])
+    except Exception:
+        return (0, 0, 0)
+
 def run_backup() -> tuple:
-    """Yedekle: GDrive versiyonlu (timestamp, silinmez)."""
+    """Yedekle: GDrive versiyonlu (yalnız v1.6.3+; eski sürümde no-op)."""
+    if _ver_tuple(motor_version()) < (1, 6, 3):
+        print("  💾 YEDEK: motor eski (no-op — GDrive snapshot both içinde)")
+        return 0, "", "backup yalnız v1.6.3+ — no-op"
     print("  💾 YEDEK: sync_motor backup")
     rc, out, err = motor("backup", timeout=1800)
     if rc == 0:

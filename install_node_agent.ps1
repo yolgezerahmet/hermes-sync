@@ -13,8 +13,10 @@
 # Geliştiren: CumulusNET Mühendislik — 2026
 
 $ErrorActionPreference = "Stop"
-$SyncDir = "$env:USERPROFILE\cumulus-sync-motor"
-$HermesDir = "$env:USERPROFILE\.hermes"
+# NOT (H2 geri bildirimi, 15 Ağu): kullanıcı klasörü `hahmet` DEĞİL — `yolge`.
+# Windows'ta gerçek kullanıcı profilini otomatik almak için $env:USERPROFILE kullanılır.
+$SyncDir = Join-Path $env:USERPROFILE "cumulus-sync-motor"
+$HermesDir = Join-Path $env:USERPROFILE ".hermes"
 $ScriptsDir = Join-Path $SyncDir "scripts"
 $TaskName = "CumulusNodeAgent"
 
