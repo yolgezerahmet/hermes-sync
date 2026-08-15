@@ -1960,7 +1960,8 @@ def cmd_backup(cfg, node=None, hub=None, dry_run=False):
             if dry_run:
                 print(f"    [DRY] {n}: {os.path.basename(tarp)} ({os.path.getsize(tarp)//1024}KB) sha={sha[:12]}")
                 continue
-            r = subprocess.run(["rclone", "copyto", tarp, f"{hub}/{n}/",
+            r = subprocess.run(["rclone", "copyto", tarp,
+                                f"{hub}/{n}/{os.path.basename(tarp)}",
                                 "--ignore-checksum", "--no-traverse"],
                                capture_output=True, text=True)
             if r.returncode == 0:
