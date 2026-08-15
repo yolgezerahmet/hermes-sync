@@ -41,6 +41,7 @@ Geliştiren: CumulusNET Mühendislik — 2026
 """
 
 import argparse
+import fcntl
 import hashlib
 import json
 import logging
@@ -54,7 +55,7 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 
-__version__ = "1.6.3"
+__version__ = "1.6.4"
 __author__ = "CumulusNET Engineering"
 __license__ = "MIT"
 
@@ -1822,6 +1823,7 @@ def cmd_agent_status(cfg):
         "conflict_files": conflicts[:10],
         "nodes": list(cfg["dirs"].keys()),
         "tracked_push": list(fp_nodes.keys()),
+        "son_kosu": last_run_summary(),
     }
     # sağlık: çakışma / son push bilgisi / çözüm önerisi
     rec = []
@@ -1831,8 +1833,31 @@ def cmd_agent_status(cfg):
         rec.append("PUSH: henüz push yok — 'sync_motor.py both' çalıştır (GDrive hub karşılıklı)")
     else:
         rec.append("OK: push takibi aktif")
+    lr = status["son_kosu"]
+    if lr and lr.get("rc", 0) != 0:
+        rec.append(f"SON KOŞU HATALI: {lr.get('komut')} rc={lr.get('rc')} @ {lr.get('ts','?')[:19]}")
     status["recommendation"] = " | ".join(rec) if rec else "OK — eylem gerekmiyor"
     print(_j.dumps(status, ensure_ascii=False, indent=2))
+
+
+def last_run_summary():
+    """~/.hermes/state/sync_last_run.json'dan son mutating koşu özeti."""
+    try:
+        if not os.path.exists(RUN_STATE):
+            return None
+        hist = json.load(open(RUN_STATE)).get("history", [])
+        if not hist:
+            return None
+        last = hist[-1]
+        return {
+            "ts": last.get("ts"),
+            "komut": last.get("komut"),
+            "rc": last.get("rc"),
+            "node": last.get("node"),
+            "machine": last.get("machine"),
+        }
+    except Exception:
+        return None
 
 
 # ── v1.6.3: GDrive VERSİYON TAKİPLİ YEDEK + LİSTE + GERİ ALMA ──
@@ -1841,6 +1866,63 @@ GDRIVE_VERS = "gdrive:cumulusos-backups/versiyonlu"
 
 def _hub_base(args_hub=None):
     return args_hub or GDRIVE_VERS
+
+
+# ── v1.6.4: TEK-INSTANCE KİLİT + SON-KOŞU RAPORU ──
+
+MOTOR_LOCK = "/tmp/cumulus_sync.lock"
+RUN_STATE = os.path.expanduser("~/.hermes/state/sync_last_run.json")
+
+# Bu komutlar GDrive/GitHub'a YAZAR → kilit zorunlu. Okuma komutları
+# (status/conflicts/versions/agent-status/nodes/doctor) kilitsiz çalışır.
+MUTATING_CMDS = {"push", "pull", "both", "backup", "rollback",
+                 "init", "add-node", "share", "apply"}
+
+def acquire_lock():
+    """Aynı anda yalnız bir sync işlemi GDrive/GitHub'a yazsın.
+
+    fcntl.flock(LOCK_EX|LOCK_NB): ikinci koşu anında RED alır (beklemez).
+    Dönüş: fd (kilit sahibi) veya None (başka sync aktif).
+    """
+    try:
+        fd = open(MOTOR_LOCK, "w")
+    except OSError:
+        return None
+    try:
+        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        fd.write(f"{os.getpid()} {datetime.now().isoformat()}\n")
+        fd.flush()
+        return fd
+    except OSError:
+        try:
+            fd.close()
+        except Exception:
+            pass
+        return None
+
+def record_run(cfg, komut, rc, node=None, extra=None):
+    """Son koşu kaydı — web paneli/agent-status 'herhangi node üzerinden' okur."""
+    try:
+        hist = []
+        if os.path.exists(RUN_STATE):
+            try:
+                hist = json.load(open(RUN_STATE)).get("history", [])
+            except Exception:
+                hist = []
+        hist.append({
+            "ts": datetime.now().isoformat(),
+            "komut": komut,
+            "rc": rc,
+            "node": node,
+            "machine": cfg.get("machine"),
+            "extra": extra or {},
+        })
+        hist = hist[-50:]  # son 50 koşu
+        os.makedirs(os.path.dirname(RUN_STATE), exist_ok=True)
+        json.dump({"history": hist}, open(RUN_STATE, "w"),
+                  ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"  ⚠ son-koşu raporu yazılamadı: {e}")
 
 def _tar_node(cfg, node, outdir, ts):
     """Node'u tar.gz yap (gizli hariç) → (tar_path, sha)."""
@@ -1991,11 +2073,21 @@ def main(argv=None):
 
     cfg = load_config(args.config)
 
+    # ── v1.6.4: TEK-INSTANCE KİLİT — aynı anda iki sync aynı hub'a yazmasın
+    lock_fd = None
+    if args.komut in MUTATING_CMDS and not args.dry_run:
+        lock_fd = acquire_lock()
+        if lock_fd is None:
+            print("⛔ Başka bir sync işlemi çalışıyor — bu koşu ATLANDI "
+                  "(kilit aktif, /tmp/cumulus_sync.lock)", file=sys.stderr)
+            return 0   # cron no_agent: exit 0 = sessiz atla; sorun değil
+
     print(f"\n╔{'═'*58}╗")
     print(f"║  CUMULUS SYNC MOTOR v{__version__} — {cfg['machine']}"
           f"{' '*(34-len(cfg['machine']))}║")
     print(f"╚{'═'*58}╝")
 
+    rc = 0
     if args.komut == "status":
         cmd_status(cfg)
     elif args.komut == "push":
@@ -2007,24 +2099,27 @@ def main(argv=None):
         if not args.dry_run:
             cmd_pull(cfg)
     elif args.komut == "doctor":
-        return cmd_doctor(cfg)
+        rc = cmd_doctor(cfg)
     elif args.komut == "probe":
-        return cmd_probe(cfg)
+        rc = cmd_probe(cfg)
     elif args.komut == "propose":
-        return cmd_propose(cfg)
+        rc = cmd_propose(cfg)
     elif args.komut == "apply":
         if not args.tool:
             print("Kullanım: sync_motor.py apply --tool <ad> [--yes]")
-            return 1
-        return cmd_apply(cfg, args.tool, yes=args.yes)
+            rc = 1
+        else:
+            rc = cmd_apply(cfg, args.tool, yes=args.yes)
     elif args.komut == "conflicts":
         cmd_conflicts(cfg)
+    elif args.komut == "agent-status":
+        cmd_agent_status(cfg)
     elif args.komut == "backup":
-        return cmd_backup(cfg, node=args.node, hub=args.hub, dry_run=args.dry_run)
+        rc = cmd_backup(cfg, node=args.node, hub=args.hub, dry_run=args.dry_run)
     elif args.komut == "versions":
-        return cmd_versions(cfg, node=args.node, hub=args.hub)
+        rc = cmd_versions(cfg, node=args.node, hub=args.hub)
     elif args.komut == "rollback":
-        return cmd_rollback(cfg, args.node, args.version, hub=args.hub, force=args.force)
+        rc = cmd_rollback(cfg, args.node, args.version, hub=args.hub, force=args.force)
     elif args.komut == "init":
         cmd_init(cfg)
     elif args.komut == "nodes":
@@ -2036,16 +2131,27 @@ def main(argv=None):
         if not node_name or not args.path:
             print("Kullanım: sync_motor.py add-node <ad> --path <dizin> "
                   "[--include '*.md,*.txt'] [--max-kb 1024]")
-            return 1
-        cmd_add_node(cfg, node_name, args.path, args.include, args.max_kb)
+            rc = 1
+        else:
+            cmd_add_node(cfg, node_name, args.path, args.include, args.max_kb)
     elif args.komut == "share":
         node_name = args.hedef or args.node
         if not node_name or not args.to:
             print("Kullanım: sync_motor.py share <node> --to <kullanıcı>")
-            return 1
-        cmd_share(cfg, node_name, args.to)
+            rc = 1
+        else:
+            cmd_share(cfg, node_name, args.to)
 
-    return 0
+    # ── v1.6.4: son-koşu kaydı (mutating koşular + agent-status okuyucuları)
+    if args.komut in MUTATING_CMDS and not args.dry_run:
+        record_run(cfg, args.komut, rc, node=args.node)
+        if lock_fd is not None:
+            try:
+                lock_fd.close()
+            except Exception:
+                pass
+
+    return rc
 
 
 if __name__ == "__main__":

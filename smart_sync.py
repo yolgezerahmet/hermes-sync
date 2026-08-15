@@ -10,8 +10,28 @@ Güvenlik: .env/*.key/pem hariç; .git hariç; per-node versiyonlu; retention.
 Verim: manifest delta (sadece değişen node paketlenir).
 """
 
-import argparse, hashlib, json, os, shutil, subprocess, sys, tarfile, tempfile, time
+import argparse, fcntl, hashlib, json, os, shutil, subprocess, sys, tarfile, tempfile, time
 from pathlib import Path
+
+# sync_motor.py ile AYNI lock — iki motor aynı anda aynı GDrive hub'a yazamasın
+MOTOR_LOCK = "/tmp/cumulus_sync.lock"
+
+def acquire_lock():
+    try:
+        fd = open(MOTOR_LOCK, "w")
+    except OSError:
+        return None
+    try:
+        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        fd.write(f"smart_sync {os.getpid()} {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
+        fd.flush()
+        return fd
+    except OSError:
+        try:
+            fd.close()
+        except Exception:
+            pass
+        return None
 
 DEFAULT_NODES = {
     "kernel":    "/root/.config/superpowers/worktrees/cumulusos/canonical-full-product-gates",
@@ -140,6 +160,14 @@ def main():
 
     if args.action == "nodes":
         print("node'lar:", ", ".join(DEFAULT_NODES)); return
+
+    # TEK-INSTANCE KİLİT — sync_motor ile aynı lock; eşzamanlı yazma yasak
+    if args.action in ("push", "both") and not args.dry_run:
+        lock_fd = acquire_lock()
+        if lock_fd is None:
+            print("⛔ Başka bir sync işlemi çalışıyor (sync_motor/smart_sync) — "
+                  "bu koşu ATLANDI", file=sys.stderr)
+            return
 
     ts = time.strftime("%Y%m%d_%H%M%S")
     nodes = [args.node] if args.node else list(DEFAULT_NODES)

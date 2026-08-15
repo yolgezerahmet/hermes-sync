@@ -60,20 +60,37 @@ def versions(node):
         return []
     return sorted([f for f in out.splitlines() if f.endswith(".tar.gz")])
 
+def last_run_summary():
+    try:
+        p = "/root/.hermes/state/sync_last_run.json"
+        if not os.path.exists(p):
+            return None
+        hist = json.load(open(p)).get("history", [])
+        return hist[-1] if hist else None
+    except Exception:
+        return None
+
 def api_status():
     nodes = node_list()
     lp = last_push_map()
     cf = conflicts()
-    data = {"nodes": [], "conflicts": len(cf), "conflict_files": cf[:10]}
+    lr = last_run_summary()
+    data = {"nodes": [], "conflicts": len(cf), "conflict_files": cf[:10],
+            "son_kosu": lr}
     for n in nodes:
         vs = _ver_cache.get(n, [])   # cache-only — /api/versions tazeler (hız)
         data["nodes"].append({
             "node": n, "last_push": lp.get(n, None),
             "versions": len(vs), "latest": vs[-1] if vs else None,
         })
-    data["recommendation"] = (
-        f"ÇÖZ: {len(cf)} çakışma — sync_motor.py conflicts ile incele"
-        if cf else "OK — eylem gerekmiyor")
+    rec = []
+    if cf:
+        rec.append(f"ÇÖZ: {len(cf)} çakışma — sync_motor.py conflicts ile incele")
+    if lr and lr.get("rc", 0) != 0:
+        rec.append(f"SON KOŞU HATALI: {lr.get('komut')} rc={lr.get('rc')} @ {(lr.get('ts') or '?')[:19]}")
+    if not rec:
+        rec.append("OK — eylem gerekmiyor")
+    data["recommendation"] = " | ".join(rec)
     return data
 
 def html_page(status):
