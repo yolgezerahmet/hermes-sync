@@ -49,10 +49,12 @@ import shutil
 import subprocess
 import sys
 import time
+import tarfile
+import tempfile
 from datetime import datetime
 from pathlib import Path
 
-__version__ = "1.6.2"
+__version__ = "1.6.3"
 __author__ = "CumulusNET Engineering"
 __license__ = "MIT"
 
@@ -1832,6 +1834,106 @@ def cmd_agent_status(cfg):
     status["recommendation"] = " | ".join(rec) if rec else "OK — eylem gerekmiyor"
     print(_j.dumps(status, ensure_ascii=False, indent=2))
 
+
+# ── v1.6.3: GDrive VERSİYON TAKİPLİ YEDEK + LİSTE + GERİ ALMA ──
+
+GDRIVE_VERS = "gdrive:cumulusos-backups/versiyonlu"
+
+def _hub_base(args_hub=None):
+    return args_hub or GDRIVE_VERS
+
+def _tar_node(cfg, node, outdir, ts):
+    """Node'u tar.gz yap (gizli hariç) → (tar_path, sha)."""
+    import hashlib
+    src = cfg["dirs"][node]
+    base = src["path"] if isinstance(src, dict) else src
+    if not os.path.exists(base):
+        return None, None
+    tarp = os.path.join(outdir, f"{node}_{ts}.tar.gz")
+    with tarfile.open(tarp, "w:gz") as tar:
+        for root, dirs, files in os.walk(base):
+            dirs[:] = [d for d in dirs if d != ".git"]
+            for f in files:
+                if any(sec in f for sec in (".env", ".key", ".pem")):
+                    continue
+                p = os.path.join(root, f)
+                tar.add(p, arcname=os.path.relpath(p, os.path.dirname(base)))
+    h = hashlib.sha256()
+    with open(tarp, "rb") as f:
+        for chunk in iter(lambda: f.read(65536), b""):
+            h.update(chunk)
+    return tarp, h.hexdigest()
+
+def cmd_backup(cfg, node=None, hub=None, dry_run=False):
+    """GDrive versiyon takipli yedek (timestamp snapshot; silmez)."""
+    hub = _hub_base(hub)
+    print(f"\n  💾 GDRIVE VERSİYON YEDEK — {hub}")
+    nodes = [node] if node else list(cfg["dirs"].keys())
+    tmp = tempfile.mkdtemp(prefix="syncver_")
+    try:
+        for n in nodes:
+            tarp, sha = _tar_node(cfg, n, tmp, time.strftime("%Y%m%d_%H%M%S"))
+            if not tarp:
+                print(f"    ⚠ {n}: kaynak yok — atlandı"); continue
+            if dry_run:
+                print(f"    [DRY] {n}: {os.path.basename(tarp)} ({os.path.getsize(tarp)//1024}KB) sha={sha[:12]}")
+                continue
+            r = subprocess.run(["rclone", "copyto", tarp, f"{hub}/{n}/",
+                                "--ignore-checksum", "--no-traverse"],
+                               capture_output=True, text=True)
+            if r.returncode == 0:
+                print(f"    ✅ {n}: {os.path.basename(tarp)} sha={sha[:12]}")
+            else:
+                print(f"    ❌ {n}: {r.stderr.strip()[:120]}")
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+def cmd_versions(cfg, node=None, hub=None):
+    """GDrive'da node'un versiyonlarını listele."""
+    hub = _hub_base(hub)
+    nodes = [node] if node else list(cfg["dirs"].keys())
+    for n in nodes:
+        r = subprocess.run(["rclone", "lsf", f"{hub}/{n}", "--files-only"],
+                           capture_output=True, text=True)
+        vers = [f for f in r.stdout.splitlines() if f.endswith(".tar.gz")]
+        print(f"\n  📦 {n}: {len(vers)} versiyon")
+        for v in vers[-8:]:
+            print(f"    {v}")
+
+def cmd_rollback(cfg, node, version, hub=None, force=False):
+    """Belirli versiyonu non-destructive geri al (.conflict korur; --force ez)."""
+    if not node or not version:
+        print("Kullanım: sync_motor.py rollback <node> --version <dosya.tar.gz> [--force]")
+        return 1
+    hub = _hub_base(hub)
+    dst = cfg["dirs"][node]
+    base = dst["path"] if isinstance(dst, dict) else dst
+    tmp = tempfile.mkdtemp(prefix="syncrb_")
+    try:
+        tarp = os.path.join(tmp, version)
+        r = subprocess.run(["rclone", "copyto", f"{hub}/{node}/{version}", tarp],
+                           capture_output=True, text=True)
+        if r.returncode != 0:
+            print(f"    ❌ indirme hatası: {r.stderr.strip()[:120]}")
+            return 1
+        with tarfile.open(tarp, "r:gz") as tar:
+            for m in tar.getmembers():
+                dstp = os.path.join(base, m.name)
+                if m.isfile() and os.path.exists(dstp) and not force:
+                    # farklıysa .conflict koru, değilse atla
+                    srcp = os.path.join(tmp, m.name)
+                    tar.extract(m, path=tmp, filter="data")
+                    if open(dstp, "rb").read() != open(srcp, "rb").read():
+                        c = f"{dstp}.conflict.{int(time.time())}"
+                        shutil.copy(srcp, c)
+                        print(f"    ! çakışma korundu: {os.path.basename(c)}")
+                else:
+                    tar.extract(m, path=base, filter="data")
+        print(f"    ✅ {node} ← {version} geri alındı (force={force})")
+        return 0
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
 def main(argv=None):
     parser = argparse.ArgumentParser(
         prog="sync_motor",
@@ -1841,7 +1943,7 @@ def main(argv=None):
                         choices=["status", "push", "pull", "both",
                                  "conflicts", "init", "select", "nodes",
                                  "add-node", "share", "doctor", "version",
-                                 "probe", "propose", "apply", "agent-status"])
+                                 "probe", "propose", "apply", "agent-status", "backup", "versions", "rollback"])
     parser.add_argument("hedef", nargs="?",
                         help="add-node: node adı | share: node adı")
     parser.add_argument("--config", default=None,
@@ -1870,6 +1972,12 @@ def main(argv=None):
                         help="renksiz çıktı")
     parser.add_argument("--skip-unchanged", action="store_true",
                         help="push/both: içerik değişmediyse node'u atla (delta, v1.6.2)")
+    parser.add_argument("--hub", default=None,
+                        help="backup/versions/rollback: GDrive versiyon dizini (varsayılan gdrive:cumulusos-backups/versiyonlu)")
+    parser.add_argument("--version", default=None,
+                        help="rollback: geri alınacak versiyon dosyası (ör: kernel_20260815_120000.tar.gz)")
+    parser.add_argument("--force", action="store_true",
+                        help="rollback: çakışma dosyası oluşturmadan üzerine yaz")
     args = parser.parse_args(argv)
 
     if args.komut == "version":
@@ -1911,6 +2019,12 @@ def main(argv=None):
         return cmd_apply(cfg, args.tool, yes=args.yes)
     elif args.komut == "conflicts":
         cmd_conflicts(cfg)
+    elif args.komut == "backup":
+        return cmd_backup(cfg, node=args.node, hub=args.hub, dry_run=args.dry_run)
+    elif args.komut == "versions":
+        return cmd_versions(cfg, node=args.node, hub=args.hub)
+    elif args.komut == "rollback":
+        return cmd_rollback(cfg, args.node, args.version, hub=args.hub, force=args.force)
     elif args.komut == "init":
         cmd_init(cfg)
     elif args.komut == "nodes":
