@@ -84,8 +84,8 @@ def api_status():
             "node": n, "last_push": lp.get(n, None),
             "versions": len(vs), "latest": vs[-1] if vs else None,
         })
-    # çoklu makine durumu — sync_coordinator çıktısı (hızlı, 60s cache)
-    ok, out, _ = _sh(["python3", COORD, "status", "--json"], timeout=90)
+    # çoklu makine durumu — sync_coordinator çıktısı (hızlı, 8s cap)
+    ok, out, _ = _sh(["python3", COORD, "status", "--json"], timeout=8)
     if ok:
         try:
             c = json.loads(out)
