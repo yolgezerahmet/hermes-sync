@@ -56,7 +56,7 @@ python3 sync_motor.py select          # interaktif node seçimi
 python3 sync_motor.py nodes           # node listesi + versiyonlar
 python3 sync_motor.py conflicts       # çakışmaları listele
 python3 sync_motor.py doctor          # ortam sağlığı (bağımlılık + bağlantı) — v1.4
-python3 sync_motor.py version         # sürüm
+python3 sync_motor.py version         # sürüm (1.6.1)
 
 # Güvenli önizleme (v1.4): ne yapılacağını göster, HİÇBİR ŞEY yazma
 python3 sync_motor.py push --dry-run
@@ -179,3 +179,7 @@ MIT — bkz. [LICENSE](LICENSE)
 2. Feature branch açın
 3. Test: `python3 -m unittest discover tests`
 4. PR gönderin
+
+## Akıllı Aktarım (v1.6.1)
+`python3 smart_sync.py both --hub gdrive:cumulusos-backups/smart --machine <h1|h2>`
+GDrive hub üzerinden KARŞILIKLI aktif iş/veri transferi (non-destructive .conflict merge). Detay: smart_sync.py docstring.

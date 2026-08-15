@@ -52,7 +52,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-__version__ = "1.6.0"
+__version__ = "1.6.1"
 __author__ = "CumulusNET Engineering"
 __license__ = "MIT"
 
