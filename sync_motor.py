@@ -52,7 +52,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-__version__ = "1.6.1"
+__version__ = "1.6.2"
 __author__ = "CumulusNET Engineering"
 __license__ = "MIT"
 
@@ -1010,13 +1010,20 @@ def list_conflicts(cfg):
 # KOMUTLAR
 # ═══════════════════════════════════════════════════════════════
 
-def cmd_push(cfg, node=None, dry_run=False):
+def cmd_push(cfg, node=None, dry_run=False, skip_unchanged=False):
     print(f"\n  🔄 PUSH — {cfg['machine']}"
           + (f" [node: {node}]" if node else " [tüm node'lar]")
           + (" [DRY-RUN]" if dry_run else ""))
     if node and node not in cfg["dirs"]:
         log.error(f"Bilinmeyen node: {node} — mevcut: {list(cfg['dirs'].keys())}")
         return
+    _skip_guard_done = False
+    if skip_unchanged:
+        fp = node_fingerprint(cfg, node)
+        last = load_last_push(cfg).get(node)
+        if last == fp:
+            print(f"    ⏭ skip (değişiklik yok): {node}")
+            return
 
     if node:
         # Tek node: sadece o dizini tara
@@ -1122,6 +1129,12 @@ def detect_changes_node(cfg, node):
         if path not in local:
             deleted.append(path)
     return new, changed, deleted, local
+
+
+    # v1.6.2: delta push — başarılı push sonrası parmak izini kaydet
+    if node and not dry_run:
+        save_last_push(cfg, node, node_fingerprint(cfg, node))
+    return 0
 
 
 def cmd_add_node(cfg, name, path, include="*", max_kb=1024):
@@ -1745,6 +1758,80 @@ def cmd_init(cfg):
 # ANA
 # ═══════════════════════════════════════════════════════════════
 
+
+def node_fingerprint(cfg, node):
+    """İçerik parmak izi: (relpath, boyut, mtime) özeti — delta push için."""
+    import hashlib
+    base = cfg["dirs"][node]["path"] if isinstance(cfg["dirs"][node], dict) else cfg["dirs"][node]
+    h = hashlib.sha256()
+    items = []
+    for root, dirs, files in os.walk(base):
+        dirs[:] = [d for d in dirs if d != ".git"]
+        for f in files:
+            if any(sec in f for sec in (".env", ".key", ".pem")):
+                continue
+            p = os.path.join(root, f)
+            try:
+                st = os.stat(p)
+                items.append((os.path.relpath(p, base), st.st_size, int(st.st_mtime)))
+            except OSError:
+                pass
+    items.sort()
+    for it in items:
+        h.update(str(it).encode())
+    return h.hexdigest()
+
+def _state_path(cfg):
+    return os.path.join(cfg["state"]["dir"], "last_push.json")
+
+def load_last_push(cfg):
+    try:
+        return json.load(open(_state_path(cfg)))
+    except Exception:
+        return {}
+
+def save_last_push(cfg, node, fp):
+    d = load_last_push(cfg)
+    d[node] = fp
+    os.makedirs(cfg["state"]["dir"], exist_ok=True)
+    json.dump(d, open(_state_path(cfg), "w"))
+
+def run_with_retry(fn, *a, retries=1, **kw):
+    """Geçici ağ hatalarında 1 retry — otonom dayanıklılık."""
+    for i in range(retries + 1):
+        try:
+            return fn(*a, **kw)
+        except Exception as e:
+            if i < retries and "Errno" in str(e) or "timeout" in str(e).lower():
+                print(f"    ⏳ geçici hata ({e}) — retry {i+1}/{retries}")
+                time.sleep(5)
+            else:
+                raise
+
+def cmd_agent_status(cfg):
+    """Hermes agent/otonom cron için JSON durum + öneri."""
+    import json as _j
+    conflicts = list_conflicts(cfg)
+    fp_nodes = load_last_push(cfg)
+    status = {
+        "motor": f"sync_motor v{__version__}",
+        "machine": cfg["machine"],
+        "conflicts": len(conflicts),
+        "conflict_files": conflicts[:10],
+        "nodes": list(cfg["dirs"].keys()),
+        "tracked_push": list(fp_nodes.keys()),
+    }
+    # sağlık: çakışma / son push bilgisi / çözüm önerisi
+    rec = []
+    if conflicts:
+        rec.append(f"ÇÖZ: {len(conflicts)} çakışma dosyası — incele + manuel birleştir (.conflict.TS korunur)")
+    if not fp_nodes:
+        rec.append("PUSH: henüz push yok — 'sync_motor.py both' çalıştır (GDrive hub karşılıklı)")
+    else:
+        rec.append("OK: push takibi aktif")
+    status["recommendation"] = " | ".join(rec) if rec else "OK — eylem gerekmiyor"
+    print(_j.dumps(status, ensure_ascii=False, indent=2))
+
 def main(argv=None):
     parser = argparse.ArgumentParser(
         prog="sync_motor",
@@ -1754,7 +1841,7 @@ def main(argv=None):
                         choices=["status", "push", "pull", "both",
                                  "conflicts", "init", "select", "nodes",
                                  "add-node", "share", "doctor", "version",
-                                 "probe", "propose", "apply"])
+                                 "probe", "propose", "apply", "agent-status"])
     parser.add_argument("hedef", nargs="?",
                         help="add-node: node adı | share: node adı")
     parser.add_argument("--config", default=None,
@@ -1781,6 +1868,8 @@ def main(argv=None):
                         help="apply: onay sormadan kur (varsayılan: interaktif onay)")
     parser.add_argument("--no-color", action="store_true",
                         help="renksiz çıktı")
+    parser.add_argument("--skip-unchanged", action="store_true",
+                        help="push/both: içerik değişmediyse node'u atla (delta, v1.6.2)")
     args = parser.parse_args(argv)
 
     if args.komut == "version":
