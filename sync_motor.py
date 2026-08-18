@@ -1972,16 +1972,25 @@ def _tar_node(cfg, node, outdir, ts):
 def cmd_backup(cfg, node=None, hub=None, dry_run=False):
     """GDrive versiyon takipli yedek (timestamp snapshot; silmez).
 
-    18 Ağu 2026 FIX (disk %100 olayı — syncver_* 175GB birikimi):
+    18 Ağu 2026 FIX v2 (disk %100 olayı — syncver_* 175GB birikimi):
     - Her node tar'ı upload SONRASI hemen silinir (tmp'de birikmesin).
-    - Eski/stale syncver_* dizinleri koşu başında temizlenir (önceki
-      timeout/kill ile kalmış olanlar dahil).
-    Kök neden: tar+rclone 30dk aşınca süreç kill oluyor, eski finally
-    rmtree çalışmıyordu → her başarısız koşu ~10GB tar bırakıyordu.
+    - STALE TEMİZLİĞİ FONKSİYON BAŞINA TAŞINDI (v1'de finally'deydi — süreç
+      timeout/kill olunca çalışmıyordu; 18 Ağu 23:05'te 71GB yeni birikim
+      kanıtladı). Artık her koşu başında önceki kalıntılar temizlenir.
+    Kök neden: tar+rclone 30dk aşınca süreç kill oluyor, finally rmtree
+    çalışmıyor → her başarısız koşu ~10GB tar bırakıyor.
     """
     hub = _hub_base(hub)
     print(f"\n  💾 GDRIVE VERSİYON YEDEK — {hub}")
     nodes = [node] if node else list(cfg["dirs"].keys())
+    # v2 FIX: stale syncver_* dizinleri KOŞU BAŞINDA temizle (finally güvenilmez)
+    try:
+        for stale in glob.glob("/tmp/syncver_*"):
+            if os.path.isdir(stale):
+                shutil.rmtree(stale, ignore_errors=True)
+                print(f"    🧹 stale temizlendi (koşu başı): {os.path.basename(stale)}")
+    except Exception:
+        pass
     tmp = tempfile.mkdtemp(prefix="syncver_")
     try:
         for n in nodes:
