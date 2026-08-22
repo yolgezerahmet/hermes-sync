@@ -274,7 +274,7 @@ def doctor():
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="node_agent", description="Otonom eşitleme+yedekleme ajanı")
     ap.add_argument("komut", nargs="?", default="status",
-                    choices=["once", "status", "daemon", "hub-check", "doctor"])
+                    choices=["once", "status", "daemon", "hub-check", "doctor", "mesh"])
     ap.add_argument("--interval", type=int, default=5400, help="daemon: saniye (varsayılan 5400=90dk)")
     ap.add_argument("--no-sync", action="store_true", help="once: eşitleme atla")
     ap.add_argument("--no-backup", action="store_true", help="once: yedek atla")
@@ -300,6 +300,15 @@ def main(argv=None):
         return 0
     if args.komut == "daemon":
         return run_daemon(args.interval)
+    if args.komut == "mesh":
+        # P2P mesh durumu (v1.7.0)
+        try:
+            from sync_p2p import p2p_status
+            print(p2p_status(load_config()))
+        except Exception as e:
+            print(f"mesh hata: {e}")
+            print("ipucu: sync_p2p.py kurulu mu? (cumulus-sync-motor içinde)")
+        return 0
     if args.komut == "hub-check":
         print(json.dumps({"machine": machine_id(), "hub": hub_check()}, ensure_ascii=False, indent=2))
         return 0
