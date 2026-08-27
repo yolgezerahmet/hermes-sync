@@ -424,6 +424,12 @@ def scan_directory(label, dir_cfg):
     # GÜVENLİK: hassas dizin adları — yol bileşeninden reddedilir
     SECRET_DIRS = ("secrets", "credentials", "service-account",
                    ".aws", ".ssh", "private", "keys", "tokens")
+    # GPU POLİTİKASI (26 Ağu, OceanAPI #5): H2 model ağırlıkları senkron DIŞINDA
+    # Büyük model dosyaları yalnız metadata olarak işaretlenir, içerik taşınmaz
+    GPU_SKIP_PATTERNS = ("*.gguf", "*.safetensors", "*.pt", "*.pth",
+                         "*.ckpt", "*.onnx", "*.bin", "*.h5", "*.pb",
+                         "*.tflite", "*.model", "*.lora", "*.adapter")
+    GPU_MAX_KB = 51200  # 50MB üzeri model dosyası senkron dışı (metadata-only)
     # GPT-5.6 P0 (15 Ağu): İÇERİK taraması — dosya adı filtresi yetmez;
     # riskli adaylarda token/anahtar pattern'leri taranır (≤64KB, performans)
     CONTENT_SCAN_NAMES = ("config.json", "settings.yaml", "settings.yml",
@@ -437,6 +443,16 @@ def scan_directory(label, dir_cfg):
     def is_secret(fname):
         import fnmatch
         return any(fnmatch.fnmatch(fname, p) for p in SECRET_PATTERNS)
+
+    def is_gpu_skip(fname, fsize):
+        """GPU/model dosyası politikası: büyük model ağırlıkları senkron dışı."""
+        import fnmatch
+        if any(fnmatch.fnmatch(fname, p) for p in GPU_SKIP_PATTERNS):
+            return True
+        if fsize > GPU_MAX_KB * 1024 and os.path.splitext(fname)[1].lower() in (
+                ".bin", ".dat", ".raw", ".npy", ".npz"):
+            return True
+        return False
 
     def content_scan(fpath, fname):
         """Yalnızca riskli aday isimlerinde içerik taraması (performans korunur)."""
@@ -1470,9 +1486,25 @@ def cmd_pull(cfg):
     local = scan_all(cfg)
     rfiles = remote.get("files", {})
 
+    # GÜVENLİK (26 Ağu, OceanAPI #4): path traversal koruması
+    # Manifest'ten gelen yollar güvenilmez — kök dışına çıkış REDDEDİLİR
+    safe_dirs = set()
+    for node, dc in (cfg.get("dirs") or {}).items():
+        for p in (dc.get("paths") or [dc.get("path")] if dc else []):
+            if p:
+                safe_dirs.add(os.path.realpath(os.path.expanduser(p)))
+
+    def _is_safe_path(relpath):
+        if relpath.startswith(("/", "\\")) or ".." in relpath.split("/"):
+            return False
+        return True
+
     to_pull = []
     conflicts = []
     for path, rinfo in rfiles.items():
+        if not _is_safe_path(path):
+            log.warning(f"GÜVENLİK: tehlikeli yol reddedildi — {path}")
+            continue
         if path not in local:
             to_pull.append(path)
         elif local[path].get("sha") != rinfo.get("sha"):
