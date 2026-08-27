@@ -13,7 +13,8 @@ GDRIVE = f"gdrive:hermes-sync/hahmet/{os.uname().nodename}/versiyonlu/hermes-ful
 
 # Hariç tutulacak çöp (en büyük tasarruf)
 EXCLUDE_DIRS = [".curator_backups", ".hub", ".git", "__pycache__", "node_modules",
-                "cache", ".cache", "audio_cache", "logs", "usage_tracker", "state"]
+                "cache", ".cache", "audio_cache", "logs", "usage_tracker", "state",
+                "bin", "state-snapshots", "node", "tmp", "snapshots"]
 EXCLUDE_EXT = [".pyc", ".log", ".tar.gz", ".zip"]
 
 def collect_files(root, subdirs, prefix):
@@ -62,9 +63,9 @@ def make_tar(files, out_path):
 def main():
     print(f"=== HERMES+OPENCLAW YEDEK {TS} ===")
     files = []
-    # Hermes: memory + config + skills + plugins (çöpsüz)
+    # Hermes: memory + config + skills + plugins + PROFİLLER (çöpsüz)
     files += collect_files(HERMES, ["memory_store.db", "fact_store.db", "config.yaml", ".env",
-                                     "skills", "plugins"], "hermes")
+                                     "skills", "plugins", "profiles"], "hermes")
     # OpenClaw: tümü
     if os.path.exists(OPENCLAW):
         files += collect_files(OPENCLAW, ["skills", "config.json", "memory", "settings.json"], "openclaw")
