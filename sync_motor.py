@@ -1962,7 +1962,12 @@ def _tar_node(cfg, node, outdir, ts):
                 if any(sec in f for sec in (".env", ".key", ".pem")):
                     continue
                 p = os.path.join(root, f)
-                tar.add(p, arcname=os.path.relpath(p, os.path.dirname(base)))
+                try:
+                    tar.add(p, arcname=os.path.relpath(p, os.path.dirname(base)))
+                except OSError as e:
+                    # Canlı yazılan dosya tar sırasında büyüdü/küçüldü — atla
+                    # (rsync --ignore-errors deseni; gateway log/db'leri için normal)
+                    print(f"    ⚠ atlandı (canlı dosya): {p} ({e})")
     h = hashlib.sha256()
     with open(tarp, "rb") as f:
         for chunk in iter(lambda: f.read(65536), b""):
@@ -1984,9 +1989,12 @@ def cmd_backup(cfg, node=None, hub=None, dry_run=False):
     print(f"\n  💾 GDRIVE VERSİYON YEDEK — {hub}")
     nodes = [node] if node else list(cfg["dirs"].keys())
     # v2 FIX: stale syncver_* dizinleri KOŞU BAŞINDA temizle (finally güvenilmez)
+    # v3 FIX (24 Ağu): EŞZAMANLI koşuların dizinini silme — yalnız 10 dk'dan eski
+    # kalanları temizle (aktif koşunun tmp'si taze olur, dokunulmaz).
     try:
+        _now = time.time()
         for stale in glob.glob("/tmp/syncver_*"):
-            if os.path.isdir(stale):
+            if os.path.isdir(stale) and (_now - os.path.getmtime(stale)) > 600:
                 shutil.rmtree(stale, ignore_errors=True)
                 print(f"    🧹 stale temizlendi (koşu başı): {os.path.basename(stale)}")
     except Exception:
@@ -2015,10 +2023,12 @@ def cmd_backup(cfg, node=None, hub=None, dry_run=False):
                 pass
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
-        # FIX: stale syncver_* dizinleri (önceki koşulardan kalan) temizle
+        # FIX: stale syncver_* dizinleri (önceki koşulardan kalan) temizle —
+        # yalnız 10 dk'dan eski (eşzamanlı koşu koruması, v3 24 Ağu)
         try:
+            _now2 = time.time()
             for stale in glob.glob("/tmp/syncver_*"):
-                if os.path.isdir(stale):
+                if os.path.isdir(stale) and (_now2 - os.path.getmtime(stale)) > 600:
                     shutil.rmtree(stale, ignore_errors=True)
                     print(f"    🧹 stale temizlendi: {os.path.basename(stale)}")
         except Exception:
