@@ -2053,6 +2053,29 @@ def _tar_node(cfg, node, outdir, ts):
     else:
         pats = [str(x).strip() for x in include if str(x).strip()]
     base_parent = os.path.dirname(base.rstrip("/")) or base
+    # 28 Ağu v2: max_kb ÖN KONTROL — tar oluşturmadan boyutu hesapla, aşarsa atla
+    # (önceden tar oluşturulup sonra siliniyordu: pcb 665MB/research 971MB her koşuda israf)
+    if max_kb:
+        _total = 0
+        for _root, _dirs, _files in os.walk(base):
+            _dirs[:] = [d for d in _dirs if d != ".git"]
+            for _f in _files:
+                if any(_sec in _f for _sec in (".env", ".key", ".pem")):
+                    continue
+                _p = os.path.join(_root, _f)
+                _rel = os.path.relpath(_p, base_parent)
+                if pats and not any(fnmatch.fnmatch(_rel, pat) or fnmatch.fnmatch(_f, pat) for pat in pats):
+                    continue
+                try:
+                    _total += os.path.getsize(_p)
+                except OSError:
+                    pass
+        # Ön kontrol = KABA ELEME (sıkıştırılmamış boyut, max_kb×8 marjı):
+        # tar.gz metin/kod için ~10× sıkıştırır; hermes (config+state 2.4MB→631KB tar)
+        # gibi sıkışabilir node'lar yanlış atlanmasın. Kesin kontrol tar sonrası yapılır.
+        if _total // 1024 > int(max_kb) * 8:
+            print(f"    ⚠ {node}: boyut {_total//1024}KB > max_kb {max_kb}KB×8 — atlandı (ön kontrol, tar oluşturulmadı)")
+            return None, None
     with tarfile.open(tarp, "w:gz") as tar:
         for root, dirs, files in os.walk(base):
             dirs[:] = [d for d in dirs if d != ".git"]
