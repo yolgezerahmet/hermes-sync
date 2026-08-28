@@ -1,8 +1,8 @@
 {
  "node": "hermes-skills",
- "ts": "2026-08-28T20:09:14",
- "revision": "2bfcf37c0e48",
- "file_count": 15947,
+ "ts": "2026-08-28T21:42:19",
+ "revision": "fcd139aefab2",
+ "file_count": 15948,
  "files": {
   ".curator_state": {
    "sha": "079c2ea53d6f78ecbb5d78833dce63a2b6463c311e1a7404ccea655311127d42",
@@ -13,13 +13,13 @@
   ".bundled_manifest": {
    "sha": "b1c6fe80b9d718fe9d9868be6eb2f1e0eda0af9dce4fa500dfd351e7b6c10a19",
    "size": 3877,
-   "mtime": 1787936023,
+   "mtime": 1787941788,
    "machine": "H1"
   },
   ".usage.json": {
-   "sha": "8369d968fe32333e88f7469ee479a691ca5b54da4d9de3c16084b4def4e7f1ea",
+   "sha": "4ed705fef612d13f0a22d6d9b4a3df2d19e5dd6ee4211ce185ba09a6bfaed275",
    "size": 191880,
-   "mtime": 1787935623,
+   "mtime": 1787942499,
    "machine": "H1"
   },
   "cumulus-unutma-checklist.md": {
@@ -26795,9 +26795,9 @@
    "machine": "H1"
   },
   "ops/h1-h2-versioned-sync/SKILL.md": {
-   "sha": "97407775f041ec8093b32dbf563c0d82b2db0f7bcc7740072768e12f2456e680",
-   "size": 10462,
-   "mtime": 1786816079,
+   "sha": "21a580c2d7908f556d32046f5d03d6d29d793b0742746dbad34e215041652ae2",
+   "size": 12164,
+   "mtime": 1787940050,
    "machine": "H1"
   },
   "ops/h1-h2-versioned-sync/references/sync-motor-v170-p2p-mesh-20260822.md": {
@@ -26810,6 +26810,12 @@
    "sha": "b5a16877274ba06bf553a893a5daa641632e8f0e8e936cf48958228256398a9a",
    "size": 2206,
    "mtime": 1787401808,
+   "machine": "H1"
+  },
+  "ops/h1-h2-versioned-sync/references/sync-motor-tarnode-include-maxkb-20260828.md": {
+   "sha": "960a05c9ab1c5cf71c8d0720595d5df644ec3ce26922540d4c02f5fceb9816df",
+   "size": 5465,
+   "mtime": 1787940037,
    "machine": "H1"
   },
   "ops/h1-h2-versioned-sync/references/sync-motor-v160-akilli-kurulum.md": {
