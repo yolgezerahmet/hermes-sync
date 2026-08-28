@@ -1,13 +1,13 @@
 {
  "node": "hermes-full",
- "ts": "2026-08-28T18:36:23",
- "revision": "9434692281a9",
- "file_count": 39744,
+ "ts": "2026-08-28T19:24:21",
+ "revision": "5ce32b207660",
+ "file_count": 39763,
  "files": {
   "web-ui-build-stamp.json": {
-   "sha": "8fcfadc5b9f3a53db195405844ae0fe086bc1d1e8860dd3aa2c07c71ef9ade2d",
+   "sha": "1ce500a6072adbda5e26e2e5af57f54c296d3ae1023bded79b6a110afe6f494c",
    "size": 137,
-   "mtime": 1787867576,
+   "mtime": 1787932887,
    "machine": "H1"
   },
   "HERMES.md": {
@@ -29,9 +29,9 @@
    "machine": "H1"
   },
   "channel_directory.json": {
-   "sha": "3a6e537909c0304ef3a57424e481c03a149671857a53d95d5ec951d438b05dd9",
-   "size": 67,
-   "mtime": 1787931086,
+   "sha": "ded2e369e2b70b547da0468242fe4f566a3f553c601349dbf5db628f8d19d380",
+   "size": 210,
+   "mtime": 1787934039,
    "machine": "H1"
   },
   "holographic_facts_backup.20260813_213334.json": {
@@ -85,7 +85,7 @@
   "processes.json": {
    "sha": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
    "size": 2,
-   "mtime": 1787926151,
+   "mtime": 1787933486,
    "machine": "H1"
   },
   "DERIN_YAZIM_YONERGESI.md": {
@@ -131,9 +131,9 @@
    "machine": "H1"
   },
   "gateway_state.json": {
-   "sha": "02cca0240523bbf68f7579a72faf24ea5cb42d1180a00561351a5dc679f04792",
-   "size": 1301,
-   "mtime": 1787926952,
+   "sha": "235536d5585e13045f9edd0e6ba26daa2723d2a6cebea2f53ca1750d48090937",
+   "size": 956,
+   "mtime": 1787933497,
    "machine": "H1"
   },
   "SOUL.md": {
@@ -29909,15 +29909,15 @@
    "machine": "H1"
   },
   "session_awareness/current_sessions.md": {
-   "sha": "e17d9fef882ef65573337097ca750f6bb2e7f7f30753602f17e36cfe62e08868",
-   "size": 3312,
-   "mtime": 1787931233,
+   "sha": "9ff57d3efd0aa07db3d89ac6dfa63d0a4656245e250c34e90fe844f57ec7b2be",
+   "size": 3119,
+   "mtime": 1787934102,
    "machine": "H1"
   },
   "session_awareness/current_sessions.json": {
-   "sha": "6a0f33fc55a1a4932fd160153c7de2a6652065ec0aab5cecd7341209ac71b1c4",
-   "size": 13256,
-   "mtime": 1787931233,
+   "sha": "626daa63a7a45b95f0644589fca4fc24d49f3feadc602fdbcf73f4ff6ff23975",
+   "size": 12733,
+   "mtime": 1787934102,
    "machine": "H1"
   },
   "gepa/README.md": {
@@ -52367,15 +52367,15 @@
    "machine": "H1"
   },
   "usage_tracker/latest.json": {
-   "sha": "d17e851b3be36794d537b94801c1709acd86b62cd6e6b1a65b25e8c107d867c2",
-   "size": 17180,
-   "mtime": 1787930753,
+   "sha": "bef0b64f89393cbe2a01e9e79d58d1ca412b264ac36b8938d1274c1cfa27ff42",
+   "size": 17183,
+   "mtime": 1787932555,
    "machine": "H1"
   },
   "usage_tracker/latest.md": {
-   "sha": "13605d8eef29bb01a1545a67aa0aa70963b268505d53d2547ba13f945681e0f8",
-   "size": 1497,
-   "mtime": 1787930753,
+   "sha": "9577ab9c55572882686cc08e9f3d5a20f63662bfd37847a6314498d7605e3123",
+   "size": 1499,
+   "mtime": 1787932555,
    "machine": "H1"
   },
   "pairing/_rate_limits.json": {
@@ -52403,9 +52403,9 @@
    "machine": "H1"
   },
   "cron/jobs.json": {
-   "sha": "5e0f664ca95b1a3f4759570d8d7b839926503f0f3733f641ac3ccd4c69e9441e",
+   "sha": "12c48cd2e09e3392a4c92cb80cff9822a99cd37575e81968b150075727d0f801",
    "size": 73622,
-   "mtime": 1787931352,
+   "mtime": 1787934220,
    "machine": "H1"
   },
   "cron/output/53ec72d91de5/2026-08-17_22-08-45.md": {
@@ -52732,12 +52732,6 @@
    "mtime": 1787922043,
    "machine": "H1"
   },
-  "cron/output/6897d56a0662/2026-08-28_14-19-38.md": {
-   "sha": "596e880cf546681e1b8db5c3437f48659a36f54389268cebb9a897a255e096ed",
-   "size": 743,
-   "mtime": 1787915978,
-   "machine": "H1"
-  },
   "cron/output/6897d56a0662/2026-08-28_16-36-45.md": {
    "sha": "5f1c89be73df50571cec9755ba4fb298daed8a938db3baae851e92c0d28106dd",
    "size": 723,
@@ -52810,10 +52804,22 @@
    "mtime": 1787928529,
    "machine": "H1"
   },
+  "cron/output/6897d56a0662/2026-08-28_18-52-53.md": {
+   "sha": "c54a6165a970da1716e106f7a4cac5961a72c1849c7bb2b40bf1bebf470b8258",
+   "size": 723,
+   "mtime": 1787932373,
+   "machine": "H1"
+  },
   "cron/output/6897d56a0662/2026-08-28_16-06-44.md": {
    "sha": "02279f9ea8713653e8c54536958b4ff4d91e7b55a4ae198f2553b9a85edba7e2",
    "size": 723,
    "mtime": 1787922404,
+   "machine": "H1"
+  },
+  "cron/output/6897d56a0662/2026-08-28_19-03-55.md": {
+   "sha": "893947a62e6053cb85e1fb127bd84223df60d1ca9869a17db2a7b517c25e0fcc",
+   "size": 722,
+   "mtime": 1787933035,
    "machine": "H1"
   },
   "cron/output/6897d56a0662/2026-08-28_15-49-42.md": {
@@ -52822,10 +52828,10 @@
    "mtime": 1787921382,
    "machine": "H1"
   },
-  "cron/output/6897d56a0662/2026-08-28_13-55-36.md": {
-   "sha": "871552fbe943bee09c6589300c86ff0992c76b1389b45dfacf39f2f599bd1f01",
-   "size": 743,
-   "mtime": 1787914536,
+  "cron/output/6897d56a0662/2026-08-28_19-21-40.md": {
+   "sha": "f3412dfa326f61acbcb2ac2bebf42c65cf468ac8d2fab601918c192a878453fd",
+   "size": 722,
+   "mtime": 1787934100,
    "machine": "H1"
   },
   "cron/output/6897d56a0662/2026-08-28_17-36-48.md": {
@@ -52838,12 +52844,6 @@
    "sha": "e80fb47564e341ea5da8b44117631c05474256c4c4ae2e7e463a4e0925de50ce",
    "size": 743,
    "mtime": 1787916698,
-   "machine": "H1"
-  },
-  "cron/output/6897d56a0662/2026-08-28_14-01-37.md": {
-   "sha": "dba7c0847af879a7a2f34b54fd6f2f2199f89e44d9d6fb99be18b4efb6bbb11d",
-   "size": 743,
-   "mtime": 1787914897,
    "machine": "H1"
   },
   "cron/output/6897d56a0662/2026-08-28_16-48-45.md": {
@@ -52864,16 +52864,16 @@
    "mtime": 1787921742,
    "machine": "H1"
   },
+  "cron/output/6897d56a0662/2026-08-28_19-15-40.md": {
+   "sha": "5172a581fc54224641a5f7e8593697a0e1c97672f7b478298802685d6c8f4f8b",
+   "size": 722,
+   "mtime": 1787933740,
+   "machine": "H1"
+  },
   "cron/output/6897d56a0662/2026-08-28_16-42-45.md": {
    "sha": "fff07e90c90b247a53c0e05c8e49ace8f442343b0e33940979261d29abeb7b15",
    "size": 723,
    "mtime": 1787924565,
-   "machine": "H1"
-  },
-  "cron/output/6897d56a0662/2026-08-28_14-25-38.md": {
-   "sha": "64ae12c74a870446e845fb3399f54f3d65dbbbdb1a187528cacf53180698ecaf",
-   "size": 743,
-   "mtime": 1787916338,
    "machine": "H1"
   },
   "cron/output/6897d56a0662/2026-08-28_15-37-41.md": {
@@ -52900,12 +52900,6 @@
    "mtime": 1787929550,
    "machine": "H1"
   },
-  "cron/output/6897d56a0662/2026-08-28_13-49-36.md": {
-   "sha": "d183578bc9510c35f15c96cbe18bb83a0501b63828cf0fbf7d37cf60a828feda",
-   "size": 743,
-   "mtime": 1787914176,
-   "machine": "H1"
-  },
   "cron/output/6897d56a0662/2026-08-28_15-01-40.md": {
    "sha": "e251190b9e84cd5305b2c0e9af23613de4d897c947d4c2ee3d81530b82bfdf1e",
    "size": 743,
@@ -52916,6 +52910,12 @@
    "sha": "1e8abdd00bc463ccbf2a24eca05a75015ed758d1611bf899d3235a21db49efec",
    "size": 743,
    "mtime": 1787919941,
+   "machine": "H1"
+  },
+  "cron/output/6897d56a0662/2026-08-28_18-46-53.md": {
+   "sha": "458544e15a5c9b82372f1b99141761349779bc276534e173bb5388134bf29eaa",
+   "size": 723,
+   "mtime": 1787932013,
    "machine": "H1"
   },
   "cron/output/6897d56a0662/2026-08-28_16-18-44.md": {
@@ -52936,10 +52936,16 @@
    "mtime": 1787926367,
    "machine": "H1"
   },
-  "cron/output/6897d56a0662/2026-08-28_14-13-37.md": {
-   "sha": "aa767211657b1111d781855873b0a007036be69241a7373ce6d28c5936b90d51",
-   "size": 743,
-   "mtime": 1787915617,
+  "cron/output/6897d56a0662/2026-08-28_18-41-52.md": {
+   "sha": "fa7badf6a5cc5681250a5d371eabb8b5b983eea8624d5b27a4013facddddd598",
+   "size": 723,
+   "mtime": 1787931712,
+   "machine": "H1"
+  },
+  "cron/output/6897d56a0662/2026-08-28_18-58-54.md": {
+   "sha": "ca9a2cd15a3d7e218207b4b5e352a8722544c338f97c97d44718628c2b5b28e9",
+   "size": 723,
+   "mtime": 1787932734,
    "machine": "H1"
   },
   "cron/output/6897d56a0662/2026-08-28_16-24-45.md": {
@@ -52996,16 +53002,10 @@
    "mtime": 1787928169,
    "machine": "H1"
   },
-  "cron/output/6897d56a0662/2026-08-28_14-07-37.md": {
-   "sha": "4a28fb2819fba77a74da4bd0ce67db3bc7edda27e4aae0790822ae0064e6b18a",
-   "size": 743,
-   "mtime": 1787915257,
-   "machine": "H1"
-  },
-  "cron/output/6897d56a0662/2026-08-28_13-43-36.md": {
-   "sha": "18b8fa7347fc3cbeb67d15bb97f810968e7085d9f5c8b1d899f62bca4d5f0196",
-   "size": 743,
-   "mtime": 1787913816,
+  "cron/output/6897d56a0662/2026-08-28_19-09-54.md": {
+   "sha": "4eeb41a344b86152e47f716f113684c53c5b99c0d2e550300f7bf96118a69dd0",
+   "size": 722,
+   "mtime": 1787933394,
    "machine": "H1"
   },
   "cron/output/f3b64aa0dbb1/2026-08-28_16-55-45.md": {
@@ -53074,6 +53074,12 @@
    "mtime": 1787923544,
    "machine": "H1"
   },
+  "cron/output/f3b64aa0dbb1/2026-08-28_19-10-54.md": {
+   "sha": "d6700654e87755e2ce1e60495de585950ab8682b82b5c09cacde445293fb13f5",
+   "size": 149,
+   "mtime": 1787933454,
+   "machine": "H1"
+  },
   "cron/output/f3b64aa0dbb1/2026-08-28_15-50-42.md": {
    "sha": "0fb8c3149d5309ffed30138ddff5933672fa5e5027102f74661e852a3366ed84",
    "size": 149,
@@ -53098,12 +53104,6 @@
    "mtime": 1787925646,
    "machine": "H1"
   },
-  "cron/output/f3b64aa0dbb1/2026-08-28_14-45-39.md": {
-   "sha": "5109e0cc2ba0fb2ac41437ceb2b700549502856da8f11d51deb476aeb64aad74",
-   "size": 149,
-   "mtime": 1787917539,
-   "machine": "H1"
-  },
   "cron/output/f3b64aa0dbb1/2026-08-28_18-25-51.md": {
    "sha": "7399fad2175cb22dfe27844d9f470f71dea33f25c49e7071443ac40a016976de",
    "size": 149,
@@ -53120,6 +53120,12 @@
    "sha": "423894696020fc98d902c1cc4c8bd6b09e661c1aadb33af58fd065d4c83b970f",
    "size": 149,
    "mtime": 1787919940,
+   "machine": "H1"
+  },
+  "cron/output/f3b64aa0dbb1/2026-08-28_18-40-52.md": {
+   "sha": "a568a29d09d7fd1ccbed08d6a2fe638dc533430d6398a2d027f8b0e35a29487f",
+   "size": 149,
+   "mtime": 1787931652,
    "machine": "H1"
   },
   "cron/output/f3b64aa0dbb1/2026-08-28_17-40-47.md": {
@@ -53140,22 +53146,16 @@
    "mtime": 1787929850,
    "machine": "H1"
   },
-  "cron/output/f3b64aa0dbb1/2026-08-28_15-05-40.md": {
-   "sha": "19489427c34af466d080ce2295dc19ac0b3080ac8a3fda0ca15cd5e863ca8077",
-   "size": 149,
-   "mtime": 1787918740,
-   "machine": "H1"
-  },
-  "cron/output/f3b64aa0dbb1/2026-08-28_14-35-38.md": {
-   "sha": "dc3ad895260b7a986bec43363c6bbc19beda099c383e861a31fd370886b67925",
-   "size": 149,
-   "mtime": 1787916938,
-   "machine": "H1"
-  },
   "cron/output/f3b64aa0dbb1/2026-08-28_16-10-44.md": {
    "sha": "fdf122adc5b59ba3e9b4bdfc22af96b6bf5d24eb056207b681245711d9eb2b46",
    "size": 149,
    "mtime": 1787922644,
+   "machine": "H1"
+  },
+  "cron/output/f3b64aa0dbb1/2026-08-28_19-20-39.md": {
+   "sha": "c46b46fc2708b8de8f8b1933aceb14b3cfaa150f0d489cdf7352f893153704e2",
+   "size": 149,
+   "mtime": 1787934039,
    "machine": "H1"
   },
   "cron/output/f3b64aa0dbb1/2026-08-28_17-15-46.md": {
@@ -53188,10 +53188,22 @@
    "mtime": 1787928949,
    "machine": "H1"
   },
+  "cron/output/f3b64aa0dbb1/2026-08-28_18-50-53.md": {
+   "sha": "fad1b14284c237228a822444abf3700d86856707636978ad77fed0586e002138",
+   "size": 149,
+   "mtime": 1787932253,
+   "machine": "H1"
+  },
   "cron/output/f3b64aa0dbb1/2026-08-28_16-50-45.md": {
    "sha": "bd3addab8b204a3492930f4943ed2879536da2aebdd5db026aedefc1fbd18264",
    "size": 149,
    "mtime": 1787925045,
+   "machine": "H1"
+  },
+  "cron/output/f3b64aa0dbb1/2026-08-28_19-15-39.md": {
+   "sha": "869a2f68d473299b5e1f925a763d3077077bfd465b6e47716d95e126848bf706",
+   "size": 149,
+   "mtime": 1787933739,
    "machine": "H1"
   },
   "cron/output/f3b64aa0dbb1/2026-08-28_15-20-40.md": {
@@ -53212,16 +53224,16 @@
    "mtime": 1787929550,
    "machine": "H1"
   },
+  "cron/output/f3b64aa0dbb1/2026-08-28_19-05-54.md": {
+   "sha": "8b9fc92f68447b4dc684c6ff9c5b6e4d17767ada0e5bf0a1ee2df00e8ed00a5a",
+   "size": 149,
+   "mtime": 1787933154,
+   "machine": "H1"
+  },
   "cron/output/f3b64aa0dbb1/2026-08-28_17-35-47.md": {
    "sha": "ab4dd0fef7b9ae748cc4065fbb70e09cf0d055aba9eea126694c8793ad6f2e91",
    "size": 149,
    "mtime": 1787927747,
-   "machine": "H1"
-  },
-  "cron/output/f3b64aa0dbb1/2026-08-28_15-00-39.md": {
-   "sha": "8c901167cea8fc62380a35c56fddb655add67ea8623453aba941dcc0cb468620",
-   "size": 149,
-   "mtime": 1787918439,
    "machine": "H1"
   },
   "cron/output/f3b64aa0dbb1/2026-08-28_17-05-46.md": {
@@ -53236,34 +53248,22 @@
    "mtime": 1787921141,
    "machine": "H1"
   },
+  "cron/output/f3b64aa0dbb1/2026-08-28_19-00-53.md": {
+   "sha": "f1535b720871602ea54024d15a7babdf6855fb487c7d929ba95373a3336f74dc",
+   "size": 149,
+   "mtime": 1787932853,
+   "machine": "H1"
+  },
   "cron/output/f3b64aa0dbb1/2026-08-28_18-35-52.md": {
    "sha": "79c9179fee348e928b617ce45f57e5856857b4b6e68027c3f9e04bef18b63b38",
    "size": 149,
    "mtime": 1787931352,
    "machine": "H1"
   },
-  "cron/output/f3b64aa0dbb1/2026-08-28_14-40-38.md": {
-   "sha": "da3f30675a7eb53136874faccedb97c67ca21532ffb719d9bd1f59e32793b1cc",
+  "cron/output/f3b64aa0dbb1/2026-08-28_18-45-53.md": {
+   "sha": "a03992d84d54f5dd978732f92dcb3ad837de6ca1074915f734dd74c0b59e75e8",
    "size": 149,
-   "mtime": 1787917238,
-   "machine": "H1"
-  },
-  "cron/output/f3b64aa0dbb1/2026-08-28_15-10-40.md": {
-   "sha": "4d84b7be50bdc573d2c422ecf9ab41a6b7e79555728a293930896a97b257296e",
-   "size": 149,
-   "mtime": 1787919040,
-   "machine": "H1"
-  },
-  "cron/output/f3b64aa0dbb1/2026-08-28_14-50-39.md": {
-   "sha": "c73ebf3895cb1864c13af00fd91b0a93173717dd870fb2c1d86b18b79e0e7add",
-   "size": 149,
-   "mtime": 1787917839,
-   "machine": "H1"
-  },
-  "cron/output/f3b64aa0dbb1/2026-08-28_14-30-38.md": {
-   "sha": "9301fc8e9ad7671574d196b004ae77286289ffcf69a368820b39a75919f77eee",
-   "size": 149,
-   "mtime": 1787916638,
+   "mtime": 1787931953,
    "machine": "H1"
   },
   "cron/output/f3b64aa0dbb1/2026-08-28_15-15-40.md": {
@@ -53272,10 +53272,10 @@
    "mtime": 1787919340,
    "machine": "H1"
   },
-  "cron/output/f3b64aa0dbb1/2026-08-28_14-55-39.md": {
-   "sha": "ced6edfcd83a54485464ba2fec098b6f0655fb9395a4dc7473276f8e691b64b8",
+  "cron/output/f3b64aa0dbb1/2026-08-28_18-55-53.md": {
+   "sha": "899e83c3493849bca1030e812d75ac6973a5103ca591220387a6aea718a49e6c",
    "size": 149,
-   "mtime": 1787918139,
+   "mtime": 1787932553,
    "machine": "H1"
   },
   "cron/output/f3b64aa0dbb1/2026-08-28_17-20-47.md": {
@@ -53446,12 +53446,6 @@
    "mtime": 1787846640,
    "machine": "H1"
   },
-  "cron/output/1e3c7cb5d013/2026-08-27_16-33-32.md": {
-   "sha": "b9cfa035c917f4228bbdf384ee0869a2097db2375b08f2f578d1ba0beb2bd336",
-   "size": 162,
-   "mtime": 1787837612,
-   "machine": "H1"
-  },
   "cron/output/1e3c7cb5d013/2026-08-28_17-54-59.md": {
    "sha": "32e41869e4e040c3e2b1dc2fe6b1fa511b8e2a59eb92996f70a47059bb97dba1",
    "size": 162,
@@ -53576,6 +53570,12 @@
    "sha": "06d800a8ab97b6ccd693e2ebb8aca949fc39ea691f74d52aedb667501bb9435e",
    "size": 162,
    "mtime": 1787879456,
+   "machine": "H1"
+  },
+  "cron/output/1e3c7cb5d013/2026-08-28_18-55-55.md": {
+   "sha": "5009bc89973243e32c57dee884a81ae5c1683c474ca1a9f76c1ee8cb48187ab4",
+   "size": 162,
+   "mtime": 1787932555,
    "machine": "H1"
   },
   "cron/output/1e3c7cb5d013/2026-08-27_17-03-38.md": {
@@ -55000,10 +55000,10 @@
    "mtime": 1787852640,
    "machine": "H1"
   },
-  "cron/output/99c4e1e2ad1e/2026-08-26_14-49-57.md": {
-   "sha": "1c90a36ae6ec8c598b96b2b67332cc8900cf1cfa264907f82a59716495861725",
-   "size": 3453,
-   "mtime": 1787744997,
+  "cron/output/99c4e1e2ad1e/2026-08-28_18-38-15.md": {
+   "sha": "2591403b6f327ee34290126dd459ff63f72c13d8b14827464f3ee92f431fde95",
+   "size": 3439,
+   "mtime": 1787931495,
    "machine": "H1"
   },
   "cron/output/99c4e1e2ad1e/2026-08-27_02-08-17.md": {
@@ -55420,6 +55420,12 @@
    "mtime": 1787890331,
    "machine": "H1"
   },
+  "cron/output/a7105d742364/2026-08-28_18-53-54.md": {
+   "sha": "d4c90139dabe61c9fa8a65a289435d05d1851f15791cd968a3d4bb4ea54da32b",
+   "size": 155,
+   "mtime": 1787932434,
+   "machine": "H1"
+  },
   "cron/output/a7105d742364/2026-08-28_06-41-10.md": {
    "sha": "5bb413a609d0f14cfd387c391ca79283cc74df375b2911848e03a68a24f32601",
    "size": 155,
@@ -55520,12 +55526,6 @@
    "sha": "289458f6f2af9b6de34af399f55d3341f9d3964d6ee4814e31c9fe99795df759",
    "size": 155,
    "mtime": 1787892133,
-   "machine": "H1"
-  },
-  "cron/output/a7105d742364/2026-08-27_17-31-43.md": {
-   "sha": "f0a89a28a6ef4ce6bf11ed58e5e04f11044ef1e7ca0be7aef298538b2c086526",
-   "size": 155,
-   "mtime": 1787841103,
    "machine": "H1"
   },
   "cron/output/a7105d742364/2026-08-28_02-38-41.md": {
@@ -55960,6 +55960,12 @@
    "mtime": 1787875244,
    "machine": "H1"
   },
+  "cron/output/3c9516a84883/2026-08-28_19-00-54.md": {
+   "sha": "f1d41babc4a257e776c7bdb1386746b66e43a4a1e1d277ce4a635d504ac86235",
+   "size": 158,
+   "mtime": 1787932854,
+   "machine": "H1"
+  },
   "cron/output/3c9516a84883/2026-08-27_09-00-06.md": {
    "sha": "217c4c467cc38f1cdd0cc5878c933b1d4f8248421564bca3d1c92c501fa01921",
    "size": 158,
@@ -56066,12 +56072,6 @@
    "sha": "1a37c572a6e52765da070b0721db3f17a24cee1aabc34033881adc2447eef894",
    "size": 158,
    "mtime": 1787806801,
-   "machine": "H1"
-  },
-  "cron/output/3c9516a84883/2026-08-26_17-00-10.md": {
-   "sha": "0566adda25635484f6d50488816f511beed92fe2a4bb59179983ecb99b2b4fe1",
-   "size": 158,
-   "mtime": 1787752810,
    "machine": "H1"
   },
   "cron/output/2bca1d045851/2026-08-21_04-00-58.md": {
@@ -57052,6 +57052,12 @@
    "mtime": 1787520424,
    "machine": "H1"
   },
+  "cron/output/98ae0fcb56cf/2026-08-28_18-47-20.md": {
+   "sha": "664c9646dd2e186ef590bf02769f3e25347de4d3f2f34353f322dc23b9cc82c5",
+   "size": 1952,
+   "mtime": 1787932040,
+   "machine": "H1"
+  },
   "cron/output/98ae0fcb56cf/2026-08-23_00-22-36.md": {
    "sha": "a2d7280e0b7827ad5a463cbad11f95c1718f75cb238711111a2709623e9a623f",
    "size": 2707,
@@ -57514,12 +57520,6 @@
    "mtime": 1787776687,
    "machine": "H1"
   },
-  "cron/output/7fa227c6d1e0/2026-08-25_13-42-59.md": {
-   "sha": "fb4cbf5be13467a0bc03865da4c653c95a261f2dc4ee03224ee9c05a209e28d1",
-   "size": 156,
-   "mtime": 1787654579,
-   "machine": "H1"
-  },
   "cron/output/7fa227c6d1e0/2026-08-26_17-27-08.md": {
    "sha": "897b9f1ae0d1ff8f57ec2bb4d64167236979aed9a78c0f2fac68638c32fd262d",
    "size": 156,
@@ -57596,6 +57596,12 @@
    "sha": "0d1735120bbe4b3871738182b67e26e38ef6cff6f20afd98ef97ed723c837379",
    "size": 156,
    "mtime": 1787809748,
+   "machine": "H1"
+  },
+  "cron/output/7fa227c6d1e0/2026-08-28_18-38-14.md": {
+   "sha": "eab197198bb8135c607d84dc75622a44ab6476984ab3d5bf5a05122f9b5d97c8",
+   "size": 156,
+   "mtime": 1787931494,
    "machine": "H1"
   },
   "cron/output/7fa227c6d1e0/2026-08-27_19-30-10.md": {
@@ -57692,6 +57698,12 @@
    "sha": "c7607386952d59c4797ae99fd73ca9cbf0b99af1a860133bbb1bd179df41aa0d",
    "size": 156,
    "mtime": 1787820579,
+   "machine": "H1"
+  },
+  "cron/output/259dd1df1fd3/2026-08-28_19-05-57.md": {
+   "sha": "cac2fc01cacaa39cc01128127d4c8bce7e673be0f8cd758a9069381f4db133a9",
+   "size": 167,
+   "mtime": 1787933157,
    "machine": "H1"
   },
   "cron/output/259dd1df1fd3/2026-08-28_12-57-36.md": {
@@ -57802,6 +57814,12 @@
    "mtime": 1787928351,
    "machine": "H1"
   },
+  "cron/output/259dd1df1fd3/2026-08-28_18-49-56.md": {
+   "sha": "c6a109927aefa091b13317e8a1b595957ba5e8e8615434ce969fd3c18d4c0b37",
+   "size": 167,
+   "mtime": 1787932196,
+   "machine": "H1"
+  },
   "cron/output/259dd1df1fd3/2026-08-28_09-23-29.md": {
    "sha": "c05fc0c859472a7905855723aa4406cdecddd5878f13f9efc5b0b141dcb51f41",
    "size": 288,
@@ -57844,12 +57862,6 @@
    "mtime": 1787925468,
    "machine": "H1"
   },
-  "cron/output/259dd1df1fd3/2026-08-28_04-03-56.md": {
-   "sha": "6afafde21376f65f270a81b603d8b716cf5f93fe5ab82982c2a72945e171a131",
-   "size": 288,
-   "mtime": 1787879036,
-   "machine": "H1"
-  },
   "cron/output/259dd1df1fd3/2026-08-28_15-53-44.md": {
    "sha": "66c37915c3024b18c823115b87a5bc4fcb7b8154c567e88d00ad8f2ad73b8533",
    "size": 288,
@@ -57860,12 +57872,6 @@
    "sha": "ca8d5bb8c8977984297326051036d2d37309319f1d219dfb7bc65dbf5f3a1ff7",
    "size": 288,
    "mtime": 1787909135,
-   "machine": "H1"
-  },
-  "cron/output/259dd1df1fd3/2026-08-28_04-35-00.md": {
-   "sha": "59a0213fcf0a3d73f76fd1db454b3d7855d63f24872ac8e540946cb0fb01864c",
-   "size": 288,
-   "mtime": 1787880900,
    "machine": "H1"
   },
   "cron/output/259dd1df1fd3/2026-08-28_07-13-12.md": {
@@ -57958,6 +57964,12 @@
    "mtime": 1787887510,
    "machine": "H1"
   },
+  "cron/output/259dd1df1fd3/2026-08-28_19-21-42.md": {
+   "sha": "fda0e847beb9c9b94b45ea0920ba233e2d24cc2eef18a0a4d358965310d39647",
+   "size": 167,
+   "mtime": 1787934102,
+   "machine": "H1"
+  },
   "cron/output/259dd1df1fd3/2026-08-28_08-01-15.md": {
    "sha": "76676f354baa81b3f63196a034c972cde8af83ebe741a86647e5e9aeca947c9f",
    "size": 288,
@@ -57976,12 +57988,6 @@
    "mtime": 1787906309,
    "machine": "H1"
   },
-  "cron/output/259dd1df1fd3/2026-08-28_04-19-58.md": {
-   "sha": "0f3f6c2c02f6326a2c3be614f2db0c53f65c81d05cfd6cc8d0d85366049e3887",
-   "size": 288,
-   "mtime": 1787879998,
-   "machine": "H1"
-  },
   "cron/output/259dd1df1fd3/2026-08-28_11-22-27.md": {
    "sha": "eddf08140e32fa26efcfe27465f34aae94327ec04ebfd58f7136473faa814417",
    "size": 288,
@@ -57992,6 +57998,12 @@
    "sha": "aaa2a6645b3afb70c0c0b782f0876f2dc68de0f93d00e89d26e6c2b3584da90d",
    "size": 288,
    "mtime": 1787886549,
+   "machine": "H1"
+  },
+  "cron/output/147ac7b09ffd/2026-08-28_18-45-59.md": {
+   "sha": "d798ce8e299f56b558758d3f4c0636e7f1251b2a42df175cc10c5964ab122129",
+   "size": 160,
+   "mtime": 1787931959,
    "machine": "H1"
   },
   "cron/output/147ac7b09ffd/2026-08-28_17-25-49.md": {
@@ -58138,12 +58150,6 @@
    "mtime": 1787892974,
    "machine": "H1"
   },
-  "cron/output/147ac7b09ffd/2026-08-28_05-49-06.md": {
-   "sha": "7d900a38519b7640ae64189ee4684291dad0b1abff80c3bf410db678822190bd",
-   "size": 160,
-   "mtime": 1787885346,
-   "machine": "H1"
-  },
   "cron/output/147ac7b09ffd/2026-08-28_11-06-25.md": {
    "sha": "b7296d140e893e7ae87f0f1180af63bdf7815e52f35a9e99c32b23a9ec2d7551",
    "size": 160,
@@ -58168,16 +58174,16 @@
    "mtime": 1787894898,
    "machine": "H1"
   },
+  "cron/output/147ac7b09ffd/2026-08-28_19-01-56.md": {
+   "sha": "53082856f03a3249a101dc39b63758484c9137c5111f2064890fc3c930fb0435",
+   "size": 160,
+   "mtime": 1787932916,
+   "machine": "H1"
+  },
   "cron/output/147ac7b09ffd/2026-08-28_14-30-40.md": {
    "sha": "a1c28e242a4ac4119ee05856b785413df8eaa19ea6ed7ac6bf49ca817a26674a",
    "size": 160,
    "mtime": 1787916640,
-   "machine": "H1"
-  },
-  "cron/output/147ac7b09ffd/2026-08-28_05-33-05.md": {
-   "sha": "185a6bc0bc6361452b224d27344dd052c5c5506c7bf4f77db619ff553c35b103",
-   "size": 160,
-   "mtime": 1787884385,
    "machine": "H1"
   },
   "cron/output/147ac7b09ffd/2026-08-28_07-40-14.md": {
@@ -58264,6 +58270,12 @@
    "mtime": 1787913817,
    "machine": "H1"
   },
+  "cron/output/147ac7b09ffd/2026-08-28_19-17-40.md": {
+   "sha": "59334b50baebcf649f6a95fdbcdad58b852c456f8fe211b3155e91595c7bc9b2",
+   "size": 160,
+   "mtime": 1787933860,
+   "machine": "H1"
+  },
   "cron/output/147ac7b09ffd/2026-08-28_12-55-35.md": {
    "sha": "dbe0ed9c8d4635fc118813ef85fd3c50042b76d10ba52f4b1bc37e8c6dd5c4c0",
    "size": 160,
@@ -58286,18 +58298,6 @@
    "sha": "569c47be3c902b2d2e2be3ee899110edc03f2ff085081689e304b8c047aba19f",
    "size": 160,
    "mtime": 1787914778,
-   "machine": "H1"
-  },
-  "cron/output/147ac7b09ffd/2026-08-28_05-17-06.md": {
-   "sha": "18ffa13f7a989c52253292dfd3b9e733830df2afc39ce54dea684bd519835b9b",
-   "size": 160,
-   "mtime": 1787883426,
-   "machine": "H1"
-  },
-  "cron/output/ced51101870b/2026-08-27_17-43-44.md": {
-   "sha": "737e0c7a366be8096dce47378e0dd6bb385039a168899b9374383fbe98cfe8e3",
-   "size": 151,
-   "mtime": 1787841824,
    "machine": "H1"
   },
   "cron/output/ced51101870b/2026-08-28_11-18-24.md": {
@@ -58426,6 +58426,12 @@
    "mtime": 1787859866,
    "machine": "H1"
   },
+  "cron/output/ced51101870b/2026-08-28_19-19-39.md": {
+   "sha": "ac33762b6871816f83314d83d6e2ed9405c9580daa025696e666723f8d0d9121",
+   "size": 151,
+   "mtime": 1787933979,
+   "machine": "H1"
+  },
   "cron/output/ced51101870b/2026-08-27_19-14-01.md": {
    "sha": "2597d71aa1026813b856dcac55a2779ab9346a2214d9e45f181ab7e5c430adda",
    "size": 151,
@@ -58486,6 +58492,12 @@
    "mtime": 1787926727,
    "machine": "H1"
   },
+  "cron/output/ced51101870b/2026-08-28_18-48-53.md": {
+   "sha": "e9d8e829c5ef333704c4dc81f828e34fb81a47a5d63fb849b03f00234e60a251",
+   "size": 151,
+   "mtime": 1787932133,
+   "machine": "H1"
+  },
   "cron/output/ced51101870b/2026-08-27_20-14-12.md": {
    "sha": "a06483ebb2df5026e7368ed641b4872d357996bbd8106d0d839a141ecd907475",
    "size": 151,
@@ -58520,12 +58532,6 @@
    "sha": "45d762b243c5e331e27726f102b3b6214e0dafeb0d79530d4bb31cbd1f77485c",
    "size": 151,
    "mtime": 1787892372,
-   "machine": "H1"
-  },
-  "cron/output/ced51101870b/2026-08-27_18-13-50.md": {
-   "sha": "fb67ede8d39ad21a2eee4578161ac433c88fc9fca967a8960aa325c5e7002c51",
-   "size": 151,
-   "mtime": 1787843630,
    "machine": "H1"
   },
   "cron/output/ced51101870b/2026-08-28_06-16-08.md": {
@@ -59650,12 +59656,6 @@
    "mtime": 1787927447,
    "machine": "H1"
   },
-  "cron/output/6b6f9da2b253/2026-08-27_18-00-49.md": {
-   "sha": "567decbdb74ccbb9a69845d6981bcc4b372e9ff864c873ae95822342979e9064",
-   "size": 152,
-   "mtime": 1787842849,
-   "machine": "H1"
-  },
   "cron/output/6b6f9da2b253/2026-08-28_01-00-28.md": {
    "sha": "b51604de77037b24d97ada842f58d469fc903ea559a7a7de1a1e2eefbcbf968c",
    "size": 152,
@@ -59720,6 +59720,12 @@
    "sha": "a04e582797301c2184ddc77c9fe41fd86d484f91b4cc147f63c6b4ebe3c84965",
    "size": 152,
    "mtime": 1787875244,
+   "machine": "H1"
+  },
+  "cron/output/6b6f9da2b253/2026-08-28_19-00-54.md": {
+   "sha": "6d87106bf06edda014e59dc4c735951c3d1dbd69482ba07749ff933b5cf64915",
+   "size": 152,
+   "mtime": 1787932854,
    "machine": "H1"
   },
   "cron/output/6b6f9da2b253/2026-08-28_03-30-48.md": {
@@ -60178,6 +60184,12 @@
    "mtime": 1787893214,
    "machine": "H1"
   },
+  "cron/output/c0693f5169c8/2026-08-28_19-00-55.md": {
+   "sha": "bf60a39fe6cba5752f49e253ce95a409bd4bf1223fc9d9ea6af52205c2abac1d",
+   "size": 1592,
+   "mtime": 1787932855,
+   "machine": "H1"
+  },
   "cron/output/c0693f5169c8/2026-08-27_11-00-31.md": {
    "sha": "1ba17a4a476ea23d449081383c4b381f589e826ddf7fae76d4ec396c0092fc63",
    "size": 1657,
@@ -60236,12 +60248,6 @@
    "sha": "10cffccc550f7d0a44c658d91960290a99909911fa5ae66e26bfccab89b98459",
    "size": 1657,
    "mtime": 1787767258,
-   "machine": "H1"
-  },
-  "cron/output/c0693f5169c8/2026-08-26_17-00-12.md": {
-   "sha": "f7ebad56331f8d2d80191bf34db5ad8df457d0801639e63744283f2d33a7cdf0",
-   "size": 1621,
-   "mtime": 1787752812,
    "machine": "H1"
   },
   "cron/output/c0693f5169c8/2026-08-28_01-00-29.md": {
@@ -61306,6 +61312,12 @@
    "mtime": 1787810840,
    "machine": "H1"
   },
+  "cron/output/de59a5c7cc5f/2026-08-28_18-52-28.md": {
+   "sha": "c7adb6d439ede7af93585762727f2420fc0ec52b4f549d0c738c0fde0662dcf0",
+   "size": 8608,
+   "mtime": 1787932348,
+   "machine": "H1"
+  },
   "cron/output/de59a5c7cc5f/2026-08-26_15-03-03.md": {
    "sha": "6a31ac73e85560fa052a8f456d25eecbaf14271b73f2b4456a4b697a66c21099",
    "size": 5624,
@@ -61388,12 +61400,6 @@
    "sha": "d74353cce49478af7896c7b25d3d700c9d8fa8ed5a8f488fb4ac9cf38fb76ac4",
    "size": 5624,
    "mtime": 1787648271,
-   "machine": "H1"
-  },
-  "cron/output/de59a5c7cc5f/2026-08-22_11-39-52.md": {
-   "sha": "57dd7a1d47657e455a9abb972dcaaed4dc60feb4a6ff66862e5948eb440c34c9",
-   "size": 5624,
-   "mtime": 1787387992,
    "machine": "H1"
   },
   "cron/output/de59a5c7cc5f/2026-08-23_17-47-41.md": {
@@ -90917,9 +90923,9 @@
    "machine": "H1"
   },
   "skills/productivity/google-workspace/scripts/_hermes_home.py": {
-   "sha": "a8861702cefda8684e1bec353044dafc0c52dbdd85cf02bc21454126b596baf5",
-   "size": 1630,
-   "mtime": 1777926383,
+   "sha": "4d0f4393059688353bf8a3cca8118f08548edbae6f3c6ed477ff9f2d1205cff0",
+   "size": 1636,
+   "mtime": 1787932325,
    "machine": "H1"
   },
   "skills/productivity/google-workspace/scripts/google_api.py": {
@@ -143782,6 +143788,60 @@
    "mtime": 1785266191,
    "machine": "H1"
   },
+  "state-snapshots/20260828-154240-pre-update/manifest.json": {
+   "sha": "0a461f534dd0f94d9d7421aa725db250685784864eba6d6713768ec30de4a85b",
+   "size": 657,
+   "mtime": 1787931760,
+   "machine": "H1"
+  },
+  "state-snapshots/20260828-154240-pre-update/channel_directory.json": {
+   "sha": "996604c3e157e18e8241700ccabfcfb35915de26702f8f908d3a1df07547e814",
+   "size": 67,
+   "mtime": 1787931688,
+   "machine": "H1"
+  },
+  "state-snapshots/20260828-154240-pre-update/auth.json": {
+   "sha": "d02bbe1d72dba3877c9e5351d02ae33ac4caf1bb5dc59a570ec233a7ead52c81",
+   "size": 5468,
+   "mtime": 1786995794,
+   "machine": "H1"
+  },
+  "state-snapshots/20260828-154240-pre-update/processes.json": {
+   "sha": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "size": 2,
+   "mtime": 1787926151,
+   "machine": "H1"
+  },
+  "state-snapshots/20260828-154240-pre-update/config.yaml": {
+   "sha": "5f1f9af19790ee51efd58ceb248a4ad6d3a18c3e2a21b59beea9649a6e112d32",
+   "size": 73323,
+   "mtime": 1787917941,
+   "machine": "H1"
+  },
+  "state-snapshots/20260828-154240-pre-update/gateway_state.json": {
+   "sha": "02cca0240523bbf68f7579a72faf24ea5cb42d1180a00561351a5dc679f04792",
+   "size": 1301,
+   "mtime": 1787926952,
+   "machine": "H1"
+  },
+  "state-snapshots/20260828-154240-pre-update/pairing/_rate_limits.json": {
+   "sha": "a0299ec9d6deffa45815d1580e7461289ab90eadd7da629cfe186665b6c3908c",
+   "size": 44,
+   "mtime": 1778659014,
+   "machine": "H1"
+  },
+  "state-snapshots/20260828-154240-pre-update/pairing/telegram-pending.json": {
+   "sha": "f30bbc7950a509c5d7f1aeaa6b4fb9001c474197239ebe668d61915356664c14",
+   "size": 113,
+   "mtime": 1778659014,
+   "machine": "H1"
+  },
+  "state-snapshots/20260828-154240-pre-update/cron/jobs.json": {
+   "sha": "a5847d3fd411b1557df229e96a1b70dd1c73c00d40e8f4bd112658ab440fce82",
+   "size": 73358,
+   "mtime": 1787931712,
+   "machine": "H1"
+  },
   "state-snapshots/20260805-140540-pre-update/manifest.json": {
    "sha": "325a41cea1423c0078f6261c4b7459dd31ffa6eebf812abc091d68a706c8404e",
    "size": 657,
@@ -144428,6 +144488,60 @@
    "sha": "0a089faed1869ead9407b6f4b0e82789a7859e90720eb51093010a42af3cc82e",
    "size": 51868,
    "mtime": 1786089311,
+   "machine": "H1"
+  },
+  "state-snapshots/20260828-160146-pre-update/manifest.json": {
+   "sha": "2a6184367828c088c3d3717325a71967599ef7869b50d111617056cf6e96f710",
+   "size": 656,
+   "mtime": 1787932906,
+   "machine": "H1"
+  },
+  "state-snapshots/20260828-160146-pre-update/channel_directory.json": {
+   "sha": "89cd9601a77b72d2a9d9f05bcd6d66af22b08e8274bf0b6254224774290906e0",
+   "size": 67,
+   "mtime": 1787932891,
+   "machine": "H1"
+  },
+  "state-snapshots/20260828-160146-pre-update/auth.json": {
+   "sha": "d02bbe1d72dba3877c9e5351d02ae33ac4caf1bb5dc59a570ec233a7ead52c81",
+   "size": 5468,
+   "mtime": 1786995794,
+   "machine": "H1"
+  },
+  "state-snapshots/20260828-160146-pre-update/processes.json": {
+   "sha": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "size": 2,
+   "mtime": 1787932901,
+   "machine": "H1"
+  },
+  "state-snapshots/20260828-160146-pre-update/config.yaml": {
+   "sha": "5f1f9af19790ee51efd58ceb248a4ad6d3a18c3e2a21b59beea9649a6e112d32",
+   "size": 73323,
+   "mtime": 1787917941,
+   "machine": "H1"
+  },
+  "state-snapshots/20260828-160146-pre-update/gateway_state.json": {
+   "sha": "4abf7f5f9b573db47cc68c350ca8adec8d2098e6dd145ea1369e08a0ddca4b6d",
+   "size": 957,
+   "mtime": 1787932901,
+   "machine": "H1"
+  },
+  "state-snapshots/20260828-160146-pre-update/pairing/_rate_limits.json": {
+   "sha": "a0299ec9d6deffa45815d1580e7461289ab90eadd7da629cfe186665b6c3908c",
+   "size": 44,
+   "mtime": 1778659014,
+   "machine": "H1"
+  },
+  "state-snapshots/20260828-160146-pre-update/pairing/telegram-pending.json": {
+   "sha": "f30bbc7950a509c5d7f1aeaa6b4fb9001c474197239ebe668d61915356664c14",
+   "size": 113,
+   "mtime": 1778659014,
+   "machine": "H1"
+  },
+  "state-snapshots/20260828-160146-pre-update/cron/jobs.json": {
+   "sha": "f046ec6a2ab75d3c8eb96c57f314bf2e674a1855836393b19a91745658df2ceb",
+   "size": 73358,
+   "mtime": 1787932855,
    "machine": "H1"
   },
   "state-snapshots/20260728-223538-pre-update/manifest.json": {
@@ -214204,13 +214318,13 @@
    "mtime": 1785674022,
    "machine": "H1"
   },
-  "profiles/cumulus-light/state-snapshots/20260828-054849-pre-update/manifest.json": {
-   "sha": "7723f9c10160aecf528f8a8d9eb1b1c7a1f7b076f3d9964e7bff4d5841c08b8f",
+  "profiles/cumulus-light/state-snapshots/20260828-160146-pre-update/manifest.json": {
+   "sha": "02067ac14e109ac8f8af4b6215b297b245cd423d277ca15de65b520a04d02f56",
    "size": 302,
-   "mtime": 1787896129,
+   "mtime": 1787932906,
    "machine": "H1"
   },
-  "profiles/cumulus-light/state-snapshots/20260828-054849-pre-update/config.yaml": {
+  "profiles/cumulus-light/state-snapshots/20260828-160146-pre-update/config.yaml": {
    "sha": "fd793033ab12be5ff5be1c2578e6008ebbef1009abef33a239789b8ab5e8eb32",
    "size": 2652,
    "mtime": 1787730631,
@@ -215009,9 +215123,9 @@
    "machine": "H1"
   },
   "profiles/kiro-worker/skills/productivity/google-workspace/scripts/_hermes_home.py": {
-   "sha": "a8861702cefda8684e1bec353044dafc0c52dbdd85cf02bc21454126b596baf5",
-   "size": 1630,
-   "mtime": 1777926383,
+   "sha": "4d0f4393059688353bf8a3cca8118f08548edbae6f3c6ed477ff9f2d1205cff0",
+   "size": 1636,
+   "mtime": 1787932325,
    "machine": "H1"
   },
   "profiles/kiro-worker/skills/productivity/google-workspace/scripts/google_api.py": {
@@ -217720,19 +217834,19 @@
    "mtime": 1779345654,
    "machine": "H1"
   },
-  "profiles/kiro-worker/state-snapshots/20260828-054849-pre-update/manifest.json": {
-   "sha": "72eac825140ba7bddcf6eb23cf11cb8856eec68c3d644c6cef5a43fba3d9fc30",
+  "profiles/kiro-worker/state-snapshots/20260828-160146-pre-update/manifest.json": {
+   "sha": "c651513fa7ad4a59c7738a3ba14cfcbc1cf89df15377adcb9a240030cc608605",
    "size": 299,
-   "mtime": 1787896129,
+   "mtime": 1787932906,
    "machine": "H1"
   },
-  "profiles/kiro-worker/state-snapshots/20260828-054849-pre-update/auth.json": {
+  "profiles/kiro-worker/state-snapshots/20260828-160146-pre-update/auth.json": {
    "sha": "9a3f7e3b556d98dda0a6bee6ac888a56780b3f917932ccbc7aba89a814c9b96f",
    "size": 4009,
    "mtime": 1780340859,
    "machine": "H1"
   },
-  "profiles/kiro-worker/state-snapshots/20260828-054849-pre-update/config.yaml": {
+  "profiles/kiro-worker/state-snapshots/20260828-160146-pre-update/config.yaml": {
    "sha": "1c5582ea0462c896ec9be2bf73289f0dc2e38ff469a2a7187ba3c19f4dadebdc",
    "size": 2158,
    "mtime": 1787730631,
