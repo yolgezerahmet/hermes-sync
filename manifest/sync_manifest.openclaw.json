@@ -1,0 +1,50 @@
+{
+ "node": "openclaw",
+ "ts": "2026-08-28T18:36:23",
+ "revision": "366d2d1efd32",
+ "file_count": 7,
+ "files": {
+  "skills/cumulus-sync-motor/config.openclaw.json": {
+   "sha": "609cc904be50fac879d173d138983cf8ed6f4e659da1cb6023eb422c8b57848d",
+   "size": 2930,
+   "mtime": 1785772360,
+   "machine": "H1"
+  },
+  "skills/cumulus-sync-motor/SKILL.md": {
+   "sha": "e6e459e85b73d47b508f8df2ce936d7c528c9001158dd0c1d9d50de9adfd19e1",
+   "size": 3755,
+   "mtime": 1785762270,
+   "machine": "H1"
+  },
+  "skills/cumulus-sync-motor/config.example.json": {
+   "sha": "34a399faf2cf482736f9d671cc9116e537c571f57c8e6f064a47dcd4aff0498f",
+   "size": 1448,
+   "mtime": 1785762310,
+   "machine": "H1"
+  },
+  "skills/cumulus-sync-motor/scripts/sync_motor.py": {
+   "sha": "8804b3c36fe6f5e331587e85c4e617fa4a3b05036fcec977684707a0797c44cc",
+   "size": 50400,
+   "mtime": 1785776468,
+   "machine": "H1"
+  },
+  "skills/cumulus-sync-motor/scripts/hermes_full_backup.py": {
+   "sha": "8091f94423026c28df8d87b536f93cac3ef36893078f48df8c3f756d04d79e05",
+   "size": 4443,
+   "mtime": 1787845103,
+   "machine": "H1"
+  },
+  "skills/cumulus-sync-motor/scripts/__pycache__/sync_motor.cpython-312.pyc": {
+   "sha": "7d3e9de70b25ab22f3dcecca3dc0e58c1514f313e24fda8e811cfd55fb385cc2",
+   "size": 55095,
+   "mtime": 1785762338,
+   "machine": "H1"
+  },
+  "skills/cumulus-sync-motor/tests/test_sync_motor.py": {
+   "sha": "9461cbb0ff0ffecfe8b57153619d2883adff31dd3dd6aa64fc256464bc5005b4",
+   "size": 4519,
+   "mtime": 1785763481,
+   "machine": "H1"
+  }
+ }
+}
