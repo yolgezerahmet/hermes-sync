@@ -2030,13 +2030,24 @@ def record_run(cfg, komut, rc, node=None, extra=None):
         print(f"  ⚠ son-koşu raporu yazılamadı: {e}")
 
 def _tar_node(cfg, node, outdir, ts):
-    """Node'u tar.gz yap (gizli hariç) → (tar_path, sha)."""
-    import hashlib
+    """Node'u tar.gz yap (gizli hariç) → (tar_path, sha).
+
+    28 Ağu 2026 FIX: config.json'daki `include` (virgüllü glob listesi) ve
+    `max_kb` (tar üst sınırı) ayarları ARTIK uygulanıyor. Öncesinde hermes
+    node'u (/root/.hermes, backups 39GB dahil) TÜM dizini tar ediyordu →
+    27GB tar + rclone upload 30dk timeout (syncver_* birikimi + disk %100).
+    include yoksa eski davranış (tüm dizin) korunur.
+    """
+    import hashlib, fnmatch
     src = cfg["dirs"][node]
     base = src["path"] if isinstance(src, dict) else src
+    include = (src.get("include") if isinstance(src, dict) else None)
+    max_kb = (src.get("max_kb") if isinstance(src, dict) else None)
     if not os.path.exists(base):
         return None, None
     tarp = os.path.join(outdir, f"{node}_{ts}.tar.gz")
+    pats = [x.strip() for x in include.split(",")] if include else []
+    base_parent = os.path.dirname(base.rstrip("/")) or base
     with tarfile.open(tarp, "w:gz") as tar:
         for root, dirs, files in os.walk(base):
             dirs[:] = [d for d in dirs if d != ".git"]
@@ -2044,12 +2055,21 @@ def _tar_node(cfg, node, outdir, ts):
                 if any(sec in f for sec in (".env", ".key", ".pem")):
                     continue
                 p = os.path.join(root, f)
+                rel = os.path.relpath(p, base_parent)
+                if pats:
+                    if not any(fnmatch.fnmatch(rel, pat) or fnmatch.fnmatch(f, pat) for pat in pats):
+                        continue
                 try:
-                    tar.add(p, arcname=os.path.relpath(p, os.path.dirname(base)))
+                    tar.add(p, arcname=rel)
                 except OSError as e:
                     # Canlı yazılan dosya tar sırasında büyüdü/küçüldü — atla
                     # (rsync --ignore-errors deseni; gateway log/db'leri için normal)
                     print(f"    ⚠ atlandı (canlı dosya): {p} ({e})")
+    size_kb = os.path.getsize(tarp) // 1024
+    if max_kb and size_kb > int(max_kb):
+        os.remove(tarp)
+        print(f"    ⚠ {node}: tar {size_kb}KB > max_kb {max_kb}KB — atlandı (küçük node kuralı; hermes-full cron kapsar)")
+        return None, None
     h = hashlib.sha256()
     with open(tarp, "rb") as f:
         for chunk in iter(lambda: f.read(65536), b""):
