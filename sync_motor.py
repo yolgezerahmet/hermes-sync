@@ -2046,7 +2046,12 @@ def _tar_node(cfg, node, outdir, ts):
     if not os.path.exists(base):
         return None, None
     tarp = os.path.join(outdir, f"{node}_{ts}.tar.gz")
-    pats = [x.strip() for x in include.split(",")] if include else []
+    if include is None:
+        pats = []
+    elif isinstance(include, str):
+        pats = [x.strip() for x in include.split(",") if x.strip()]
+    else:
+        pats = [str(x).strip() for x in include if str(x).strip()]
     base_parent = os.path.dirname(base.rstrip("/")) or base
     with tarfile.open(tarp, "w:gz") as tar:
         for root, dirs, files in os.walk(base):
@@ -2106,7 +2111,7 @@ def cmd_backup(cfg, node=None, hub=None, dry_run=False):
         for n in nodes:
             tarp, sha = _tar_node(cfg, n, tmp, time.strftime("%Y%m%d_%H%M%S"))
             if not tarp:
-                print(f"    ⚠ {n}: kaynak yok — atlandı"); continue
+                print(f"    ⚠ {n}: atlandı (kaynak yok veya max_kb — yukarıya bak)"); continue
             if dry_run:
                 print(f"    [DRY] {n}: {os.path.basename(tarp)} ({os.path.getsize(tarp)//1024}KB) sha={sha[:12]}")
                 continue
