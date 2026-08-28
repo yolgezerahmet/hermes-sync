@@ -79,7 +79,7 @@ def run(cmd, timeout=600, cwd=None):
     except Exception as e:
         return -1, "", str(e)
 
-def motor(*args, timeout=900):
+def motor(*args, timeout=1800):
     """sync_motor.py komutu sarmalayıcı."""
     return run([sys.executable, str(MOTOR), *args], timeout=timeout)
 
@@ -188,7 +188,7 @@ def run_backup() -> tuple:
         print("  💾 YEDEK: motor eski (no-op — GDrive snapshot both içinde)")
         return 0, "", "backup yalnız v1.6.3+ — no-op"
     print("  💾 YEDEK: sync_motor backup")
-    rc, out, err = motor("backup", timeout=1800)
+    rc, out, err = motor("backup", timeout=3600)
     if rc == 0:
         print("  ✅ yedek tamam")
     else:
