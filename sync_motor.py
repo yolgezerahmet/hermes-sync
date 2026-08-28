@@ -63,7 +63,7 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 
-__version__ = "1.6.5"
+__version__ = "1.8.0"
 __author__ = "CumulusNET Engineering"
 __license__ = "MIT"
 
@@ -776,67 +776,86 @@ def gh_ensure_repo(cfg):
 def gh_push_manifest(cfg, mf):
     """Manifest'i GitHub'a API ile push et (repo clone'suz).
     Doğrudan urllib ile çağrılır — shell argüman limiti sorununu aşar.
-    GitHub content API limiti ~1MB — manifest küçük tutulmalı."""
+    GitHub content API limiti ~1MB — manifest küçük tutulmalı.
+
+    v1.8.0 (28 Ağu, OceanAPI #1): SHARD manifest — 27MB tek dosya yerine
+    node başına ayrı JSON. Sadece değişen node'un shard'ı push edilir.
+    """
     import base64
     import urllib.request
     import urllib.error
 
     repo = cfg["github"]["repo"]
-    mfile = cfg["github"]["manifest_file"]
     token = _gh_token()
     if not token:
         log.error("gh token alınamadı — gh auth status kontrol")
         return False
 
-    content = json.dumps(mf, indent=1, ensure_ascii=False)
-    b64 = base64.b64encode(content.encode()).decode()
+    # Shard'lama: her node ayrı dosya
+    import hashlib
+    ts = datetime.now().isoformat(timespec="seconds")
+    pushed = 0
+    for node, node_files in _split_by_node(mf):
+        if not node_files:
+            continue
+        shard = {
+            "node": node,
+            "ts": ts,
+            "revision": hashlib.sha256(json.dumps(node_files, sort_keys=True).encode()).hexdigest()[:12],
+            "file_count": len(node_files),
+            "files": node_files,
+        }
+        content = json.dumps(shard, indent=1, ensure_ascii=False)
+        b64 = base64.b64encode(content.encode()).decode()
+        mfile = f"manifest/sync_manifest.{node}.json"
 
-    # Mevcut SHA
-    sha = None
-    url_get = f"https://api.github.com/repos/{repo}/contents/{mfile}"
-    req_get = urllib.request.Request(url_get,
-                                     headers={"Authorization": f"Bearer {token}",
-                                              "User-Agent": "sync-motor"})
-    try:
-        with urllib.request.urlopen(req_get, timeout=20) as resp:
-            data = json.loads(resp.read().decode())
-            sha = data.get("sha")
-    except urllib.error.HTTPError as e:
-        if e.code != 404:
-            log.warning(f"manifest GET {e.code}")
-    except Exception as e:
-        log.warning(f"manifest GET: {e}")
+        # Mevcut SHA
+        sha = None
+        url_get = f"https://api.github.com/repos/{repo}/contents/{mfile}"
+        req_get = urllib.request.Request(url_get,
+                headers={"Authorization": f"Bearer {token}", "User-Agent": "sync-motor"})
+        try:
+            with urllib.request.urlopen(req_get, timeout=20) as resp:
+                data = json.loads(resp.read().decode())
+                sha = data.get("sha")
+        except urllib.error.HTTPError as e:
+            if e.code != 404:
+                log.warning(f"shard GET {e.code} {node}")
+        except Exception as e:
+            log.warning(f"shard GET: {e}")
 
-    payload = {
-        "message": f"sync {datetime.now().isoformat()}",
-        "content": b64,
-    }
-    if sha:
-        payload["sha"] = sha
+        payload = {"message": f"sync {ts} {node}", "content": b64}
+        if sha:
+            payload["sha"] = sha
+        url_put = f"https://api.github.com/repos/{repo}/contents/{mfile}"
+        req_put = urllib.request.Request(url_put,
+                data=json.dumps(payload).encode(),
+                headers={"Authorization": f"Bearer {token}", "User-Agent": "sync-motor",
+                         "Content-Type": "application/json"},
+                method="PUT")
+        try:
+            with urllib.request.urlopen(req_put, timeout=30) as resp:
+                resp.read()
+                pushed += 1
+        except Exception as e:
+            log.warning(f"shard PUT {node}: {e}")
+    log.info(f"Shard push: {pushed} node güncellendi")
+    return pushed > 0
 
-    data = json.dumps(payload).encode()
-    req_put = urllib.request.Request(
-        url_get, data=data, method="PUT",
-        headers={"Authorization": f"Bearer {token}",
-                 "Content-Type": "application/json",
-                 "User-Agent": "sync-motor"})
-    try:
-        with urllib.request.urlopen(req_put, timeout=30) as resp:
-            result = json.loads(resp.read().decode())
-            log.info(f"Manifest GitHub'a push edildi "
-                     f"({len(mf['files'])} dosya, sha={result.get('sha','')[:8]})")
-            return True
-    except urllib.error.HTTPError as e:
-        body = e.read().decode(errors="ignore")[:200]
-        log.error(f"Manifest push başarısız: HTTP {e.code} {body}")
-        return False
-    except Exception as e:
-        log.error(f"Manifest push başarısız: {e}")
-        return False
+def _split_by_node(mf):
+    """Manifest'i node öneklerine göre böl (shard)."""
+    nodes = sorted({p.split("/")[0] for p in (mf.get("files", {}) or {})})
+    for node in nodes:
+        prefix = f"{node}/"
+        node_files = {p[len(prefix):]: info for p, info in (mf.get("files", {}) or {}).items()
+                      if p.startswith(prefix)}
+        yield node, node_files
 
 
 def gh_fetch_manifest(cfg):
-    """GitHub'dan uzak manifest çek (urllib ile)."""
+    """GitHub'dan uzak manifest çek (urllib ile).
+    v1.8.0 (28 Ağu): SHARD destekli — manifest/*.json dosyalarını birleştir.
+    Eski tek dosya (sync_manifest.json) da desteklenir (geriye uyum)."""
     import base64
     import urllib.request
     import urllib.error
@@ -847,6 +866,37 @@ def gh_fetch_manifest(cfg):
     if not token:
         return None
 
+    merged = {"files": {}}
+
+    # 1) Shard'ları dene (manifest/ dizini)
+    url = f"https://api.github.com/repos/{repo}/contents/manifest"
+    req = urllib.request.Request(
+        url, headers={"Authorization": f"Bearer {token}", "User-Agent": "sync-motor"})
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            shard_list = json.loads(resp.read().decode())
+        for item in shard_list:
+            if item.get("type") != "file" or not item["name"].endswith(".json"):
+                continue
+            dl_url = item.get("download_url")
+            if not dl_url:
+                continue
+            req2 = urllib.request.Request(
+                dl_url, headers={"Authorization": f"Bearer {token}",
+                                 "User-Agent": "sync-motor"})
+            with urllib.request.urlopen(req2, timeout=60) as resp2:
+                shard = json.loads(resp2.read().decode())
+            node = shard.get("node", item["name"].replace("sync_manifest.", "").replace(".json", ""))
+            for fpath, finfo in (shard.get("files", {}) or {}).items():
+                merged["files"][f"{node}/{fpath}"] = finfo
+        if merged["files"]:
+            return merged
+    except urllib.error.HTTPError:
+        pass  # manifest/ yok — eski tek dosyaya düş
+    except Exception as e:
+        log.debug(f"shard manifest GET: {e}")
+
+    # 2) Eski tek dosya (geriye uyum)
     url = f"https://api.github.com/repos/{repo}/contents/{mfile}"
     req = urllib.request.Request(
         url, headers={"Authorization": f"Bearer {token}",
