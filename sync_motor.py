@@ -330,11 +330,15 @@ def load_config(path=None):
                                 "config.json")
     if os.path.exists(path):
         try:
-            with open(path) as f:
+            with open(path, encoding="utf-8", errors="replace") as f:
                 user_cfg = json.load(f)
-            # Derin birleştirme (basit: üst seviye)
+            # Derin birleştirme: kullanıcı config'i varsa 'dirs' TAMAMEN kullanıcının
+            # değeriyle değiştirilir (DEFAULT_CONFIG node'ları Windows'ta path'siz
+            # kalıp gereksiz yere koşmaz / geri gelmez — hermes-full örneği).
             for section, values in user_cfg.items():
-                if isinstance(values, dict) and section in cfg:
+                if section == "dirs" and isinstance(values, dict):
+                    cfg["dirs"] = values
+                elif isinstance(values, dict) and section in cfg:
                     cfg[section].update(values)
                 else:
                     cfg[section] = values
@@ -358,12 +362,20 @@ def load_config(path=None):
         f"gdrive:hermes-sync/{user_id}/{machine_id}/versiyonlu")
     cfg["gdrive"]["user_root"] = f"gdrive:hermes-sync/{user_id}"
 
-    # Windows'ta dizin yollarını çevir
+    # Windows'ta dizin yollarını çevir — SADECE config.json'da tanımlanmamışsa.
+    # (Öncesi patent'i her zaman C:\ProjectCumulus ile eziyordu; kullanıcı
+    # config'inde gerçek yol varken yanlış dizine bakıyordu — H2 29 Ağu 2026.)
     if os.name == "nt":
-        cfg["dirs"]["kernel"]["paths"] = [r"C:\cumulusos"]
-        cfg["dirs"]["patent"]["path"] = r"C:\ProjectCumulus"
-        cfg["dirs"]["scripts"]["path"] = str(Path.home() / ".hermes" / "scripts")
-        cfg["dirs"]["openclaw"]["path"] = str(Path.home() / ".openclaw")
+        _d = cfg.get("dirs", {})
+        if "kernel" in _d and "paths" not in _d["kernel"]:
+            _d["kernel"]["paths"] = ([_d["kernel"]["path"]] if _d["kernel"].get("path")
+                                     else [r"C:\cumulusos"])
+        if "patent" in _d and not _d["patent"].get("path"):
+            _d["patent"]["path"] = r"C:\ProjectCumulus"
+        if "scripts" in _d and not _d["scripts"].get("path"):
+            _d["scripts"]["path"] = str(Path.home() / ".hermes" / "scripts")
+        if "openclaw" in _d and not _d["openclaw"].get("path"):
+            _d["openclaw"]["path"] = str(Path.home() / ".openclaw")
 
     # Yol genişlet (~ → home)
     for k in ("manifest_local", "logfile"):
@@ -531,7 +543,7 @@ def load_manifest(cfg):
     path = cfg["state"]["manifest_local"]
     if os.path.exists(path):
         try:
-            with open(path) as f:
+            with open(path, encoding="utf-8", errors="replace") as f:
                 return json.load(f)
         except Exception:
             pass
@@ -548,7 +560,7 @@ def save_manifest(cfg, mf):
     path = cfg["state"]["manifest_local"]
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     tmp = path + ".tmp"
-    with open(tmp, "w") as f:
+    with open(tmp, "w", encoding="utf-8") as f:
         json.dump(mf, f, indent=1, ensure_ascii=False)
     os.replace(tmp, path)   # atomik yaz
 
@@ -591,10 +603,10 @@ def run_cmd(cmd, timeout=60, shell=False):
     try:
         if shell:
             r = subprocess.run(cmd, shell=True, capture_output=True,
-                               text=True, timeout=timeout)
+                               text=True, errors="replace", timeout=timeout)
         else:
             r = subprocess.run(cmd.split(), capture_output=True,
-                               text=True, timeout=timeout)
+                               text=True, errors="replace", timeout=timeout)
         return r.stdout.strip(), r.returncode
     except subprocess.TimeoutExpired:
         return "timeout", -1
@@ -944,6 +956,41 @@ def rclone_available():
     return rc == 0
 
 
+def _pack_node(base, pkg, include, exclude_dirs, limit=5000):
+    """Node dizinini .tar.gz'e paketle — saf Python, kabuk yok.
+
+    include: fnmatch desenleri (dosya adı üzerinde)
+    exclude_dirs: atlanacak dizin adları
+    Dönüş: 0 başarı, 255 hata/boş (eski kabuk sözleşmesiyle uyumlu).
+    """
+    import tarfile as _tf
+    import fnmatch
+    exc = {d.lower().strip("*/") for d in (exclude_dirs or [])}
+    picked = []
+    for root, dirs, files in os.walk(base):
+        dirs[:] = [d for d in dirs if d.lower() not in exc]
+        for f in files:
+            if any(fnmatch(f, p) for p in (include or ["*"])):
+                picked.append(os.path.join(root, f))
+                if len(picked) >= limit:
+                    break
+        if len(picked) >= limit:
+            break
+    if not picked:
+        return 255
+    try:
+        with _tf.open(pkg, "w:gz") as tf:
+            for fp in picked:
+                try:
+                    tf.add(fp, arcname=os.path.relpath(fp, base))
+                except OSError:
+                    continue          # kilitli/okunamayan dosya paketi bozmasın
+    except Exception as e:
+        log.debug(f"_pack_node: {e}")
+        return 255
+    return 0 if os.path.exists(pkg) and os.path.getsize(pkg) > 0 else 255
+
+
 def gdrive_snapshot(cfg, node=None):
     """
     Seçilen node'ların GDrive'da versiyonlu snapshot'ını al.
@@ -955,7 +1002,7 @@ def gdrive_snapshot(cfg, node=None):
         return None
 
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-    workdir = "/tmp/sync_motor_snapshot"
+    workdir = os.path.join(tempfile.gettempdir(), "sync_motor_snapshot")
     shutil.rmtree(workdir, ignore_errors=True)
     os.makedirs(workdir, exist_ok=True)
 
@@ -993,10 +1040,11 @@ def gdrive_snapshot(cfg, node=None):
         find_cmd = " -o ".join(find_expr)
         excl_find = " ".join(f"-not -path '*/{d}/*'" for d in excl)
 
-        out, rc = run_cmd(
-            f'cd "{base_expanded}" && find . {excl_find} '
-            f'\\( {find_cmd} \\) -type f 2>/dev/null | head -5000 | '
-            f'tar -czf "{pkg}" -T - 2>/dev/null', timeout=120, shell=True)
+        # Paketleme: Python tarfile (platformdan bağımsız).
+        # Eski hal find|head|tar boru hattıydı — Windows'ta shell=True cmd.exe'ye
+        # düşüyor, find/head/tar bulunmuyordu (rc=255). Aynı semantik korunur:
+        # include pattern eşleşmesi, exclude_dirs budama, 5000 dosya sınırı.
+        rc = _pack_node(base_expanded, pkg, include, excl, limit=5000)
         if rc != 0 or not os.path.exists(pkg) or os.path.getsize(pkg) == 0:
             log.warning(f"{label}: paket oluşturulamadı "
                         f"(rc={rc}, boyut={os.path.exists(pkg) and os.path.getsize(pkg)})")
@@ -1226,7 +1274,7 @@ def cmd_add_node(cfg, name, path, include="*", max_kb=1024):
     user_cfg = {}
     if os.path.exists(config_path):
         try:
-            with open(config_path) as f:
+            with open(config_path, encoding="utf-8", errors="replace") as f:
                 user_cfg = _json.load(f)
         except Exception:
             user_cfg = {}
@@ -1243,7 +1291,7 @@ def cmd_add_node(cfg, name, path, include="*", max_kb=1024):
         "gdrive": True,
     }
 
-    with open(config_path, "w") as f:
+    with open(config_path, "w", encoding="utf-8") as f:
         _json.dump(user_cfg, f, indent=2, ensure_ascii=False)
     log.info(f"Node eklendi: {name} → {path} (config.json)")
     log.info("Şimdi: python3 sync_motor.py push --node " + name)
@@ -2024,27 +2072,34 @@ def record_run(cfg, komut, rc, node=None, extra=None):
         })
         hist = hist[-50:]  # son 50 koşu
         os.makedirs(os.path.dirname(RUN_STATE), exist_ok=True)
-        json.dump({"history": hist}, open(RUN_STATE, "w"),
+        json.dump({"history": hist}, open(RUN_STATE, "w", encoding="utf-8"),
                   ensure_ascii=False, indent=2)
     except Exception as e:
         print(f"  ⚠ son-koşu raporu yazılamadı: {e}")
 
 def _tar_node(cfg, node, outdir, ts):
-    """Node'u tar.gz yap (gizli hariç) → (tar_path, sha).
+    """Node'u tar.gz yap → (tar_path, sha).
 
-    28 Ağu 2026 FIX: config.json'daki `include` (virgüllü glob listesi) ve
-    `max_kb` (tar üst sınırı) ayarları ARTIK uygulanıyor. Öncesinde hermes
-    node'u (/root/.hermes, backups 39GB dahil) TÜM dizini tar ediyordu →
-    27GB tar + rclone upload 30dk timeout (syncver_* birikimi + disk %100).
-    include yoksa eski davranış (tüm dizin) korunur.
+    H1 28 Ağu FIX + H2 29 Ağu Windows birleşik sürümü:
+    - include: virgüllü glob (string) VEYA liste — dosya adı + relpath eşleşir
+    - max_kb: tar öncesi kaba boyut kontrolü (×8 marj, tar sonrası kesin kontrol)
+    - exclude_dirs: dizin adı budaması
+    - sır filtre: .env/.key/.pem/.secret adları atlanır
+    - isdir: Windows Türkçe Unicode yollarda os.path.exists False dönebilir
+      (örn. "Cumulus Patent Dosyaları") — isdir/pathlib güvenilir.
     """
     import hashlib, fnmatch
     src = cfg["dirs"][node]
     base = src["path"] if isinstance(src, dict) else src
     include = (src.get("include") if isinstance(src, dict) else None)
     max_kb = (src.get("max_kb") if isinstance(src, dict) else None)
-    if not os.path.exists(base):
+    if not os.path.isdir(base):
         return None, None
+        return None, None
+    include = src.get("include", ["*"]) if isinstance(src, dict) else ["*"]
+    exclude_dirs = set(
+        d.lower().strip("*/") for d in (src.get("exclude_dirs", []) if isinstance(src, dict) else [])
+    )
     tarp = os.path.join(outdir, f"{node}_{ts}.tar.gz")
     if include is None:
         pats = []
@@ -2078,9 +2133,11 @@ def _tar_node(cfg, node, outdir, ts):
             return None, None
     with tarfile.open(tarp, "w:gz") as tar:
         for root, dirs, files in os.walk(base):
-            dirs[:] = [d for d in dirs if d != ".git"]
+            dirs[:] = [d for d in dirs if d.lower() not in exclude_dirs and d != ".git"]
             for f in files:
-                if any(sec in f for sec in (".env", ".key", ".pem")):
+                if any(sec in f.lower() for sec in (".env", ".key", ".pem", ".secret")):
+                    continue
+                if not any(fnmatch(f, p) for p in include):
                     continue
                 p = os.path.join(root, f)
                 rel = os.path.relpath(p, base_parent)
@@ -2090,8 +2147,6 @@ def _tar_node(cfg, node, outdir, ts):
                 try:
                     tar.add(p, arcname=rel)
                 except OSError as e:
-                    # Canlı yazılan dosya tar sırasında büyüdü/küçüldü — atla
-                    # (rsync --ignore-errors deseni; gateway log/db'leri için normal)
                     print(f"    ⚠ atlandı (canlı dosya): {p} ({e})")
     size_kb = os.path.getsize(tarp) // 1024
     if max_kb and size_kb > int(max_kb):
@@ -2141,7 +2196,7 @@ def cmd_backup(cfg, node=None, hub=None, dry_run=False):
             r = subprocess.run(["rclone", "copyto", tarp,
                                 f"{hub}/{n}/{os.path.basename(tarp)}",
                                 "--ignore-checksum", "--no-traverse"],
-                               capture_output=True, text=True)
+                               capture_output=True, text=True, errors="replace")
             if r.returncode == 0:
                 print(f"    ✅ {n}: {os.path.basename(tarp)} sha={sha[:12]}")
             else:
@@ -2170,7 +2225,7 @@ def cmd_versions(cfg, node=None, hub=None):
     nodes = [node] if node else list(cfg["dirs"].keys())
     for n in nodes:
         r = subprocess.run(["rclone", "lsf", f"{hub}/{n}", "--files-only"],
-                           capture_output=True, text=True)
+                           capture_output=True, text=True, errors="replace")
         vers = [f for f in r.stdout.splitlines() if f.endswith(".tar.gz")]
         print(f"\n  📦 {n}: {len(vers)} versiyon")
         for v in vers[-8:]:
@@ -2188,7 +2243,7 @@ def cmd_rollback(cfg, node, version, hub=None, force=False):
     try:
         tarp = os.path.join(tmp, version)
         r = subprocess.run(["rclone", "copyto", f"{hub}/{node}/{version}", tarp],
-                           capture_output=True, text=True)
+                           capture_output=True, text=True, errors="replace")
         if r.returncode != 0:
             print(f"    ❌ indirme hatası: {r.stderr.strip()[:120]}")
             return 1

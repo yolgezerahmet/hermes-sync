@@ -3,13 +3,15 @@
 H1/H2/H3'ten toplar → zstd sıkıştırır → GDrive versiyonlu + manifest
 Kapsam: memory + config + skills (çöpsüz) + plugins + openclaw + addons
 """
-import os, json, subprocess, hashlib, tarfile, sys, glob
+import os, json, subprocess, hashlib, tarfile, sys, glob, socket, tempfile
 from datetime import datetime
 
 HERMES = os.path.expanduser("~/.hermes")
 OPENCLAW = os.path.expanduser("~/.openclaw")
 TS = datetime.now().strftime("%Y%m%d_%H%M%S")
-GDRIVE = f"gdrive:hermes-sync/hahmet/{os.uname().nodename}/versiyonlu/hermes-full/{TS}"
+NODE = os.environ.get("COMPUTERNAME", socket.gethostname())
+GDRIVE = f"gdrive:hermes-sync/hahmet/{NODE}/versiyonlu/hermes-full/{TS}"
+TMP = tempfile.gettempdir()
 
 # Hariç tutulacak çöp (en büyük tasarruf)
 EXCLUDE_DIRS = [".curator_backups", ".hub", ".git", "__pycache__", "node_modules",
@@ -72,7 +74,7 @@ def main():
     total = sum(os.path.getsize(f) for f, _ in files if os.path.exists(f))
     print(f"Dosya: {len(files)} | Ham: {total/1024/1024:.1f} MB")
 
-    out = f"/tmp/hermes_full_{TS}.tar.zst"
+    out = os.path.join(TMP, f"hermes_full_{TS}.tar.zst")
     size = make_tar(files, out)
     print(f"ZSTD: {size/1024/1024:.1f} MB (sıkıştırma: %{100*size/total:.0f})")
 
@@ -82,17 +84,18 @@ def main():
 
     # GDrive yükle
     r = subprocess.run(["rclone", "copy", out, GDRIVE, "--ignore-checksum"],
-                       capture_output=True, timeout=300)
+                       capture_output=True, timeout=600)
     print(f"GDrive: {'OK' if r.returncode == 0 else 'HATA ' + r.stderr.decode()[:200]}")
 
     # Manifest GDrive'a
-    man = {"ts": TS, "machine": os.uname().nodename, "files": len(files),
+    man = {"ts": TS, "machine": NODE, "files": len(files),
            "raw_mb": round(total/1024/1024, 1), "zstd_mb": round(size/1024/1024, 1),
            "sha": sha, "retention": "7g günlük + 8h haftalık + 12ay aylık"}
-    open("/tmp/hermes_full_latest.json", "w").write(json.dumps(man, indent=2))
-    subprocess.run(["rclone", "copyto", "/tmp/hermes_full_latest.json",
+    man_path = os.path.join(TMP, "hermes_full_latest.json")
+    open(man_path, "w").write(json.dumps(man, indent=2))
+    subprocess.run(["rclone", "copyto", man_path,
                     "gdrive:hermes-sync/hahmet/hermes-full-latest.json", "--ignore-checksum"],
-                   capture_output=True, timeout=120)
+                   capture_output=True, timeout=300)
     print(f"Manifest: {json.dumps(man, ensure_ascii=False)}")
     # Temizlik
     os.remove(out)

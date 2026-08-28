@@ -68,7 +68,7 @@ def make_tar(node, tmp, ts, machine):
     return out
 
 def run_rclone(args):
-    r = subprocess.run(["rclone", *args], capture_output=True, text=True, timeout=600)
+    r = subprocess.run(["rclone", *args], capture_output=True, text=True, errors="replace", timeout=600)
     return r.returncode == 0, r.stdout.strip(), r.stderr.strip()
 
 def hub_kind(hub):

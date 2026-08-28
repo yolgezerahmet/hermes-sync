@@ -71,7 +71,7 @@ def now_iso() -> str:
 def run(cmd, timeout=600, cwd=None):
     """Alt süreç çalıştır; (rc, stdout, stderr) döner."""
     try:
-        r = subprocess.run(cmd, capture_output=True, text=True,
+        r = subprocess.run(cmd, capture_output=True, text=True, errors="replace",
                            timeout=timeout, cwd=str(cwd or MOTOR_DIR))
         return r.returncode, (r.stdout or ""), (r.stderr or "")
     except subprocess.TimeoutExpired:
@@ -85,14 +85,14 @@ def motor(*args, timeout=1800):
 
 def load_config():
     try:
-        return json.load(open(CONFIG))
+        return json.load(open(CONFIG, encoding="utf-8", errors="replace"))
     except Exception:
         return {}
 
 def read_run_state():
     try:
         if RUN_STATE.exists():
-            return json.load(open(RUN_STATE)).get("history", [])
+            return json.load(open(RUN_STATE, encoding="utf-8", errors="replace")).get("history", [])
     except Exception:
         pass
     return []
@@ -221,7 +221,7 @@ def run_once(do_sync=True, do_backup=True, report=True):
                          "backup": status.get("backup", {}).get("rc")}}
         hist.append(rec)
         RUN_STATE.parent.mkdir(parents=True, exist_ok=True)
-        json.dump({"history": hist[-50:]}, open(RUN_STATE, "w"),
+        json.dump({"history": hist[-50:]}, open(RUN_STATE, "w", encoding="utf-8"),
                   ensure_ascii=False, indent=2)
         status["son_kosu"] = rec     # rapora güncel kaydı yaz
     except Exception as e:
