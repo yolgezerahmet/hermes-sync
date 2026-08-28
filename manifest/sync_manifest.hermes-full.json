@@ -1,8 +1,8 @@
 {
  "node": "hermes-full",
- "ts": "2026-08-29T00:36:28",
- "revision": "6857ceed4dfd",
- "file_count": 39788,
+ "ts": "2026-08-29T00:49:27",
+ "revision": "9ecccf944a6a",
+ "file_count": 39789,
  "files": {
   "web-ui-build-stamp.json": {
    "sha": "1ce500a6072adbda5e26e2e5af57f54c296d3ae1023bded79b6a110afe6f494c",
@@ -35,9 +35,9 @@
    "machine": "H1"
   },
   "channel_directory.json": {
-   "sha": "e990a1b951fea9afa31b566a2358f52bf41dc8df6c20d14422136a5dbacf0c33",
+   "sha": "b8314eea700beb05fb034a692421afb55b4ace51e06bb64b483d3f4d2a96cd65",
    "size": 210,
-   "mtime": 1787952685,
+   "mtime": 1787953588,
    "machine": "H1"
   },
   "holographic_facts_backup.20260813_213334.json": {
@@ -101,9 +101,9 @@
    "machine": "H1"
   },
   "ollama_cloud_models_cache.json": {
-   "sha": "28b5c50306915269acb910c5597a719de6309140f07c139bd01abfce6c4da9ad",
+   "sha": "32141402f8ee1b1e5e3f0a4ba53e6eb3fb5a2492c0e4bc73a58a3044c30dbdd9",
    "size": 399,
-   "mtime": 1787934255,
+   "mtime": 1787953567,
    "machine": "H1"
   },
   "PATENT-VOICE.md": {
@@ -125,9 +125,9 @@
    "machine": "H1"
   },
   "provider_models_cache.json": {
-   "sha": "ad346401e6da02c0110486a55bc336ec775c57927bff26b00374b4e8b2f0d9be",
+   "sha": "c8281e70b08782608004914067384b5b6649b3036c7e4fefee48a717902cfcc7",
    "size": 13584,
-   "mtime": 1787934258,
+   "mtime": 1787953573,
    "machine": "H1"
   },
   "config.yaml": {
@@ -52409,9 +52409,9 @@
    "machine": "H1"
   },
   "cron/jobs.json": {
-   "sha": "5515b037ce3c1c286f5077984445315b710d681281a9b8498169a386b55df83e",
+   "sha": "3a0ea369470555718c99221947a977df54c633b45ff7c4a541b8d88d70db5028",
    "size": 74948,
-   "mtime": 1787952957,
+   "mtime": 1787953737,
    "machine": "H1"
   },
   "cron/output/53ec72d91de5/2026-08-17_22-08-45.md": {
@@ -52744,6 +52744,12 @@
    "mtime": 1787949834,
    "machine": "H1"
   },
+  "cron/output/6897d56a0662/2026-08-29_00-43-57.md": {
+   "sha": "aa834d0115f968629e40ed84cc2ae13dc53c97549f8fd08b78e9a8d4cdb0ed60",
+   "size": 729,
+   "mtime": 1787953437,
+   "machine": "H1"
+  },
   "cron/output/6897d56a0662/2026-08-28_23-37-53.md": {
    "sha": "ac2415e74c7c87d73b112f0a524514fc423bc7dbf4d5d7a903c5bf95eceaaf23",
    "size": 730,
@@ -52846,12 +52852,6 @@
    "mtime": 1787947011,
    "machine": "H1"
   },
-  "cron/output/6897d56a0662/2026-08-28_19-39-41.md": {
-   "sha": "582b0540de0b201c235b0b8906d2032c86cb1f68c55f8cb002deab9c4ec69f74",
-   "size": 743,
-   "mtime": 1787935181,
-   "machine": "H1"
-  },
   "cron/output/6897d56a0662/2026-08-28_21-21-47.md": {
    "sha": "1b44502dc11e245815f503081cd84e7c1b65ee6abb09e63626990f2c94945326",
    "size": 730,
@@ -52916,6 +52916,12 @@
    "sha": "8367843aa5dfd26894069525ca117e42cddc789239ab1d38b7e686ce305ec550",
    "size": 730,
    "mtime": 1787943469,
+   "machine": "H1"
+  },
+  "cron/output/6897d56a0662/2026-08-29_00-37-57.md": {
+   "sha": "04dc565de0b8cbc52abf2a2f08f3d6907b3a92ccdaabb7e2cd4d2c2b78170e53",
+   "size": 730,
+   "mtime": 1787953077,
    "machine": "H1"
   },
   "cron/output/6897d56a0662/2026-08-28_22-50-51.md": {
@@ -53002,12 +53008,6 @@
    "mtime": 1787944130,
    "machine": "H1"
   },
-  "cron/output/6897d56a0662/2026-08-28_19-45-41.md": {
-   "sha": "234f80dbffccb8b869bf6c766dda2ea7f2f039d66f9f0c6deeed51bf522634a0",
-   "size": 743,
-   "mtime": 1787935541,
-   "machine": "H1"
-  },
   "cron/output/6897d56a0662/2026-08-28_23-07-52.md": {
    "sha": "52c160abef8480e754ca0f588158f680cf0ad5cafd1dc5a40ba6f7d18960516d",
    "size": 730,
@@ -53080,12 +53080,6 @@
    "mtime": 1787951455,
    "machine": "H1"
   },
-  "cron/output/f3b64aa0dbb1/2026-08-28_20-30-44.md": {
-   "sha": "6e5ccbac832ead3ce16a38a21fbf8efd6a0b3d8447ca67ecfdf8d95c05192208",
-   "size": 149,
-   "mtime": 1787938244,
-   "machine": "H1"
-  },
   "cron/output/f3b64aa0dbb1/2026-08-29_00-25-56.md": {
    "sha": "25fa89e1a8e55fc6aa733f843158bedc587bbf9206a051b3e63708ad046d11f4",
    "size": 149,
@@ -53126,12 +53120,6 @@
    "sha": "946bda097a81fa096770512d84c4ecbf7357c06a3f108799073307164b9d1476",
    "size": 149,
    "mtime": 1787943048,
-   "machine": "H1"
-  },
-  "cron/output/f3b64aa0dbb1/2026-08-28_20-35-45.md": {
-   "sha": "74c852e6847311ff259216991b6c92fd5df15bd90a2a00ef5175535f83f3ced0",
-   "size": 149,
-   "mtime": 1787938545,
    "machine": "H1"
   },
   "cron/output/f3b64aa0dbb1/2026-08-28_22-10-49.md": {
@@ -53228,6 +53216,18 @@
    "sha": "1114f7e272b7888f2ebb58d5b44b7a52be8a4ddfa8e6328fc92da0a154f371b8",
    "size": 149,
    "mtime": 1787948753,
+   "machine": "H1"
+  },
+  "cron/output/f3b64aa0dbb1/2026-08-29_00-40-57.md": {
+   "sha": "64c339266ebd257ae644ae2d5dd08bf545eb27a5064b60002bcf6ef9b0a6a789",
+   "size": 149,
+   "mtime": 1787953257,
+   "machine": "H1"
+  },
+  "cron/output/f3b64aa0dbb1/2026-08-29_00-45-57.md": {
+   "sha": "070b129645097a942aef60db427b52b0ef1fcd3c1fff53ef6246aeedbcd7e269",
+   "size": 149,
+   "mtime": 1787953557,
    "machine": "H1"
   },
   "cron/output/f3b64aa0dbb1/2026-08-28_22-45-51.md": {
@@ -54952,6 +54952,12 @@
    "mtime": 1787774406,
    "machine": "H1"
   },
+  "cron/output/99c4e1e2ad1e/2026-08-29_00-48-56.md": {
+   "sha": "093550db329c3ef83f005f40e84eaadd117dfc61687b29892cbf26ec74dd9e08",
+   "size": 2919,
+   "mtime": 1787953736,
+   "machine": "H1"
+  },
   "cron/output/99c4e1e2ad1e/2026-08-28_16-32-56.md": {
    "sha": "c0033b81a94285313cad8320bd3f4a4a934a4b49582c7d76177b31a21958c2b5",
    "size": 2819,
@@ -54986,12 +54992,6 @@
    "sha": "a954933f6a2a1b30421d0b3278db1ba107adc34a2a99b8e8cc8808b32be56d57",
    "size": 2536,
    "mtime": 1787804707,
-   "machine": "H1"
-  },
-  "cron/output/99c4e1e2ad1e/2026-08-26_20-57-48.md": {
-   "sha": "8fa6c521292c4a91f07dd3ed0e44c72c74eba369353d19b685add364d1ac973c",
-   "size": 3027,
-   "mtime": 1787767068,
    "machine": "H1"
   },
   "cron/output/99c4e1e2ad1e/2026-08-27_10-29-05.md": {
@@ -55234,12 +55234,6 @@
    "mtime": 1787637236,
    "machine": "H1"
   },
-  "cron/output/8b1a738e790c/2026-08-24_22-36-52.md": {
-   "sha": "448afee9fd0f28080e5f696d3057027ee79d212bbd03a1af029ee89ef9e98218",
-   "size": 152,
-   "mtime": 1787600212,
-   "machine": "H1"
-  },
   "cron/output/8b1a738e790c/2026-08-28_17-52-56.md": {
    "sha": "2db24b2293722e8cf9d37c3c526912f13e5834a5e76a1962e9d5cf8302f56adc",
    "size": 152,
@@ -55274,6 +55268,12 @@
    "sha": "7c72ed7d4e74aa9003c69e270838899820e23ef985f7ef0f98d0b3621274d66a",
    "size": 152,
    "mtime": 1787815970,
+   "machine": "H1"
+  },
+  "cron/output/8b1a738e790c/2026-08-29_00-43-01.md": {
+   "sha": "c87240a72fa396afb6f8c834d596544d8972b6acf55d12d3ba5a59757612a7eb",
+   "size": 152,
+   "mtime": 1787953381,
    "machine": "H1"
   },
   "cron/output/8b1a738e790c/2026-08-25_20-46-58.md": {
@@ -57058,6 +57058,12 @@
    "mtime": 1787737064,
    "machine": "H1"
   },
+  "cron/output/98ae0fcb56cf/2026-08-29_00-48-32.md": {
+   "sha": "ddd1eb061d7a5cde8620dcab417ba12ae3f6bbfc90b4d17fbf809b68dca1c3e7",
+   "size": 1952,
+   "mtime": 1787953712,
+   "machine": "H1"
+  },
   "cron/output/98ae0fcb56cf/2026-08-26_06-36-37.md": {
    "sha": "addb621d639a99666409506454ff7e29d8dea5e6834577c23ad65fc037c712a6",
    "size": 1952,
@@ -58138,6 +58144,12 @@
    "mtime": 1787952058,
    "machine": "H1"
   },
+  "cron/output/147ac7b09ffd/2026-08-29_00-37-02.md": {
+   "sha": "ae3f723afb5382fc00c8393e7696dfa89172c0472d9dc83a804d27da7be9b3d3",
+   "size": 160,
+   "mtime": 1787953022,
+   "machine": "H1"
+  },
   "cron/output/147ac7b09ffd/2026-08-28_12-07-33.md": {
    "sha": "72834187f35b2c5aa9125f23d76a9f1c89524251887d623ca6f10c40327257fe",
    "size": 160,
@@ -58154,12 +58166,6 @@
    "sha": "58c05028481028f7743fb9707f0bb372e0ca980632e929ca84f89a2209d50de4",
    "size": 160,
    "mtime": 1787915737,
-   "machine": "H1"
-  },
-  "cron/output/147ac7b09ffd/2026-08-28_11-22-26.md": {
-   "sha": "38a6d3988d580774db991309c5e3722b76cbe6cfaf1267aed21288185aa39da6",
-   "size": 160,
-   "mtime": 1787905346,
    "machine": "H1"
   },
   "cron/output/147ac7b09ffd/2026-08-28_11-37-28.md": {
@@ -145853,9 +145859,9 @@
    "machine": "H1"
   },
   "checkpoints/store/ledgers/94a6b447580330f9.json": {
-   "sha": "ec96108105c36e3478c544344170b0721c989a92be7c41c5c43bb2770ee6b2a5",
-   "size": 11932,
-   "mtime": 1787935394,
+   "sha": "1489a4960c7732ace7e56395f174ad7208241c23d6f1a22e94ffd9677341746e",
+   "size": 12097,
+   "mtime": 1787953698,
    "machine": "H1"
   },
   "checkpoints/store/ledgers/b1254c204136a3b0.json": {
