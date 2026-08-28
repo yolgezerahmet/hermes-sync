@@ -1,8 +1,8 @@
 {
  "node": "hermes-skills",
- "ts": "2026-08-28T22:12:30",
- "revision": "fcd139aefab2",
- "file_count": 15948,
+ "ts": "2026-08-28T22:59:22",
+ "revision": "59644f4c00a2",
+ "file_count": 15965,
  "files": {
   ".curator_state": {
    "sha": "079c2ea53d6f78ecbb5d78833dce63a2b6463c311e1a7404ccea655311127d42",
@@ -13,13 +13,13 @@
   ".bundled_manifest": {
    "sha": "b1c6fe80b9d718fe9d9868be6eb2f1e0eda0af9dce4fa500dfd351e7b6c10a19",
    "size": 3877,
-   "mtime": 1787941788,
+   "mtime": 1787947072,
    "machine": "H1"
   },
   ".usage.json": {
-   "sha": "4ed705fef612d13f0a22d6d9b4a3df2d19e5dd6ee4211ce185ba09a6bfaed275",
+   "sha": "b4765f0fc36c43b7645cb9bcc94b4be66eaa6b0cd3ce2d74fb5cacb85048d6b3",
    "size": 191880,
-   "mtime": 1787942499,
+   "mtime": 1787943650,
    "machine": "H1"
   },
   "cumulus-unutma-checklist.md": {
@@ -29170,6 +29170,24 @@
    "mtime": 1779393772,
    "machine": "H1"
   },
+  "writing/turkce-hikaye-edebi-yazarlik/SKILL.md": {
+   "sha": "a0cec2b8a360fc1524a7f8b15a45a1e6f1aeaf59c7e5fab34581d5f978d36e5e",
+   "size": 4796,
+   "mtime": 1787594246,
+   "machine": "H1"
+  },
+  "hermes-mcp-custom-providers/SKILL.md": {
+   "sha": "d11d5e3e76e23ec7017fc30a7632fed92203065afd4da8d7779a808954bd342a",
+   "size": 3728,
+   "mtime": 1787590851,
+   "machine": "H1"
+  },
+  "hermes-mcp-custom-providers/references/oceanapi-504-split-pattern.md": {
+   "sha": "ba2377d605b2a89819f991e1689016439da1e6b55a5780c0d768eb371fc7eb35",
+   "size": 2599,
+   "mtime": 1787680040,
+   "machine": "H1"
+  },
   "cumulus-pcb-development/SKILL.md": {
    "sha": "ad88b8e4f3d61155bb605686786124ec990687913043b6c504fc46ff11d7e275",
    "size": 1411,
@@ -44848,6 +44866,12 @@
    "mtime": 1785264143,
    "machine": "H1"
   },
+  "cron-fleet-ops/SKILL.md": {
+   "sha": "c4061b5c456e8d87500396d889ed9e70359306f7cea9198a0627d629610493fc",
+   "size": 3326,
+   "mtime": 1787590881,
+   "machine": "H1"
+  },
   "element14/SKILL.md": {
    "sha": "6d0f0546114810681cc5b3ca9422467ff916290961ff5aeb715f718de4f1d14b",
    "size": 11025,
@@ -49682,6 +49706,54 @@
    "sha": "667e20f63d9ce3fac28d3284bd0fb03064ab86173bcb18cdf3c43d67d2695300",
    "size": 6954,
    "mtime": 1779393772,
+   "machine": "H1"
+  },
+  "agent-skills/code-review-and-quality/SKILL.md": {
+   "sha": "f344c00fa92e4617263671a9fb59f2a017c6aefc4e2cb3fed50d4cdc6f503f4e",
+   "size": 21609,
+   "mtime": 1787694812,
+   "machine": "H1"
+  },
+  "agent-skills/security-and-hardening/SKILL.md": {
+   "sha": "76c2ab3a935126736be9d11ad8e577ed0a89c5461de951c50a3e80b4d6814e11",
+   "size": 23937,
+   "mtime": 1787674317,
+   "machine": "H1"
+  },
+  "agent-skills/performance-optimization/SKILL.md": {
+   "sha": "c1a0dac2c6acf9b020447cea87fc5fce532794035cc70e9a21c5de8c1e0e42b0",
+   "size": 14890,
+   "mtime": 1787674317,
+   "machine": "H1"
+  },
+  "agent-skills/doubt-driven-development/SKILL.md": {
+   "sha": "0bd56bb08ceffd5853a605ec5e874f2f3774b323b230614d43360b2d7c528fba",
+   "size": 16216,
+   "mtime": 1787674317,
+   "machine": "H1"
+  },
+  "agent-skills/incremental-implementation/SKILL.md": {
+   "sha": "70c638742c58ca64d5650bc066bbe496a42f5baa43e225bf50434da3c5b6ca33",
+   "size": 9351,
+   "mtime": 1787674317,
+   "machine": "H1"
+  },
+  "agent-skills/observability-and-instrumentation/SKILL.md": {
+   "sha": "5d6ab3a2afa72b5c8633f6b7d2989da36ba8e871be50e3a3d5ef6b31a020fcfd",
+   "size": 10810,
+   "mtime": 1787674317,
+   "machine": "H1"
+  },
+  "agent-skills/debugging-and-error-recovery/SKILL.md": {
+   "sha": "41726ea871e510c9f92e8f5873170cdcd83c6face0b5fa8e1effd7df60e92f21",
+   "size": 10640,
+   "mtime": 1787674317,
+   "machine": "H1"
+  },
+  "agent-skills/ci-cd-and-automation/SKILL.md": {
+   "sha": "d66e3e3bf32664044845ec595ae0a0b40299527f2c178a9f5387ea96edaede25",
+   "size": 11178,
+   "mtime": 1787674317,
    "machine": "H1"
   },
   "embedded-systems/embedded-audio-pipeline/SKILL.md": {
@@ -56302,6 +56374,18 @@
    "mtime": 1786190769,
    "machine": "H1"
   },
+  "kicad-pcb-toolchain/SKILL.md": {
+   "sha": "a0e0c45d643f4982b54e6b479bbc388534c79b26cc6333feebb1d179fd48d21c",
+   "size": 4516,
+   "mtime": 1787590811,
+   "machine": "H1"
+  },
+  "kicad-pcb-toolchain/references/toolchain-inventory.md": {
+   "sha": "c9c67c2d70199a9b9e538c0278fd407dad1eeff87feb43ba785e918e9190884e",
+   "size": 2819,
+   "mtime": 1787590821,
+   "machine": "H1"
+  },
   "hermes-desktop-plugins/SKILL.md": {
    "sha": "7c48ace0a0eae6088804287bbaa5c8a47473809b09004da236ee9354d0bdccb8",
    "size": 8849,
@@ -56798,6 +56882,18 @@
    "sha": "aa78f4af40338c0dc27f2eb6049a6eb6af23781fd88ff250d46aa3144fc2f0e4",
    "size": 10817,
    "mtime": 1781110521,
+   "machine": "H1"
+  },
+  "pcb/kicad-headless-pcb-automation/SKILL.md": {
+   "sha": "03c201929193e5871a657c0050e74efd975c3cb2f482a9a52e2f47122362b23a",
+   "size": 7777,
+   "mtime": 1787593499,
+   "machine": "H1"
+  },
+  "pcb/kicad-headless-pcb-automation/references/kicad10-toolchain-setup.md": {
+   "sha": "d870ff33e3dc0f872f95e7c813cf07ff6d10e57267586ba8b8e09dab8f9f7f42",
+   "size": 3003,
+   "mtime": 1787593510,
    "machine": "H1"
   },
   "claude/business-operations/CLAUDE.md": {
@@ -66545,9 +66641,9 @@
    "machine": "H1"
   },
   "devops/cumulus-sync-motor/SKILL.md": {
-   "sha": "4e40bf0d80b60837e1563afa4a2b17a0f5f5cee0c1faa8f5a07c66a03900e6af",
-   "size": 13427,
-   "mtime": 1787845226,
+   "sha": "a3a8eb00c9ae492e0bdcb9799011c55b133a0ee6c3a2dfe745ae02d36e9bafcc",
+   "size": 16175,
+   "mtime": 1787942847,
    "machine": "H1"
   },
   "devops/cumulus-sync-motor/references/oceanapi-audit-v1.3.2.md": {
@@ -66560,6 +66656,12 @@
    "sha": "50cce26b57b54f41a0984324ed148dc4bb0bc7b97a73840df08723105018c0be",
    "size": 4995,
    "mtime": 1786791162,
+   "machine": "H1"
+  },
+  "devops/cumulus-sync-motor/references/backup-include-maxkb-v1.8.0-20260828.md": {
+   "sha": "a0e40d8cf8a6559933b6dd186273f7767ec995cabc338a0f5414c47295b7ab22",
+   "size": 4066,
+   "mtime": 1787942860,
    "machine": "H1"
   },
   "devops/cumulus-sync-motor/references/remote-hermes-setup-20260822.md": {
