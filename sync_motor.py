@@ -970,7 +970,7 @@ def _pack_node(base, pkg, include, exclude_dirs, limit=5000):
     for root, dirs, files in os.walk(base):
         dirs[:] = [d for d in dirs if d.lower() not in exc]
         for f in files:
-            if any(fnmatch(f, p) for p in (include or ["*"])):
+            if any(fnmatch.fnmatch(f, p) for p in (include or ["*"])):
                 picked.append(os.path.join(root, f))
                 if len(picked) >= limit:
                     break
@@ -2137,7 +2137,7 @@ def _tar_node(cfg, node, outdir, ts):
             for f in files:
                 if any(sec in f.lower() for sec in (".env", ".key", ".pem", ".secret")):
                     continue
-                if not any(fnmatch(f, p) for p in include):
+                if not any(fnmatch.fnmatch(f, p) for p in include):
                     continue
                 p = os.path.join(root, f)
                 rel = os.path.relpath(p, base_parent)
