@@ -1093,7 +1093,7 @@ def announce(cfg, msg):
     local = "/tmp/hermes_uploads" if cfg["is_h1"] else "/tmp"
     os.makedirs(local, exist_ok=True)
     try:
-        with open(os.path.join(local, fname), "w") as f:
+        with open(os.path.join(local, fname), "w", encoding="utf-8", errors="replace") as f:
             f.write(f"[{datetime.now().isoformat()}] {msg}\n")
     except OSError:
         pass
@@ -1927,7 +1927,7 @@ def _state_path(cfg):
 
 def load_last_push(cfg):
     try:
-        return json.load(open(_state_path(cfg)))
+        return json.load(open(_state_path(cfg), encoding="utf-8", errors="replace"))
     except Exception:
         return {}
 
@@ -1935,7 +1935,7 @@ def save_last_push(cfg, node, fp):
     d = load_last_push(cfg)
     d[node] = fp
     os.makedirs(cfg["state"]["dir"], exist_ok=True)
-    json.dump(d, open(_state_path(cfg), "w"))
+    json.dump(d, open(_state_path(cfg), "w", encoding="utf-8"), ensure_ascii=False)
 
 def run_with_retry(fn, *a, retries=1, **kw):
     """Geçici ağ hatalarında 1 retry — otonom dayanıklılık."""
@@ -1983,7 +1983,7 @@ def last_run_summary():
     try:
         if not os.path.exists(RUN_STATE):
             return None
-        hist = json.load(open(RUN_STATE)).get("history", [])
+        hist = json.load(open(RUN_STATE, encoding="utf-8", errors="replace")).get("history", [])
         if not hist:
             return None
         last = hist[-1]
@@ -2024,7 +2024,7 @@ def acquire_lock():
     Dönüş: fd (kilit sahibi) veya None (başka sync aktif).
     """
     try:
-        fd = open(MOTOR_LOCK, "w")
+        fd = open(MOTOR_LOCK, "w", encoding="utf-8")
     except OSError:
         return None
     try:
@@ -2039,7 +2039,7 @@ def acquire_lock():
         else:
             # kilit desteği yok — yalnızca pid dosyası (en iyi çaba)
             if os.path.exists(MOTOR_LOCK) and os.path.getsize(MOTOR_LOCK) > 0:
-                pid = open(MOTOR_LOCK).read().split()[0]
+                pid = open(MOTOR_LOCK, encoding="utf-8", errors="replace").read().split()[0]
                 if pid.isdigit() and os.path.exists(f"/proc/{pid}"):
                     return None
         fd.seek(0, 2)
@@ -2059,7 +2059,7 @@ def record_run(cfg, komut, rc, node=None, extra=None):
         hist = []
         if os.path.exists(RUN_STATE):
             try:
-                hist = json.load(open(RUN_STATE)).get("history", [])
+                hist = json.load(open(RUN_STATE, encoding="utf-8", errors="replace")).get("history", [])
             except Exception:
                 hist = []
         hist.append({
@@ -2167,7 +2167,7 @@ def _restic(args, timeout=3600, cwd=None):
     env = dict(os.environ)
     # ~/.hermes/.env'den RESTIC_* değerlerini yükle (cron ortamında .env export edilmeyebilir)
     try:
-        with open(os.path.expanduser("~/.hermes/.env")) as f:
+        with open(os.path.expanduser("~/.hermes/.env"), encoding="utf-8", errors="replace") as f:
             for line in f:
                 line = line.strip()
                 if line.startswith("RESTIC_") and "=" in line:
@@ -2181,11 +2181,16 @@ def _restic(args, timeout=3600, cwd=None):
         print("    ❌ RESTIC_PASSWORD .env'de yok — restic çalışmaz")
         return None, "RESTIC_PASSWORD yok"
     # restic binary yolunu bul (PATH + bilinen konumlar; Windows/Linux/H3)
-    rbin = shutil.which("restic")
+    # 29 Ağu 2026 FIX (H2/Windows): expanduser("~/bin/restic") uzantısız döner,
+    # Windows'ta dosya adı restic.exe olduğu için os.path.exists() False veriyordu.
+    # Her adayın .exe varyantı da denenir.
+    rbin = shutil.which("restic") or shutil.which("restic.exe")
     if not rbin:
         for cand in ("/usr/local/bin/restic", "/usr/bin/restic",
                      os.path.expanduser("~/bin/restic"),
-                     os.path.expanduser("~/AppData/Local/restic/restic.exe")):
+                     os.path.expanduser("~/bin/restic.exe"),
+                     os.path.expanduser("~/AppData/Local/restic/restic.exe"),
+                     os.path.expanduser("~/AppData/Local/Microsoft/WinGet/Links/restic.exe")):
             if os.path.exists(cand):
                 rbin = cand
                 break
@@ -2193,6 +2198,7 @@ def _restic(args, timeout=3600, cwd=None):
         print("    ❌ restic binary bulunamadı (PATH'te yok)")
         return None, "restic binary yok"
     r = subprocess.run([rbin, *args], capture_output=True, text=True,
+                       encoding="utf-8", errors="replace",
                        timeout=timeout, env=env, cwd=cwd)
     return r.returncode, r.stdout + r.stderr
 
