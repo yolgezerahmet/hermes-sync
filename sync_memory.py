@@ -142,17 +142,22 @@ def import_memory_delta(memory_dir: str, delta_path: str,
     eşitse ikisini koru (çakışma). tombstone=true → kaydı kaldır (fiziksel
     silme değil — kaldır/ignore).
 
-    29 Ağu 2026 (OceanAPI denetim bulguları #3/#4/#6):
+    29 Ağu 2026 (OceanAPI denetim bulguları #3/#4/#6 + 2. tur #1/#2/#3):
     - Gelen her kayıt secret taramasından geçer (fail-closed: hit → atla,
       rejected_secret sayacı). Export RED'le hiç göndermez ama bir node
       bozulduysa/ele geçirildiyse import tarafı da savunma yapar.
     - Tombstone revision karşılaştırmalı: mevcut kayıt daha yeni ise eski
       silme uygulanmaz (veri kaybı önlendi). Eşit revision + farklı hlc'de
-      mevcut kayıt .tombstone. kopyasıyla korunur.
+      mevcut kayıt korunur (silme kaybeder — conflict sayılır).
+    - TOMBSTONE INDEX (tombstones/<rid>.json): silme işlemi hedef dosya
+      olmasa da kalıcı olarak kaydedilir. Normal yazımda index kontrol
+      edilir — index.revision >= gelen.revision ise kayıt YENİDEN
+      OLUŞTURULMAZ (resurrection/veri kaybı önlendi). Daha yüksek
+      revision'lu yeni kayıt → meşru diriltme: index temizlenir, yazılır.
     - Conflict/tombstone dosya adları µs hassasiyetli — aynı saniyede
       birden çok çakışma birbirinin üzerine yazamaz.
     """
-    applied = conflicts = tombstones = rejected_secret = 0
+    applied = conflicts = tombstones = rejected_secret = resurrected = 0
     if not os.path.exists(delta_path):
         return {"applied": 0, "conflicts": 0, "error": "delta yok"}
     with open(delta_path) as f:
@@ -170,40 +175,80 @@ def import_memory_delta(memory_dir: str, delta_path: str,
             ns_dir = os.path.join(memory_dir, ns)
             os.makedirs(ns_dir, exist_ok=True)
             target = os.path.join(ns_dir, f"{rid}.json")
-            # tombstone: kayıt silindi — mevcut dosyayı kaldır (fiziksel
-            # silme değil: .tombstone işaretleyici)
+            tomb_idx_dir = os.path.join(memory_dir, "tombstones", ns)
+            tomb_idx = os.path.join(tomb_idx_dir, f"{rid}.json")
+            rec_rev = rec.get("revision", 0)
+
+            def _tomb_idx_state():
+                if os.path.exists(tomb_idx):
+                    with open(tomb_idx) as tf:
+                        return json.load(tf)
+                return {"revision": 0, "hlc": None}
+
+            # ── TOMBSTONE işle ──
             if rec.get("tombstone"):
                 # OceanAPI #4: eski/gecikmiş tombstone daha yeni kaydı silmesin
                 cur_rev = 0
+                cur_hlc = None
                 if os.path.exists(target):
                     with open(target) as ef:
                         existing = json.load(ef)
                     cur_rev = existing.get("revision", 0)
-                if cur_rev > rec.get("revision", 0):
+                    cur_hlc = existing.get("hlc")
+                if cur_rev > rec_rev:
                     continue  # eski silme — yeni kayıt korunur
+                # eşit revision + farklı hlc → çakışma: mevcut kayıt KORUNUR
+                # (silme kaybeder; tombstone index'e yazılır ki daha eski bir
+                #  kayıt bu id'yi diriltemesin — 2. tur #2)
+                if cur_rev == rec_rev and cur_hlc and cur_hlc != rec.get("hlc"):
+                    conflicts += 1
+                    os.makedirs(tomb_idx_dir, exist_ok=True)
+                    with open(tomb_idx, "w") as tf:
+                        json.dump({"record_id": rid, "namespace": ns,
+                                   "revision": rec_rev, "hlc": rec.get("hlc"),
+                                   "tombstone": True}, tf, ensure_ascii=False)
+                    continue
                 if os.path.exists(target):
                     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
                     os.replace(target, f"{target}.tombstone.{node_id}.{ts}")
+                # kalıcı tombstone index — hedef dosya olmasa bile (2. tur #1)
+                os.makedirs(tomb_idx_dir, exist_ok=True)
+                with open(tomb_idx, "w") as tf:
+                    json.dump({"record_id": rid, "namespace": ns,
+                               "revision": rec_rev, "hlc": rec.get("hlc"),
+                               "tombstone": True}, tf, ensure_ascii=False)
                 tombstones += 1
                 continue
-            # mevcut kayıtla karşılaştır
+
+            # ── NORMAL KAYIT ──
+            # resurrection önleme (2. tur #3): bu id silindiyse (index) ve
+            # gelen kayıt daha eski/eşit ise YENİDEN OLUŞTURMA
+            tstate = _tomb_idx_state()
+            if tstate.get("tombstone") and tstate.get("revision", 0) >= rec_rev:
+                resurrected += 1
+                continue
             if os.path.exists(target):
                 with open(target) as ef:
                     existing = json.load(ef)
-                if existing.get("revision", 0) > rec.get("revision", 0):
+                if existing.get("revision", 0) > rec_rev:
                     applied += 0  # eski delta — atla
                     continue
-                if existing.get("revision", 0) == rec.get("revision", 0) \
+                if existing.get("revision", 0) == rec_rev \
                         and existing.get("hlc") != rec.get("hlc"):
                     # çakışma — ikisini koru (µs dosya adı: overwrite yok)
                     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
                     os.replace(target, f"{target}.conflict.{node_id}.{ts}")
                     conflicts += 1
+            # meşru diriltme: yeni revision > tombstone index → index temizle
+            if tstate.get("tombstone") and tstate.get("revision", 0) < rec_rev:
+                if os.path.exists(tomb_idx):
+                    os.remove(tomb_idx)
             with open(target, "w") as wf:
                 json.dump(rec, wf, ensure_ascii=False, indent=1)
             applied += 1
     return {"applied": applied, "conflicts": conflicts,
-            "tombstones": tombstones, "rejected_secret": rejected_secret}
+            "tombstones": tombstones, "rejected_secret": rejected_secret,
+            "resurrected": resurrected}
 
 
 # ─── Audit Log (JSONL + hash-chain — kim ne yaptı, değiştirilemez) ───
@@ -246,23 +291,37 @@ def append_audit_event(audit_dir: str, event: dict) -> str:
             finally:
                 fcntl.flock(lf, fcntl.LOCK_UN)
     elif msvcrt is not None:
-        with open(lock_path, "a") as lf:
-            try:
-                msvcrt.locking(lf.fileno(), msvcrt.LK_LOCK, 1)
+        # 29 Ağu FIX 2. tur (OceanAPI #4/#5): msvcrt.locking MEVCUT dosya
+        # pozisyonunu kilitler — append modunda pozisyon EOF olduğundan
+        # süreçler farklı byte'ları kilitleyip birbirini dışlamazdı. Artık
+        # lock dosyası önce 1 byte'a genişletilir, seek(0) ile byte 0
+        # kilitlenir. Kilit alınamazsa 3 deneme sonra RuntimeError (fail-
+        # closed) — kilitsiz yazım yarışı GERİ GETİRİLMEZ.
+        with open(lock_path, "a+") as lf:
+            lf.seek(0, os.SEEK_END)
+            if lf.tell() == 0:
+                lf.write(b"\x00")
+                lf.flush()
+            lf.seek(0)
+            locked = False
+            for attempt in range(3):
                 try:
-                    prev_hash = _audit_last_hash(log_path)
-                    event["previous_event_hash"] = prev_hash
-                    event["event_hash"] = _audit_event_hash(prev_hash, event)
-                    _audit_append_line(log_path, event)
-                finally:
-                    lf.seek(0)
-                    msvcrt.locking(lf.fileno(), msvcrt.LK_UNLCK, 1)
-            except OSError:
-                # kilitlenemezse yine de yaz (tek makine senaryosu)
+                    msvcrt.locking(lf.fileno(), msvcrt.LK_LOCK, 1)
+                    locked = True
+                    break
+                except OSError:
+                    time.sleep(0.05 * (attempt + 1))
+            if not locked:
+                raise RuntimeError(
+                    f"audit kilit alınamadı: {lock_path} (fail-closed, yazılmadı)")
+            try:
                 prev_hash = _audit_last_hash(log_path)
                 event["previous_event_hash"] = prev_hash
                 event["event_hash"] = _audit_event_hash(prev_hash, event)
                 _audit_append_line(log_path, event)
+            finally:
+                lf.seek(0)
+                msvcrt.locking(lf.fileno(), msvcrt.LK_UNLCK, 1)
     else:
         prev_hash = _audit_last_hash(log_path)
         event["previous_event_hash"] = prev_hash

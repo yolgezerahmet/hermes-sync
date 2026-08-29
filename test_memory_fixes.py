@@ -237,4 +237,58 @@ finally:
     motor.memory_pull_import = orig_pull
     motor.memory_to_fact_store = orig_fs
 
+# ── 8. Tombstone index / resurrection önleme (2. tur #1/#2/#3) ────────────
+print("\n── TOMBSTONE INDEX / RESURRECTION ──")
+
+# 8a. tombstone ÖNCE import (hedef yok), sonra eski kayıt → diriltme YOK
+mdir8a = os.path.join(TMP, "m8a")
+os.makedirs(os.path.join(mdir8a, "shared"), exist_ok=True)
+d_tomb = os.path.join(TMP, "t8a_tomb.jsonl")
+with open(d_tomb, "w") as f:
+    f.write(json.dumps(make_record("res", revision=7, hlc="7000.0000-node-x", tombstone=True)) + "\n")
+r1 = smem.import_memory_delta(mdir8a, d_tomb, "test-node-1")
+if r1.get("tombstones", 0) != 1:
+    fail("tombstone index yazılmadı", str(r1))
+if not os.path.exists(os.path.join(mdir8a, "tombstones", "shared", "res.json")):
+    fail("tombstones/res.json index yok")
+ok("tombstone önce import edildi + index yazıldı")
+
+d_stale = os.path.join(TMP, "t8a_stale.jsonl")
+with open(d_stale, "w") as f:
+    f.write(json.dumps(make_record("res", revision=3, hlc="3000.0000-node-y")) + "\n")
+r2 = smem.import_memory_delta(mdir8a, d_stale, "test-node-1")
+if r2.get("resurrected", 0) != 1 or r2.get("applied", 0) != 0:
+    fail("eski kayıt diriltildi", str(r2))
+if os.path.exists(os.path.join(mdir8a, "shared", "res.json")):
+    fail("silinmiş kayıt yeniden oluşturuldu (resurrection)")
+ok("eski kayıt (rev 3 < 7) diriltilmedi")
+
+# 8b. daha YENİ kayıt → meşru diriltme, index temizlenir
+d_new = os.path.join(TMP, "t8b_new.jsonl")
+with open(d_new, "w") as f:
+    f.write(json.dumps(make_record("res", revision=9, hlc="9000.0000-node-y")) + "\n")
+r3 = smem.import_memory_delta(mdir8a, d_new, "test-node-1")
+if r3.get("applied", 0) != 1:
+    fail("yeni kayıt uygulanmadı", str(r3))
+if not os.path.exists(os.path.join(mdir8a, "shared", "res.json")):
+    fail("meşru diriltme yazılmadı")
+if os.path.exists(os.path.join(mdir8a, "tombstones", "shared", "res.json")):
+    fail("tombstone index temizlenmedi")
+ok("yeni kayıt (rev 9 > 7) meşru diriltme + index temizlendi")
+
+# 8c. eşit revision + farklı hlc tombstone → mevcut kayıt KORUNUR (conflict)
+mdir8c = os.path.join(TMP, "m8c")
+os.makedirs(os.path.join(mdir8c, "shared"), exist_ok=True)
+with open(os.path.join(mdir8c, "shared", "eq.json"), "w") as f:
+    json.dump(make_record("eq", revision=5, hlc="5000.0000-node-a"), f)
+d_eq = os.path.join(TMP, "t8c_eq.jsonl")
+with open(d_eq, "w") as f:
+    f.write(json.dumps(make_record("eq", revision=5, hlc="5001.0000-node-b", tombstone=True)) + "\n")
+r4 = smem.import_memory_delta(mdir8c, d_eq, "test-node-1")
+if r4.get("conflicts", 0) != 1 or r4.get("tombstones", 0) != 0:
+    fail("eşit rev tombstone conflict sayılmadı", str(r4))
+if not os.path.exists(os.path.join(mdir8c, "shared", "eq.json")):
+    fail("eşit rev tombstone mevcut kaydı sildi")
+ok("eşit rev + farklı hlc tombstone: kayıt korundu (conflict), index yazıldı")
+
 print(f"\n✅ TÜM TESTLER GEÇTİ — {PASS} PASS")
