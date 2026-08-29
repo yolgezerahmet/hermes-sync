@@ -2,6 +2,17 @@
 
 ## [2.1.0] — 2026-08-29
 
+### Eklenen — VERSİYON ETİKETLEME (A modülü)
+- `versions <node> --tag <etiket>`: en son versiyonu etiketler
+  (tags/<tag>.txt: tam dosya adı + SHA256 + ts; rclone lsjson --hash).
+  Aynı tag → RED (üzerine yazmaz); geçersiz etiket (^[a-z0-9][a-z0-9._-]{0,63}$) → RED
+- `versions <node> --diff v1.tar.gz,v2.tar.gz`: iki versiyon tar üye listesini
+  karşılaştırır (rclone cat | tar tzf stream — içerik indirmez); eklenen/silinen
+- `rollback --dry-run`: ön-inceleme — değişecek dosya + çakışma sayısı,
+  HİÇBİR ŞEY yazmaz (force modunu da hesaba katar)
+- test_versions_cmd.py: 8 test (tag yazma/aynı-tag RED/geçersiz-tag RED,
+  diff iki tar, rollback dry-run non-destructive, rollback force)
+
 ### Eklenen — ORTAK HAFIZA (D modülü, v2.1)
 - `memory` komutu: sync_memory.py v0.1 → v1.0 AKTİF bağlandı.
   Akış: export (memory DIF → JSONL delta, secret allowlist RED) →
@@ -19,6 +30,7 @@
 ### Düzeltilen
 - sync_memory import'u sys.path'e _HERE eklenerek cwd'den bağımsız yapıldı
 - fact_store dry-run mesajı yanıltıcıydı ("+N kayıt" → "[DRY] N aday")
+- cmd_versions döngü sonrası return 0 eksikti (dispatch rc=None)
 
 ## [1.6.0] — 2026-08-13
 

@@ -54,13 +54,14 @@ import hashlib
 import json
 import logging
 import os
+import re
 import shutil
 import subprocess
 import sys
 import time
 import tarfile
 import tempfile
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 # ── v2.1 (29 Ağu 2026): sync_memory modülü (D — ortak hafıza) ──
@@ -2331,22 +2332,141 @@ def cmd_backup(cfg, node=None, hub=None, dry_run=False):
         except Exception:
             pass
 
-def cmd_versions(cfg, node=None, hub=None):
-    """GDrive'da node'un versiyonlarını listele."""
+# ── v2.1 A modülü (29 Ağu 2026): versiyon etiketi regex'i ──
+_TAG_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{0,63}$")
+
+def cmd_versions(cfg, node=None, hub=None, tag=None, diff=None):
+    """GDrive'da node'un versiyonlarını listele (+ --tag etiketle / --diff karşılaştır).
+
+    --tag <etiket>: güncel en son versiyonu etiketler (tags/<tag>.txt içinde
+    tam dosya adı + SHA256 + ts). Aynı tag varsa RED (üzerine yazmaz).
+    --diff <v1> <v2>: iki versiyon tar.gz listesini karşılaştırır (içerik
+    indirmeden tar üye listeleri — eklenen/silinen/değişen).
+    """
     hub = _hub_base(hub)
     nodes = [node] if node else list(cfg["dirs"].keys())
     for n in nodes:
         r = subprocess.run(["rclone", "lsf", f"{hub}/{n}", "--files-only"],
                            capture_output=True, text=True, errors="replace")
         vers = [f for f in r.stdout.splitlines() if f.endswith(".tar.gz")]
+        if tag:
+            rc = _tag_version(cfg, n, tag, vers, hub=hub)
+            if rc != 0:
+                return rc
+            continue
+        if diff:
+            rc = _diff_versions(cfg, n, diff, hub=hub)
+            if rc != 0:
+                return rc
+            continue
         print(f"\n  📦 {n}: {len(vers)} versiyon")
         for v in vers[-8:]:
             print(f"    {v}")
+    return 0
 
-def cmd_rollback(cfg, node, version, hub=None, force=False):
-    """Belirli versiyonu non-destructive geri al (.conflict korur; --force ez)."""
+def _tag_version(cfg, node, tag, vers, hub=None):
+    """Versiyon etiketle — non-destructive (aynı tag RED).
+
+    tags/<tag>.txt içeriği: {node, tag, version, sha256, ts}
+    """
+    if not vers:
+        print(f"    ⚠ {node}: versiyon yok — etiketlenemedi")
+        return 1
+    if not _TAG_RE.match(tag):
+        print(f"    ⛔ {node}: geçersiz etiket '{tag}' (^[a-z0-9][a-z0-9._-]{0,63}$)")
+        return 1
+    hub = _hub_base(hub)
+    tags_dir = f"{hub}/{node}/tags"
+    tag_file = f"{tags_dir}/{tag}.txt"
+    # aynı tag var mı?
+    r = subprocess.run(["rclone", "lsf", tags_dir, "--files-only"],
+                       capture_output=True, text=True, errors="replace")
+    if f"{tag}.txt" in (r.stdout or "").splitlines():
+        print(f"    ⛔ {node}: tag '{tag}' zaten var (RED — üzerine yazılmaz)")
+        return 1
+    latest = vers[-1]
+    # SHA256 — GDrive'dan indirmeden hesaplanamaz; metadata ile alınır:
+    # rclone lsjson hash alanı verir (--hash)
+    rr = subprocess.run(["rclone", "lsjson", f"{hub}/{node}", "--hash",
+                         "--files-only"],
+                        capture_output=True, text=True, errors="replace")
+    sha = ""
+    if rr.returncode == 0:
+        try:
+            for f in json.loads(rr.stdout or "[]"):
+                if f.get("Path") == latest:
+                    sha = f.get("Hash", "")
+                    break
+        except Exception:
+            sha = ""
+    meta = json.dumps({"node": node, "tag": tag, "version": latest,
+                       "sha256": sha,
+                       "ts": datetime.now(timezone.utc).isoformat() + "Z"},
+                      ensure_ascii=False, indent=1)
+    tmp = tempfile.mkdtemp(prefix="synctag_")
+    try:
+        lp = os.path.join(tmp, f"{tag}.txt")
+        with open(lp, "w") as f:
+            f.write(meta + "\n")
+        r2 = subprocess.run(["rclone", "copyto", lp, tag_file],
+                            capture_output=True, text=True, errors="replace",
+                            timeout=120)
+        if r2.returncode != 0:
+            print(f"    ❌ {node}: tag yazılamadı: {r2.stderr.strip()[:120]}")
+            return 1
+        print(f"    🏷  {node}: '{tag}' → {latest}"
+              + (f" (sha256 {sha[:12]}…)" if sha else " (sha yok)"))
+        return 0
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+def _diff_versions(cfg, node, diff, hub=None):
+    """İki versiyon arası dosya farkı — tar üye listelerini karşılaştır.
+
+    diff formatı: 'v1.tar.gz,v2.tar.gz' (virgülle ayrılmış).
+    İçerik indirilmez; rclone cat ile tar üye listesi okunur (stream).
+    """
+    hub = _hub_base(hub)
+    parts = [p.strip() for p in diff.split(",")]
+    if len(parts) != 2:
+        print(f"    ⚠ {node}: --diff 'v1.tar.gz,v2.tar.gz' formatı beklenir")
+        return 1
+    v1, v2 = parts
+    lists = []
+    for v in (v1, v2):
+        # tar üye listesini stream oku: rclone cat | tar tzf -
+        r = subprocess.run(["bash", "-c",
+                            f"rclone cat '{hub}/{node}/{v}' | tar tzf - 2>/dev/null"],
+                           capture_output=True, text=True, errors="replace",
+                           timeout=300)
+        if r.returncode != 0:
+            print(f"    ⚠ {node}: {v} okunamadı ({r.stderr.strip()[:100]})")
+            return 1
+        members = set(l for l in r.stdout.splitlines() if l.strip())
+        lists.append(members)
+    only1 = sorted(lists[0] - lists[1])
+    only2 = sorted(lists[1] - lists[0])
+    print(f"\n  🔀 {node}: {v1} ↔ {v2}")
+    print(f"    ➕ sadece {v1}: {len(only1)} dosya")
+    for f in only1[:10]:
+        print(f"      + {f}")
+    if len(only1) > 10:
+        print(f"      … +{len(only1) - 10} daha")
+    print(f"    ➖ sadece {v2}: {len(only2)} dosya")
+    for f in only2[:10]:
+        print(f"      - {f}")
+    if len(only2) > 10:
+        print(f"      … -{len(only2) - 10} daha")
+    return 0
+
+def cmd_rollback(cfg, node, version, hub=None, force=False, dry_run=False):
+    """Belirli versiyonu non-destructive geri al (.conflict korur; --force ez).
+
+    --dry-run: ön-inceleme — hangi dosyalar değişecek, kaç çakışma olacak;
+    HİÇBİR ŞEY yazmaz (v2.1 A modülü).
+    """
     if not node or not version:
-        print("Kullanım: sync_motor.py rollback <node> --version <dosya.tar.gz> [--force]")
+        print("Kullanım: sync_motor.py rollback <node> --version <dosya.tar.gz> [--force] [--dry-run]")
         return 1
     hub = _hub_base(hub)
     dst = cfg["dirs"][node]
@@ -2359,6 +2479,27 @@ def cmd_rollback(cfg, node, version, hub=None, force=False):
         if r.returncode != 0:
             print(f"    ❌ indirme hatası: {r.stderr.strip()[:120]}")
             return 1
+        # önce tar üye listesi + değişecek dosyaları hesapla
+        changed = 0
+        conflicts = 0
+        with tarfile.open(tarp, "r:gz") as tar:
+            members = [m for m in tar.getmembers() if m.isfile()]
+            for m in members:
+                dstp = os.path.join(base, m.name)
+                if os.path.exists(dstp):
+                    srcp = os.path.join(tmp, m.name)
+                    tar.extract(m, path=tmp, filter="data")
+                    if open(dstp, "rb").read() != open(srcp, "rb").read():
+                        changed += 1
+                        if not force:
+                            conflicts += 1
+                else:
+                    changed += 1
+        if dry_run:
+            print(f"    🔍 [DRY-RUN] {node} ← {version}: {changed} dosya değişecek, "
+                  f"{conflicts} çakışma korunacak (force={force})")
+            print("    HİÇBİR ŞEY yazılmadı.")
+            return 0
         with tarfile.open(tarp, "r:gz") as tar:
             for m in tar.getmembers():
                 dstp = os.path.join(base, m.name)
@@ -2626,6 +2767,10 @@ def main(argv=None):
                         help="rollback: çakışma dosyası oluşturmadan üzerine yaz")
     parser.add_argument("--memory-dir", default=None,
                         help="memory: yerel memory DIF dizini (varsayılan ~/.hermes/memory)")
+    parser.add_argument("--tag", default=None,
+                        help="versions: en son versiyonu etiketle (örn: kernel-v2.3-dgk)")
+    parser.add_argument("--diff", default=None,
+                        help="versions: iki versiyon arası dosya farkı (v1.tar.gz,v2.tar.gz)")
     args = parser.parse_args(argv)
 
     if args.komut == "version":
@@ -2689,9 +2834,11 @@ def main(argv=None):
         else:
             rc = cmd_backup(cfg, node=args.node, hub=args.hub, dry_run=args.dry_run)
     elif args.komut == "versions":
-        rc = cmd_versions(cfg, node=args.node, hub=args.hub)
+        rc = cmd_versions(cfg, node=args.node, hub=args.hub,
+                          tag=args.tag, diff=args.diff)
     elif args.komut == "rollback":
-        rc = cmd_rollback(cfg, args.node, args.version, hub=args.hub, force=args.force)
+        rc = cmd_rollback(cfg, args.node, args.version, hub=args.hub,
+                          force=args.force, dry_run=args.dry_run)
     elif args.komut == "memory":
         rc = cmd_memory(cfg, dry_run=args.dry_run, memory_dir=args.memory_dir)
     elif args.komut == "init":
