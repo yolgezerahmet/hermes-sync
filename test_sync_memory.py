@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """test_sync_memory.py — çoklu-ajan ortak hafıza testleri (2026-08-15)"""
+import copy
 import json
 import os
 import shutil
@@ -99,7 +100,11 @@ assert len(inv) == 1 and inv[0]["skill_id"] == "mesh"
 ok("skill envanter tarama")
 
 # remote'ta yeni skill + mesh farklı sürüm
-remote = inv + [{"skill_id": "vital", "version": "2.0.0",
+# 29 Ağu 2026 FIX (H2): `inv + [...]` SHALLOW copy — remote[0] ile inv[0] AYNI dict
+# nesnesiydi, satır altındaki hash ataması ikisini birden değiştirdiği için mesh
+# hash'leri eşit kalıyor ve "mismatch" hiç oluşmuyordu (test hatası; üretim kodu
+# compare_skill_inventories doğru çalışıyor — ayrı dict'lerle mismatch+missing verir).
+remote = copy.deepcopy(inv) + [{"skill_id": "vital", "version": "2.0.0",
                  "content_sha256": "ab" * 32, "manifest_path": "vital/SKILL.md"}]
 remote[0]["content_sha256"] = "cd" * 32  # mesh hash farklı
 acts = sm.compare_skill_inventories(inv, remote)

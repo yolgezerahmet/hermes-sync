@@ -169,6 +169,7 @@ DEFAULT_CONFIG = {
     "machines": {
         "h1_hostnames": ["CumulusNET-Hermes-1", "hal-server-801964"],
         "h2_hostnames": ["H2-Windows-RTX5070Ti"],
+        "h3_hostnames": ["hermesagent03", "H3-LOCAL-HERMES"],
         "openclaw_hostnames": ["openclaw"],
     },
     "dirs": {
@@ -312,19 +313,31 @@ DEFAULT_CONFIG = {
 }
 
 
-def detect_machine(hostname=None):
-    """H1 mi H2 mi OpenClaw mu? hostname + OS kombinasyonu ile."""
+def detect_machine(hostname=None, machines=None):
+    """H1 mi H2 mi H3 mü OpenClaw mu? hostname + OS kombinasyonu ile.
+
+    29 Ağu 2026 FIX (H2 bulgusu): h3_hostnames HİÇ KONTROL EDİLMİYORDU ve liste
+    daima DEFAULT_CONFIG'ten okunuyordu (kullanıcının config.json'undaki machines
+    bloğu yoksayılıyordu). Sonuç: H3 (hermesagent03, Linux) OS fallback'ine düşüp
+    kendini "H1" sanıyordu → retention_machine="H1" ayarında H1 VE H3 birlikte
+    prune deniyor, aynı restic repoyu kilitliyorlardı.
+    `machines` verilmezse eski davranış korunur (geriye uyumlu).
+    """
     hostname = hostname or (os.uname().nodename if os.name != "nt"
                             else os.environ.get("COMPUTERNAME", ""))
     hn = hostname.lower()
+    m = machines or DEFAULT_CONFIG["machines"]
 
-    for h1 in DEFAULT_CONFIG["machines"]["h1_hostnames"]:
+    for h1 in m.get("h1_hostnames", []):
         if h1.lower() in hn:
             return "H1"
-    for h2 in DEFAULT_CONFIG["machines"]["h2_hostnames"]:
+    for h2 in m.get("h2_hostnames", []):
         if h2.lower() in hn:
             return "H2"
-    for oc in DEFAULT_CONFIG["machines"].get("openclaw_hostnames", []):
+    for h3 in m.get("h3_hostnames", []):
+        if h3.lower() in hn:
+            return "H3"
+    for oc in m.get("openclaw_hostnames", []):
         if oc.lower() in hn:
             return "OPENCLAW"
     # OS fallback
@@ -354,7 +367,9 @@ def load_config(path=None):
             log.warning(f"config.json okunamadı ({e}), default kullanılıyor")
 
     # Makine tespiti
-    cfg["machine"] = detect_machine()
+    # 29 Ağu 2026: kullanıcının config.json'undaki machines bloğu artık kullanılır
+    # (önce daima DEFAULT_CONFIG okunuyordu → H3 tanınmıyordu).
+    cfg["machine"] = detect_machine(machines=cfg.get("machines"))
     cfg["is_h1"] = cfg["machine"] == "H1"
 
     # Kimlik: user_id + machine_id (GDrive yolu buna bağlı)
@@ -1397,7 +1412,7 @@ def cmd_select(cfg):
 def cmd_status(cfg):
     print("\n" + "═" * 60)
     print(f"  CUMULUS SYNC MOTOR v{__version__} — DURUM")
-    print(f"  Makine: {cfg['machine']} ({cfg['is_h1'] and 'H1 VPS' or 'H2 Desktop'})")
+    print(f"  Makine: {cfg['machine']} ({ {'H1': 'H1 VPS', 'H2': 'H2 Desktop', 'H3': 'H3 Node', 'OPENCLAW': 'OpenClaw'}.get(cfg['machine'], cfg['machine']) })")
     print("═" * 60)
 
     peer = peer_status(cfg)

@@ -164,23 +164,30 @@ def append_audit_event(audit_dir: str, event: dict) -> str:
     event.setdefault("timestamp_utc", datetime.now(timezone.utc).isoformat() + "Z")
     event.setdefault("operation_id", str(uuid.uuid4()))
     # previous hash: log'un son satırından
+    # 29 Ağu 2026 FIX (H2 bulgusu): eski "dosya sonundan geri sar" algoritması
+    # TEK SATIRLI dosyada `\n` bulamayıp seek(-2) ile dosya başını aşıyor ve
+    # OSError[Errno 22] fırlatıyordu → except prev_hash'i "0"*64'e sıfırlıyor,
+    # 2. olay zinciri kırıyordu (verify_audit_chain "zincir kırıldı" der).
+    # Audit log günlük dosya (YYYY-MM-DD.jsonl) olduğundan HER GÜNÜN ilk iki
+    # olayı bu hataya düşüyordu. LF/CRLF farkından bağımsız — H1/H3 de etkilenir.
+    # Audit log'lar günlük ve küçük; tamamını okumak güvenli ve doğru.
     prev_hash = "0" * 64
     if os.path.exists(log_path):
-        with open(log_path, "rb") as f:
-            try:
-                f.seek(-2, os.SEEK_END)
-                while f.read(1) != b"\n":
-                    f.seek(-2, os.SEEK_CUR)
-                last = json.loads(f.readline().decode())
+        try:
+            with open(log_path, "rb") as f:
+                lines = [ln for ln in f.read().split(b"\n") if ln.strip()]
+            if lines:
+                last = json.loads(lines[-1].decode("utf-8"))
                 prev_hash = last.get("event_hash", "0" * 64)
-            except Exception:
-                prev_hash = "0" * 64
+        except Exception:
+            prev_hash = "0" * 64
     body = json.dumps({k: event.get(k) for k in AUDIT_REQUIRED},
                       sort_keys=True, ensure_ascii=False)
     event["previous_event_hash"] = prev_hash
     event["event_hash"] = hashlib.sha256(
         (prev_hash + body).encode()).hexdigest()
-    with open(log_path, "a") as f:
+    # newline="\n": Windows'ta CRLF yazılmasın (satır sonu tutarlılığı)
+    with open(log_path, "a", encoding="utf-8", newline="\n") as f:
         f.write(json.dumps(event, ensure_ascii=False) + "\n")
     return event["event_hash"]
 
@@ -191,15 +198,20 @@ def verify_audit_chain(audit_dir: str) -> dict:
     if not os.path.exists(log_path):
         return {"ok": False, "error": "log yok"}
     prev = "0" * 64
-    for line in open(log_path):
-        ev = json.loads(line)
-        body = json.dumps({k: ev.get(k) for k in AUDIT_REQUIRED},
-                          sort_keys=True, ensure_ascii=False)
-        calc = hashlib.sha256((ev.get("previous_event_hash", "") + body).encode()).hexdigest()
-        if ev.get("previous_event_hash", "0"*64) != prev or calc != ev.get("event_hash"):
-            return {"ok": False, "error": "zincir kırıldı", "at": ev.get("event_id")}
-        prev = ev.get("event_hash")
-    return {"ok": True, "events": sum(1 for _ in open(log_path))}
+    n = 0
+    with open(log_path, encoding="utf-8") as fh:
+        for line in fh:
+            if not line.strip():
+                continue
+            n += 1
+            ev = json.loads(line)
+            body = json.dumps({k: ev.get(k) for k in AUDIT_REQUIRED},
+                              sort_keys=True, ensure_ascii=False)
+            calc = hashlib.sha256((ev.get("previous_event_hash", "") + body).encode()).hexdigest()
+            if ev.get("previous_event_hash", "0"*64) != prev or calc != ev.get("event_hash"):
+                return {"ok": False, "error": "zincir kırıldı", "at": ev.get("event_id")}
+            prev = ev.get("event_hash")
+    return {"ok": True, "events": n}
 
 
 # ─── Skill Envanteri (sürüm+SHA256 — farklılıklar giderilir) ───
