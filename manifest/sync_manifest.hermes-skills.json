@@ -1,8 +1,8 @@
 {
  "node": "hermes-skills",
- "ts": "2026-08-29T11:38:59",
- "revision": "941271c70795",
- "file_count": 15965,
+ "ts": "2026-08-29T12:47:05",
+ "revision": "38509eb070c2",
+ "file_count": 15967,
  "files": {
   ".curator_state": {
    "sha": "079c2ea53d6f78ecbb5d78833dce63a2b6463c311e1a7404ccea655311127d42",
@@ -13,13 +13,13 @@
   ".bundled_manifest": {
    "sha": "b1c6fe80b9d718fe9d9868be6eb2f1e0eda0af9dce4fa500dfd351e7b6c10a19",
    "size": 3877,
-   "mtime": 1787991994,
+   "mtime": 1787996799,
    "machine": "H1"
   },
   ".usage.json": {
-   "sha": "295d79b7e3babf12de68c1103f10265270f9884970584a13fc559574f5f93d35",
+   "sha": "527bdd962b25b33c80eff28606b04d832b8a9f51a3d4cf40596fc50f0e1a5bc0",
    "size": 191880,
-   "mtime": 1787958002,
+   "mtime": 1787993603,
    "machine": "H1"
   },
   "cumulus-unutma-checklist.md": {
@@ -26957,9 +26957,15 @@
    "machine": "H1"
   },
   "ops/hermes-sync-motor/SKILL.md": {
-   "sha": "cccc5f1e87e2455bdd6d3982484b3db4e4cec950ad324f18724b0dbe1ac29ae4",
-   "size": 17749,
-   "mtime": 1786795976,
+   "sha": "ebe7fc7cf3fb50588f1595c7dcf1a6272b7103a6bdc2aaa319630268cc275b29",
+   "size": 22287,
+   "mtime": 1787993570,
+   "machine": "H1"
+  },
+  "ops/hermes-sync-motor/references/machine-config-h1h3-20260829.md": {
+   "sha": "d3ff8c4141af85e45a771ecc993de81c32692eff8b645722b6e2e5f89a149693",
+   "size": 2278,
+   "mtime": 1787993593,
    "machine": "H1"
   },
   "ops/hermes-sync-motor/references/h2-parity-verification-20260815.md": {
@@ -26972,6 +26978,12 @@
    "sha": "617e5aa97a2bbc40b37d48c977ef141eda399d0ac415df6c72e5b808783b07fc",
    "size": 3183,
    "mtime": 1785773419,
+   "machine": "H1"
+  },
+  "ops/hermes-sync-motor/references/restic-incremental-backup-20260829.md": {
+   "sha": "e9fc67c1e150c646aab13396884346b2856b4d10c9eb54455a3fcf725fd94b93",
+   "size": 3456,
+   "mtime": 1787993584,
    "machine": "H1"
   },
   "ops/hermes-sync-motor/references/sync-engine-pitfalls.md": {
