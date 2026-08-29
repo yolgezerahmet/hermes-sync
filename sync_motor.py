@@ -2266,9 +2266,16 @@ def cmd_restic_backup(cfg, node=None, dry_run=False):
     ret_machine = os.environ.get("SYNC_RETENTION_MACHINE") or cfg.get("retention_machine", "")
     this_machine = cfg.get("machine", "")
     if not dry_run and (not ret_machine or this_machine == ret_machine):
-        rc, out = _restic(["forget", "--keep-daily", "7", "--keep-weekly", "4",
-                           "--keep-monthly", "6", "--prune", "--retry-lock", "5m"])
-        print(f"    🧹 retention: {'OK' if rc == 0 else out.strip()[-150:]}")
+        # forget her koşu (hızlı — snapshot siler); prune SADECE 04:00-05:00 arası
+        # (--prune tüm repo'yu GC'ler, 55 snapshot'ta dakikalar sürer; her koşuda
+        # yapılırsa H1 backup cron'u uzar ve diğer sync'ler kilit yüzünden atlanır)
+        args = ["forget", "--keep-daily", "7", "--keep-weekly", "4",
+                "--keep-monthly", "6", "--retry-lock", "5m"]
+        _h = time.localtime().tm_hour
+        if _h in (4,):
+            args += ["--prune"]
+        rc, out = _restic(args)
+        print(f"    🧹 retention: {'OK' if rc == 0 else out.strip()[-150:]}" + ("" if "--prune" in args else " (prune 04:00'de)"))
     elif not dry_run:
         print(f"    🧹 retention: atlandı (bu makine yedekliyor, prune {ret_machine} yapar)")
 
