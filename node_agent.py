@@ -208,6 +208,26 @@ def run_memory() -> tuple:
         print(f"  ⚠ ortak hafıza rc={rc}: {err.strip()[:200]}")
     return rc, out, err
 
+def run_state() -> tuple:
+    """Ortak akıl (E modülü v2.1+): state.json'a HLC saatli durum bloğu yaz.
+
+    sync_common_knowledge modülünü doğrudan kullanır (rclone mock'suz gerçek
+    GDrive hub). Hata → fail-closed (rc 1) ama diğer once adımlarını bozmaz.
+    """
+    try:
+        sys.path.insert(0, str(MOTOR_DIR))
+        import sync_common_knowledge as ck
+        st = ck.update_state(machine_id(), {
+            "last_sync": "ok",
+            "last_run": now_iso(),
+        })
+        blocks = st.get("nodes", {})
+        print(f"  🧠 ORTAK AKIL: state.json güncellendi ({len(blocks)} makine blok)")
+        return 0, "", ""
+    except Exception as e:
+        print(f"  ⚠ ortak akıl rc=1: {str(e)[:200]}")
+        return 1, "", str(e)
+
 def run_once(do_sync=True, do_backup=True, do_memory=True, report=True):
     """Tek otonom koşu — cron/Task Scheduler bu fonksiyonu çağırır."""
     status = collect_status()
@@ -228,6 +248,11 @@ def run_once(do_sync=True, do_backup=True, do_memory=True, report=True):
         rc, out, err = run_memory()
         status["memory"] = {"rc": rc, "ts": now_iso(),
                             "out_tail": out.strip()[-200:], "err_tail": err.strip()[-200:]}
+    # ortak akıl (E): state.json HLC bloğu — sync'ten bağımsız, her koşuda
+    if do_sync or do_backup or do_memory:
+        rc, out, err = run_state()
+        status["state"] = {"rc": rc, "ts": now_iso(),
+                           "out_tail": out.strip()[-200:], "err_tail": err.strip()[-200:]}
 
     # son-koşu kaydı (web paneli okur)
     try:

@@ -2,6 +2,19 @@
 
 ## [2.1.0] — 2026-08-29
 
+### Eklenen — ORTAK AKIL (E modülü, v2.1)
+- sync_common_knowledge.py: GDrive hub üzerinde dağıtık ortak durum +
+  görev kuyruğu (GPT-5.6 tasarımı). HLC mantıksal saat, fail-closed.
+  - state.json: gdrive:hermes-sync/<user>/shared/state.json — her makine
+    kendi bloğunu HLC saatli yazar, tüm makineler okur (read→merge→write)
+  - tasks/<task_id>.json: pending→running (claim, tek sahip)→done (yalnız
+    sahibi); aynı id RED, başkası sahiplenemez/done yapamaz
+  - CLI: state, tasks, task-add, task-claim, task-done
+- sync_coordinator.py: tasks + state komutları (list/add/claim/done + json)
+- node_agent.py once: run_state adımı (her koşuda state.json HLC bloğu)
+- test_common_knowledge.py: 10 test (state merge, create RED, claim tek
+  sahip, done sahibi, fail-closed) — rclone mock'lu
+
 ### Eklenen — VERSİYON ETİKETLEME (A modülü)
 - `versions <node> --tag <etiket>`: en son versiyonu etiketler
   (tags/<tag>.txt: tam dosya adı + SHA256 + ts; rclone lsjson --hash).

@@ -105,14 +105,80 @@ def main(argv=None):
     ap = argparse.ArgumentParser(prog="sync_coordinator",
                                  description="Çoklu makine eşitlik koordinatörü")
     ap.add_argument("komut", nargs="?", default="status",
-                    choices=["status", "machines", "check"])
+                    choices=["status", "machines", "check", "tasks", "state"])
     ap.add_argument("makine", nargs="?")
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--task-id", default=None)
+    ap.add_argument("--title", default=None)
+    ap.add_argument("--owner", default=None)
+    ap.add_argument("--action", default=None,
+                    help="tasks: add|claim|done (örn: --action claim --task-id X --owner h1)")
     args = ap.parse_args(argv)
 
     if args.komut == "machines":
         ms = list_machines()
         print("\n".join(ms) if ms else "(hub boş — node_agent koşuları bekleniyor)")
+        return 0
+
+    if args.komut == "tasks":
+        # E modülü (v2.1): ortak görev kuyruğu
+        try:
+            import sync_common_knowledge as ck
+        except ImportError:
+            print("sync_common_knowledge.py bulunamadı (E modülü kurulu değil)")
+            return 1
+        if args.action == "add":
+            if not args.task_id or not args.title:
+                print("Kullanım: sync_coordinator.py tasks --action add --task-id X --title 'Y'")
+                return 1
+            t = ck.create_task(args.task_id, args.title, owner=args.owner)
+            print(json.dumps(t, ensure_ascii=False, indent=1) if args.json
+                  else f"  ➕ {t['task_id']} ({t['status']})")
+            return 0
+        if args.action == "claim":
+            if not args.task_id:
+                print("Kullanım: --action claim --task-id X [--owner h1]")
+                return 1
+            t = ck.claim_task(args.task_id, owner=args.owner)
+            print(json.dumps(t, ensure_ascii=False, indent=1) if args.json
+                  else f"  🔒 {t['task_id']} → {t['status']} (owner={t.get('owner','-')})")
+            return 0
+        if args.action == "done":
+            if not args.task_id:
+                print("Kullanım: --action done --task-id X [--owner h1]")
+                return 1
+            t = ck.done_task(args.task_id, owner=args.owner)
+            print(json.dumps(t, ensure_ascii=False, indent=1) if args.json
+                  else f"  ✅ {t['task_id']} → {t['status']}")
+            return 0
+        tasks = ck.list_tasks()
+        if args.json:
+            print(json.dumps(tasks, ensure_ascii=False, indent=1))
+        else:
+            print(f"  📋 ORTAK GÖREVLER ({len(tasks)})")
+            for t in tasks:
+                print(f"    [{t.get('status','?'):7}] {t.get('task_id')} "
+                      f"— {t.get('title','')} (owner={t.get('owner','-')})")
+        return 0
+
+    if args.komut == "state":
+        # E modülü (v2.1): ortak durum state.json
+        try:
+            import sync_common_knowledge as ck
+        except ImportError:
+            print("sync_common_knowledge.py bulunamadı (E modülü kurulu değil)")
+            return 1
+        state = ck.read_state()
+        if args.json:
+            print(json.dumps(state, ensure_ascii=False, indent=1))
+        else:
+            blocks = state.get("nodes", {})
+            print(f"  🧠 ORTAK DURUM ({len(blocks)} makine)")
+            for n, b in blocks.items():
+                hlc = b.get("hlc", "-")
+                ts = b.get("ts", "-")
+                extra = {k: v for k, v in b.items() if k not in ("hlc", "ts")}
+                print(f"    {n}: hlc={hlc} ts={ts} {extra if extra else ''}")
         return 0
 
     if args.komut == "check":
