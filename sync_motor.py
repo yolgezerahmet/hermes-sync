@@ -627,6 +627,10 @@ def run_cmd(cmd, timeout=60, shell=False):
         if shell:
             r = subprocess.run(cmd, shell=True, capture_output=True,
                                text=True, errors="replace", timeout=timeout)
+        elif isinstance(cmd, (list, tuple)):
+            # LIST komut doğrudan geç (split ETME — split list'te patlar)
+            r = subprocess.run(list(cmd), capture_output=True,
+                               text=True, errors="replace", timeout=timeout)
         else:
             r = subprocess.run(cmd.split(), capture_output=True,
                                text=True, errors="replace", timeout=timeout)
@@ -2225,6 +2229,66 @@ def _restic(args, timeout=3600, cwd=None):
                        timeout=timeout, env=env, cwd=cwd)
     return r.returncode, r.stdout + r.stderr
 
+# ─── AKILLI KANAL SEÇİCİ (v2.1, 29 Ağu 2026) ───────────────────────────
+# Üç taşıyıcı: A2A (ajanlar arası görev/cevap, Tailscale HTTP) ·
+# Syncthing (P2P dosya senkron, GDrive'suz) · GDrive (arşiv/versiyonlu).
+# Seçim kuralı: görev/cevap → A2A; dosya değişikliği → Syncthing; arşiv → GDrive.
+TRANSPORT_A2A = "a2a"
+TRANSPORT_SYNCTHING = "syncthing"
+TRANSPORT_GDRIVE = "gdrive"
+
+A2A_NODES = {  # makine → Tailscale IP (a2a_cli hedefi)
+    "H1": "100.92.2.47",
+    "h3": "100.103.44.107",
+    "hermesagent03": "100.103.44.107",
+    "h2": "100.76.82.46",
+    "sistemg16": "100.76.82.46",
+}
+
+def smart_transport(kind: str, target: str = ""):
+    """Kanal seç — kind: task|file|archive."""
+    if kind == "task":
+        return TRANSPORT_A2A
+    if kind == "file":
+        return TRANSPORT_SYNCTHING
+    return TRANSPORT_GDRIVE
+
+def cmd_mesh(cfg, aksiyon, hedef="", gorev="", token="", dry_run=False):
+    """sync_motor.py mesh send|status <hedef> <görev> — A2A üzerinden ajan konuşması."""
+    if not token:
+        # .env'den A2A_TOKEN oku (cron ortamı export etmeyebilir)
+        try:
+            with open(os.path.expanduser("~/.hermes/.env")) as _f:
+                for _line in _f:
+                    if _line.startswith("A2A_TOKEN="):
+                        token = _line.split("=", 1)[1].strip()
+                        break
+        except Exception:
+            pass
+    if aksiyon == "status":
+        for name, ip in A2A_NODES.items():
+            out, rc = run_cmd(["python3", "/root/.hermes/scripts/a2a_cli.py",
+                               "send-status", ip, "--token", token or os.environ.get("A2A_TOKEN", "")],
+                              timeout=60)
+            txt = out if isinstance(out, str) else (json.dumps(out, ensure_ascii=False) if not isinstance(out, (list, tuple)) else "\n".join(str(x) for x in out))
+            try:
+                d = json.loads(txt)
+                r = d.get("result", {}).get("result", {})
+                ozet = f"host={r.get('host','?')} disk={r.get('disk_gb','?')}GB"
+            except Exception:
+                ozet = str(txt).strip().splitlines()[-1] if str(txt).strip() else "erişilemedi"
+            print(f"  {name:14s} ({ip}): {ozet}")
+        return 0
+    if aksiyon == "send":
+        ip = A2A_NODES.get(hedef, hedef)
+        out, rc = run_cmd(["python3", "/root/.hermes/scripts/a2a_cli.py",
+                           "send", ip, gorev, "--token", token or os.environ.get("A2A_TOKEN", "")],
+                          timeout=120)
+        print(out.strip()[-400:] if out.strip() else "(çıktı yok)")
+        return rc
+    print("Kullanım: mesh send|status [hedef] [görev]")
+    return 1
+
 def cmd_restic_backup(cfg, node=None, dry_run=False):
     """Restic incremental backup (v2.0 — B modülü, 28 Ağu 2026).
 
@@ -2768,7 +2832,7 @@ def main(argv=None):
                                  "conflicts", "init", "select", "nodes",
                                  "add-node", "share", "doctor", "version",
                                  "probe", "propose", "apply", "agent-status",
-                                 "backup", "versions", "rollback", "memory"])
+                                 "backup", "versions", "rollback", "memory", "mesh"])
     parser.add_argument("hedef", nargs="?",
                         help="add-node: node adı | share: node adı")
     parser.add_argument("--config", default=None,
@@ -2807,6 +2871,7 @@ def main(argv=None):
                         help="memory: yerel memory DIF dizini (varsayılan ~/.hermes/memory)")
     parser.add_argument("--tag", default=None,
                         help="versions: en son versiyonu etiketle (örn: kernel-v2.3-dgk)")
+    parser.add_argument("--token", dest="token", default="")
     parser.add_argument("--diff", default=None,
                         help="versions: iki versiyon arası dosya farkı (v1.tar.gz,v2.tar.gz)")
     args = parser.parse_args(argv)
@@ -2863,6 +2928,9 @@ def main(argv=None):
         cmd_conflicts(cfg)
     elif args.komut == "agent-status":
         cmd_agent_status(cfg)
+    elif args.komut == "mesh":
+        # Kullanım: mesh status | mesh send <host> "<görev>" (--node host, --path görev)
+        rc = cmd_mesh(cfg, args.hedef or "status", args.node or "", args.path or "", args.token)
     elif args.komut == "backup":
         # v2.0 (28 Ağu): restic entegre — backup komutu artık incremental restic
         # yedekler (CDC dedup + snapshot + restore). Eski tar tabanlı davranış
