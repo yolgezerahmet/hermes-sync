@@ -2,6 +2,14 @@
 
 ## [2.1.0] — 2026-08-29
 
+### Eklenen — ÖNCELİK SINIFLI YEDEK + DOĞRULAMA (C modülü, v2.1)
+- sync_retention.py node-bazlı politika: KRİTİK (kernel/patent/scripts/
+  hermes/math) 12 ay + 8 hafta; ORTA (research/pcb/sim/openclaw) 8 hafta;
+  BÜYÜK (hermes-skills/plugins/hermes-full) 4 hafta. --node filtresi eklendi
+- cmd_backup upload sonrası SHA doğrulama: rclone lsjson --hash → GDrive
+  hash'i yerel sha256 ile karşılaştırılır (eşleşmezse ⚠ rapor)
+- test_retention_cmd.py: 9 test (öncelik eşleme, limitler, karar, SHA verify)
+
 ### Eklenen — ORTAK AKIL (E modülü, v2.1)
 - sync_common_knowledge.py: GDrive hub üzerinde dağıtık ortak durum +
   görev kuyruğu (GPT-5.6 tasarımı). HLC mantıksal saat, fail-closed.

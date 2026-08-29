@@ -2318,7 +2318,23 @@ def cmd_backup(cfg, node=None, hub=None, dry_run=False):
                                 "--ignore-checksum", "--no-traverse"],
                                capture_output=True, text=True, errors="replace")
             if r.returncode == 0:
-                print(f"    ✅ {n}: {os.path.basename(tarp)} sha={sha[:12]}")
+                # C modülü (v2.1): upload sonrası SHA doğrulama —
+                # GDrive'daki hash'i çek, yerel sha ile karşılaştır.
+                verified = False
+                rr = subprocess.run(["rclone", "lsjson",
+                                     f"{hub}/{n}", "--hash", "--files-only"],
+                                    capture_output=True, text=True,
+                                    errors="replace", timeout=120)
+                if rr.returncode == 0:
+                    try:
+                        for f in json.loads(rr.stdout or "[]"):
+                            if f.get("Path") == os.path.basename(tarp):
+                                verified = (f.get("Hash", "") == sha)
+                                break
+                    except Exception:
+                        verified = False
+                tag_txt = " ✅ SHA doğrulandı" if verified else " ⚠ SHA doğrulanamadı (lsjson hash kapalı olabilir)"
+                print(f"    ✅ {n}: {os.path.basename(tarp)} sha={sha[:12]}{tag_txt}")
             else:
                 print(f"    ❌ {n}: {r.stderr.strip()[:120]}")
             # FIX: upload bitti → tar'ı HEMEN sil (birikme yok)
