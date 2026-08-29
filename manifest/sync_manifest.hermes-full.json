@@ -1,7 +1,7 @@
 {
  "node": "hermes-full",
- "ts": "2026-08-29T04:04:34",
- "revision": "bbc1f5dee22f",
+ "ts": "2026-08-29T04:23:33",
+ "revision": "92765734e099",
  "file_count": 23261,
  "files": {
   "config.yaml": {
@@ -29,9 +29,9 @@
    "machine": "H1"
   },
   "auth.json": {
-   "sha": "37a1cca959e601ad52406b6d91d7a4b995fdc0e94f09c3ba15c81750572de678",
+   "sha": "d2595c66e032dd79975d6fb5dd7b7656bf5f9057e00bad172f018e9fdbfb66b3",
    "size": 14056,
-   "mtime": 1787962719,
+   "mtime": 1787966328,
    "machine": "H1"
   },
   "provider_models_cache.json": {
@@ -71,9 +71,9 @@
    "machine": "H1"
   },
   "channel_directory.json": {
-   "sha": "eb46e75822d77a89a3369228991ee9bfa0801399ba4980d78efe69e06d0ea32a",
+   "sha": "d745bca7cfef92378ddf24d6b7d1c0ef3886f972dad66ed7ce5660aa66f847eb",
    "size": 67,
-   "mtime": 1787965425,
+   "mtime": 1787966327,
    "machine": "H1"
   },
   "ollama_cloud_models_cache.json": {
@@ -83,9 +83,9 @@
    "machine": "H1"
   },
   "cron/jobs.json": {
-   "sha": "3480fc33a23643d4e99dc98aed15bf19df96215112ca193af7361f444d3d869e",
+   "sha": "a2730486d935afbc42d8108d2f8b2a5be3faed98d5452f14ec8ada93a9be3b58",
    "size": 91551,
-   "mtime": 1787965471,
+   "mtime": 1787966611,
    "machine": "H1"
   },
   "cron/output/a21097370390/2026-08-28_17-17-22.md": {
@@ -1180,12 +1180,6 @@
    "mtime": 1787893625,
    "machine": "H1"
   },
-  "cron/output/ced51101870b/2026-08-28_03-06-57.md": {
-   "sha": "dc2dfd1d15ecc0b93bfec552290f92b7733d027ccc2b7dfcffb8a9c432667280",
-   "size": 151,
-   "mtime": 1787875617,
-   "machine": "H1"
-  },
   "cron/output/ced51101870b/2026-08-28_22-39-22.md": {
    "sha": "31333ec56994273f39394a33d636ca7685b981d7223fcdc51b5efd82a3e6d2cd",
    "size": 151,
@@ -1208,6 +1202,12 @@
    "sha": "4d4f053e19e1279119e6b4371da3ea9fe02b3b806601ee16d847e5caa5b99c69",
    "size": 151,
    "mtime": 1787944161,
+   "machine": "H1"
+  },
+  "cron/output/ced51101870b/2026-08-29_04-09-31.md": {
+   "sha": "b67fc26bd1582140f868b8437468d5e2035be0b78211dcae11ae7ca3fe01b5cb",
+   "size": 151,
+   "mtime": 1787965771,
    "machine": "H1"
   },
   "cron/output/ced51101870b/2026-08-28_18-38-17.md": {
@@ -2458,6 +2458,18 @@
    "mtime": 1787952085,
    "machine": "H1"
   },
+  "cron/output/259dd1df1fd3/2026-08-29_04-06-32.md": {
+   "sha": "1c826b3f38dad76a69048ea1c4ce2f35a76259a253ed696a2cd591f6791e2928",
+   "size": 296,
+   "mtime": 1787965592,
+   "machine": "H1"
+  },
+  "cron/output/259dd1df1fd3/2026-08-29_04-22-32.md": {
+   "sha": "8dc7758f20a7cee5fc5924c523f58b5776aefc50eff0dd1023eeedda959e56f9",
+   "size": 296,
+   "mtime": 1787966552,
+   "machine": "H1"
+  },
   "cron/output/259dd1df1fd3/2026-08-28_16-35-22.md": {
    "sha": "db955adf30d8c5a057dbe63d368de3dfa04e8390179d3482f7477eeacde62301",
    "size": 296,
@@ -2498,12 +2510,6 @@
    "sha": "65618eaa368631b2093468eba2ddd2a55c851f8bad3e6d95d50231e7619ac3c2",
    "size": 296,
    "mtime": 1787950164,
-   "machine": "H1"
-  },
-  "cron/output/259dd1df1fd3/2026-08-28_13-50-14.md": {
-   "sha": "56470be6660b7c868982c5a7ea188607891899d5b1958f168d23951a4055df70",
-   "size": 296,
-   "mtime": 1787914214,
    "machine": "H1"
   },
   "cron/output/259dd1df1fd3/2026-08-29_02-46-30.md": {
@@ -2558,12 +2564,6 @@
    "sha": "25c4a47d3f85c82bfc84943137a797d2fefd56f596ecc0c003389e43e5fe1643",
    "size": 296,
    "mtime": 1787940561,
-   "machine": "H1"
-  },
-  "cron/output/259dd1df1fd3/2026-08-28_14-30-11.md": {
-   "sha": "990c17b52d451b28683a59c87de66f12209efaa82c24ea0527a8e8900f72b797",
-   "size": 296,
-   "mtime": 1787916611,
    "machine": "H1"
   },
   "cron/output/259dd1df1fd3/2026-08-28_17-38-13.md": {
@@ -3736,6 +3736,12 @@
    "mtime": 1787921682,
    "machine": "H1"
   },
+  "cron/output/147ac7b09ffd/2026-08-29_04-10-54.md": {
+   "sha": "b6cbb6b505a1b70d0c541fe6beea1c227944497fdf6ab8fbdb9a581d427704fe",
+   "size": 160,
+   "mtime": 1787965854,
+   "machine": "H1"
+  },
   "cron/output/147ac7b09ffd/2026-08-29_01-47-26.md": {
    "sha": "241e098dbec1fd0705d2315ad0f83076b7fbb8a2e27ac4a31af1eefeb36c7eb4",
    "size": 160,
@@ -3944,12 +3950,6 @@
    "sha": "c69b3ad851750b3f95df58b303f8f1a70561961b9b6c49d0711f1002395df5e0",
    "size": 160,
    "mtime": 1787931280,
-   "machine": "H1"
-  },
-  "cron/output/147ac7b09ffd/2026-08-28_14-51-07.md": {
-   "sha": "ed8340a6314f92f41cdcf54709183432b9497eacc7b4c3e8bad2c05bbb157e9c",
-   "size": 160,
-   "mtime": 1787917867,
    "machine": "H1"
   },
   "cron/output/147ac7b09ffd/2026-08-29_01-30-47.md": {
@@ -4576,6 +4576,12 @@
    "mtime": 1787954485,
    "machine": "H1"
   },
+  "cron/output/6897d56a0662/2026-08-29_04-15-31.md": {
+   "sha": "0510c7d0ab0a1ff045fd1b3c9114ef6f3258dc6fadd97e8861dcffe32fe8eb71",
+   "size": 774,
+   "mtime": 1787966131,
+   "machine": "H1"
+  },
   "cron/output/6897d56a0662/2026-08-29_00-25-25.md": {
    "sha": "8a040f507c2e9230142d782a35d71c782900b472bba57310b8191fbe98d64f81",
    "size": 775,
@@ -4624,12 +4630,6 @@
    "mtime": 1787951604,
    "machine": "H1"
   },
-  "cron/output/6897d56a0662/2026-08-28_23-13-23.md": {
-   "sha": "b1b383756d25c3ce5b7c930c27ae0ca14c2b4890cfcccb0fdddd601dcada7f9b",
-   "size": 737,
-   "mtime": 1787948003,
-   "machine": "H1"
-  },
   "cron/output/6897d56a0662/2026-08-29_03-33-30.md": {
    "sha": "477bfaf4ee8bf2050f911fba203636f7059c996bac6b5a4df18b8a0246dc6066",
    "size": 774,
@@ -4640,6 +4640,12 @@
    "sha": "52803d001df0e1ed8ce22dec2412715c694f6eba30c0cc370eec5b2f2109363d",
    "size": 775,
    "mtime": 1787961450,
+   "machine": "H1"
+  },
+  "cron/output/6897d56a0662/2026-08-29_04-09-31.md": {
+   "sha": "619a6fa0ae9ebf557cd830e19b742288e946713c7b1fa27529444c0a5ea26a3e",
+   "size": 775,
+   "mtime": 1787965771,
    "machine": "H1"
   },
   "cron/output/6897d56a0662/2026-08-29_01-55-26.md": {
@@ -4712,12 +4718,6 @@
    "sha": "c08cb134040d12599f34935feeb1cded8d8c854f89550369b7aa0b1b23d38e4f",
    "size": 774,
    "mtime": 1787962170,
-   "machine": "H1"
-  },
-  "cron/output/6897d56a0662/2026-08-28_23-25-31.md": {
-   "sha": "835a8468538717b33e7c8be09d35089c6cd2758c8172d50d1bc85fa45a718d22",
-   "size": 737,
-   "mtime": 1787948731,
    "machine": "H1"
   },
   "cron/output/6897d56a0662/2026-08-29_01-37-26.md": {
@@ -4822,16 +4822,16 @@
    "mtime": 1787958027,
    "machine": "H1"
   },
-  "cron/output/6897d56a0662/2026-08-28_23-19-33.md": {
-   "sha": "2f03aa915d71d51921f94faf822b5630a446e0e403e7369a7f4fd0ef42ab27f3",
-   "size": 737,
-   "mtime": 1787948373,
-   "machine": "H1"
-  },
   "cron/output/6897d56a0662/2026-08-28_23-43-34.md": {
    "sha": "ba2b4bfc73a2da00d1a26278c1b262997b9e27fd7ce734eec30475f4e31be2e5",
    "size": 737,
    "mtime": 1787949814,
+   "machine": "H1"
+  },
+  "cron/output/6897d56a0662/2026-08-29_04-21-31.md": {
+   "sha": "21a2a4703ac069b706867a130918cdfed2ec1da34d99edcd19828c960393ad70",
+   "size": 774,
+   "mtime": 1787966491,
    "machine": "H1"
   },
   "cron/output/9321bae97ce1/2026-08-25_13-59-06.md": {
@@ -5296,12 +5296,6 @@
    "mtime": 1787930396,
    "machine": "H1"
   },
-  "cron/output/8b1a738e790c/2026-08-25_14-19-29.md": {
-   "sha": "5a54ab54cd1dc3f9d53b91abebf25d317d729da7fe49a6edfa0b3d8f4c295a3d",
-   "size": 152,
-   "mtime": 1787656769,
-   "machine": "H1"
-  },
   "cron/output/8b1a738e790c/2026-08-27_01-12-31.md": {
    "sha": "bd7ebc01697ee99897de20b3fb6ef45a40034b25f43c069598d9fb7201270163",
    "size": 152,
@@ -5348,6 +5342,12 @@
    "sha": "a3aaf955d76b5fbefd364a37fa0976c2345097ee22fb26e05a5941db5ea0931a",
    "size": 152,
    "mtime": 1787667694,
+   "machine": "H1"
+  },
+  "cron/output/8b1a738e790c/2026-08-29_04-06-51.md": {
+   "sha": "02f8a3b484dcbda8fa80e48469e4eade58b9672399ea8dace023b020c9c9aea4",
+   "size": 152,
+   "mtime": 1787965611,
    "machine": "H1"
   },
   "cron/output/6b6f9da2b253/2026-08-24_16-00-59.md": {
@@ -89189,15 +89189,15 @@
    "machine": "H1"
   },
   "session_awareness/current_sessions.md": {
-   "sha": "6cd816821a11208d731297e0b72ea7c13dfc5775d473cf62cbdf69c1bdb2a3d8",
+   "sha": "2b84aa66cbbdaaccea6672a08369f1da1677b6aadc19e9fc7b3ca49d9c6709e5",
    "size": 4617,
-   "mtime": 1787964632,
+   "mtime": 1787966552,
    "machine": "H1"
   },
   "session_awareness/current_sessions.json": {
-   "sha": "6c00a01c913941d358f16fab0d8d60e8372898fd7ec9d95b8fcbf2cfdc09b53c",
+   "sha": "474033f32fd2a2074aef28fabab585702539312572262150a53b56da6ba80ed3",
    "size": 17181,
-   "mtime": 1787964632,
+   "mtime": 1787966552,
    "machine": "H1"
   },
   "hermes-agent/AGENTS.md": {
@@ -138689,9 +138689,9 @@
    "machine": "H1"
   },
   "shared/nous_auth.json": {
-   "sha": "2d33e25962db3cdc9921c50c7d69ac6a3fc6a42fa1852da931eb4b4fcbadcd8c",
+   "sha": "f630aca2826964ebf18a4cb1c3c837cf2cb01a3d02feacdcddff6307f25a1893",
    "size": 2240,
-   "mtime": 1787962719,
+   "mtime": 1787966328,
    "machine": "H1"
   },
   "checkpoints/store/ledgers/e379fc9d8a074ec0.json": {
