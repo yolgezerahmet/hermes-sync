@@ -63,7 +63,14 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 
-__version__ = "1.8.0"
+# ── v2.1 (29 Ağu 2026): sync_memory modülü (D — ortak hafıza) ──
+# sync_memory.py aynı dizinde; farklı cwd'den çalışınca da bulunabilsin.
+_HERE = os.path.dirname(os.path.abspath(__file__))
+if _HERE not in sys.path:
+    sys.path.insert(0, _HERE)
+import sync_memory as smem
+
+__version__ = "2.1.0"
 __author__ = "CumulusNET Engineering"
 __license__ = "MIT"
 
@@ -1432,7 +1439,7 @@ def gdrive_pull_latest(cfg, node):
         f'rclone lsd {cfg["gdrive"]["versioned_dir"]}/{node} '
         f'2>/dev/null | tail -1', timeout=30, shell=True)
     if rc != 0 or not out:
-        log.info(f"{node}: GDrive'da versiyon yok")
+        log.info(f"{node}: ⚠ GDrive'da versiyon yok (pull atlandı — node yedeklenmemiş)")
         return False
     # En son timestamp klasörü
     latest = out.split()[-1]
@@ -2014,7 +2021,7 @@ RUN_STATE = os.path.expanduser("~/.hermes/state/sync_last_run.json")
 # Bu komutlar GDrive/GitHub'a YAZAR → kilit zorunlu. Okuma komutları
 # (status/conflicts/versions/agent-status/nodes/doctor) kilitsiz çalışır.
 MUTATING_CMDS = {"push", "pull", "both", "backup", "rollback",
-                 "init", "add-node", "share", "apply"}
+                 "init", "add-node", "share", "apply", "memory"}
 
 def acquire_lock():
     """Aynı anda yalnız bir sync işlemi GDrive/GitHub'a yazsın.
@@ -2214,6 +2221,12 @@ def cmd_restic_backup(cfg, node=None, dry_run=False):
     """
     nodes = [node] if node else list(cfg["dirs"].keys())
     print(f"\n  💾 RESTIC INCREMENTAL YEDEK — {RESTIC_REPO_URL}")
+    # hermes node'u restic'ten HARİÇ: /root/.hermes (22GB+) exclude_dirs'la bile
+    # büyük; hermes-full node'u ayrı zstd script ile GDrive'a gidiyor (hermes_full_backup.py).
+    # include filtreleri restic'e yansımıyor — bu yüzden tam dizin yüklenirdi (H2 bulgusu).
+    skip_nodes = {k for k, v in cfg["dirs"].items()
+                  if isinstance(v, dict) and v.get("restic") is False}
+    nodes = [n for n in nodes if n not in skip_nodes]
     for n in nodes:
         dst = cfg["dirs"][n]
         base = dst["path"] if isinstance(dst, dict) else dst
@@ -2247,11 +2260,16 @@ def cmd_restic_backup(cfg, node=None, dry_run=False):
                     print(f"    ✅ {n}: {line.strip()}")
         else:
             print(f"    ❌ {n}: {out.strip()[-200:]}")
-    # retention (tüm repo)
-    if not dry_run:
+    # retention (tüm repo) — SADECE birincil makinede (H2 bulgusu: üç makine
+    # eşzamanlı prune aynı repo'yu kilitler; repo bozulabilir)
+    ret_machine = os.environ.get("SYNC_RETENTION_MACHINE") or cfg.get("retention_machine", "")
+    this_machine = cfg.get("machine", "")
+    if not dry_run and (not ret_machine or this_machine == ret_machine):
         rc, out = _restic(["forget", "--keep-daily", "7", "--keep-weekly", "4",
-                           "--keep-monthly", "6", "--prune"])
+                           "--keep-monthly", "6", "--prune", "--retry-lock", "5m"])
         print(f"    🧹 retention: {'OK' if rc == 0 else out.strip()[-150:]}")
+    elif not dry_run:
+        print(f"    🧹 retention: atlandı (bu makine yedekliyor, prune {ret_machine} yapar)")
 
 def cmd_backup(cfg, node=None, hub=None, dry_run=False):
     """GDrive versiyon takipli yedek (timestamp snapshot; silmez).
@@ -2359,6 +2377,195 @@ def cmd_rollback(cfg, node, version, hub=None, force=False):
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
+# ═══════════════════════════════════════════════════════════════
+# D MODÜLÜ — ORTAK HAFIZA (v2.1, 29 Ağu 2026)
+# sync_memory.py (v0.1→v1.0 AKTİF): memory DIF JSONL → GDrive hub
+# gdrive:hermes-sync/<user>/shared/memory/ push/pull + import +
+# fact_store (memory_store.db facts) entegrasyonu.
+# Tasarım ilkeleri (GPT-5.6): canlı DB senkronu YOK — mantıksal delta;
+# çakışma preserve (.conflict~node~ts); secret allowlist; HLC saat.
+# ═══════════════════════════════════════════════════════════════
+
+MEMORY_HUB_SUBDIR = "shared/memory"          # cfg['gdrive']['user_root'] altında
+DEFAULT_MEMORY_DIR = os.path.expanduser("~/.hermes/memory")
+
+
+def _memory_hub(cfg):
+    """GDrive hub yolu: gdrive:hermes-sync/<user>/shared/memory"""
+    user_root = cfg.get("gdrive", {}).get("user_root",
+                                          "gdrive:hermes-sync/cumulusnet")
+    return f"{user_root}/{MEMORY_HUB_SUBDIR}"
+
+
+def _memory_node_id(cfg):
+    """Makine kimliği — memory DIF source.node_id."""
+    mid = cfg.get("identity", {}).get("machine_id") or ""
+    return mid or (os.uname().nodename if os.name != "nt"
+                   else os.environ.get("COMPUTERNAME", "unknown"))
+
+
+def memory_export(memory_dir, cfg, dry_run=False):
+    """Yerel memory DIF'lerini JSONL delta'ya export et.
+
+    sync_memory.export_memory_delta: namespace'leri (shared/private/
+    quarantine) tarar, secret allowlist'ten geçirir, deltas/<ts>-<node>-
+    <seq>.jsonl yazar. Secret hit → ValueError (RED, hiçbir şey gitmez).
+    """
+    node_id = _memory_node_id(cfg)
+    agent_id = cfg.get("identity", {}).get("user_id", "cumulusnet")
+    if dry_run:
+        print(f"    [DRY] export memory_delta (node={node_id}, agent={agent_id})")
+        return None
+    try:
+        exp = smem.export_memory_delta(memory_dir, node_id, agent_id, since_seq=0)
+        print(f"    ✅ export: {exp['records']} kayıt → {os.path.basename(exp['delta'])}")
+        return exp["delta"]
+    except ValueError as e:
+        print(f"    ⛔ SECRET RED: {e}")
+        return None
+
+
+def memory_push(cfg, delta_path, dry_run=False):
+    """Delta JSONL'yi hub'a yükle (rclone copy — silmez, non-destructive)."""
+    if not delta_path:
+        return False
+    hub = _memory_hub(cfg)
+    if dry_run:
+        print(f"    [DRY] rclone copy {os.path.basename(delta_path)} → {hub}")
+        return True
+    r = subprocess.run(["rclone", "copy", delta_path, hub],
+                       capture_output=True, text=True, errors="replace",
+                       timeout=120)
+    if r.returncode != 0:
+        print(f"    ❌ push hatası: {r.stderr.strip()[:150]}")
+        return False
+    print(f"    ✅ push: {os.path.basename(delta_path)} → {hub}")
+    return True
+
+
+def memory_pull_import(cfg, memory_dir, dry_run=False):
+    """Hub'daki uzak deltaları çek + import (conflict_policy='preserve').
+
+    Adımlar: 1) rclone lsf hub/*.jsonl → 2) her delta yerel incoming'e
+    rclone copyto → 3) smem.import_memory_delta (aynı revision: eski atla,
+    eşit+aynı hlc: atla, eşit+farklı hlc: .conflict koru, tombstone: kaldır).
+    """
+    hub = _memory_hub(cfg)
+    node_id = _memory_node_id(cfg)
+    incoming = os.path.join(memory_dir, "incoming")
+    os.makedirs(incoming, exist_ok=True)
+    if dry_run:
+        print(f"    [DRY] pull+import deltas from {hub}")
+        return 0
+    r = subprocess.run(["rclone", "lsf", hub, "--files-only"],
+                       capture_output=True, text=True, errors="replace",
+                       timeout=90)
+    if r.returncode != 0:
+        print(f"    ⚠ hub listelenemedi: {r.stderr.strip()[:120]}")
+        return 0
+    deltas = [f for f in (r.stdout or "").splitlines()
+              if f.endswith(".jsonl")]
+    total_applied = total_conflicts = total_tomb = 0
+    for fn in sorted(deltas):
+        dst = os.path.join(incoming, fn)
+        rr = subprocess.run(["rclone", "copyto", f"{hub}/{fn}", dst],
+                            capture_output=True, text=True, errors="replace",
+                            timeout=120)
+        if rr.returncode != 0:
+            print(f"    ⚠ {fn} indirilemedi: {rr.stderr.strip()[:100]}")
+            continue
+        res = smem.import_memory_delta(memory_dir, dst, node_id,
+                                       conflict_policy="preserve")
+        total_applied += res.get("applied", 0)
+        total_conflicts += res.get("conflicts", 0)
+        total_tomb += res.get("tombstones", 0)
+    if deltas:
+        print(f"    ✅ import: {len(deltas)} delta, {total_applied} uygulandı, "
+              f"{total_conflicts} çakışma korundu, {total_tomb} tombstone")
+    else:
+        print("    ℹ hub'da delta yok (ilk koşu olabilir)")
+    return total_applied
+
+
+def memory_to_fact_store(memory_dir, dry_run=False, db_path=None):
+    """Import sonrası DIF kayıtlarını fact_store'a (memory_store.db) yaz.
+
+    facts şeması: (content UNIQUE, category, tags, trust_score, ...).
+    İçerik: subject — predicate — value metni; INSERT OR IGNORE (dedup).
+    Bu, Hermes bellek füzyon hattıyla (memory_fusion.py facts_fts) birleşir.
+    """
+    db_path = db_path or os.path.expanduser("~/.hermes/memory_store.db")
+    if not os.path.exists(db_path):
+        print(f"    ℹ memory_store.db yok ({db_path}) — fact yazılmadı")
+        return 0
+    try:
+        import sqlite3
+    except ImportError:
+        print("    ⚠ sqlite3 yok — fact yazılmadı")
+        return 0
+    added = 0
+    conn = sqlite3.connect(db_path)
+    try:
+        for ns in smem.MEMORY_NAMESPACES:
+            ns_dir = os.path.join(memory_dir, ns)
+            if not os.path.isdir(ns_dir):
+                continue
+            for fn in sorted(os.listdir(ns_dir)):
+                if not fn.endswith(".json"):
+                    continue
+                try:
+                    with open(os.path.join(ns_dir, fn)) as f:
+                        rec = json.load(f)
+                except Exception:
+                    continue
+                if rec.get("tombstone"):
+                    continue
+                subj = str(rec.get("subject", "")).strip()
+                pred = str(rec.get("predicate", "")).strip()
+                val = rec.get("value")
+                if isinstance(val, (dict, list)):
+                    val = json.dumps(val, ensure_ascii=False)
+                content = " — ".join(x for x in (subj, pred, str(val)) if x)
+                if not content:
+                    continue
+                if dry_run:
+                    added += 1
+                    continue
+                cat = (pred or "sync-memory")[:63]
+                tags = rec.get("namespace", "shared")
+                cur = conn.execute(
+                    "INSERT OR IGNORE INTO facts "
+                    "(content, category, tags, trust_score) VALUES (?,?,?,?)",
+                    (content, cat, tags, 0.5))
+                added += cur.rowcount
+        conn.commit()
+    finally:
+        conn.close()
+    if added:
+        print(f"    ✅ fact_store: +{added} kayıt ({db_path})")
+    return added
+
+
+def cmd_memory(cfg, dry_run=False, memory_dir=None):
+    """Ortak hafıza D modülü: export → push → pull/import → fact_store.
+
+    Kullanım: sync_motor.py memory [--dry-run] [--memory-dir <dir>]
+    Cron bağlantısı: node_agent.py once içinde 'memory' adımı (v2.1).
+    """
+    memory_dir = memory_dir or DEFAULT_MEMORY_DIR
+    os.makedirs(memory_dir, exist_ok=True)
+    print(f"\n  🧠 ORTAK HAFIZA (D) — {_memory_hub(cfg)}")
+    print(f"    yerel: {memory_dir}")
+
+    delta = memory_export(memory_dir, cfg, dry_run=dry_run)
+    if delta is None and not dry_run:
+        return 1  # secret RED veya export hatası
+    if not memory_push(cfg, delta, dry_run=dry_run):
+        return 1
+    memory_pull_import(cfg, memory_dir, dry_run=dry_run)
+    memory_to_fact_store(memory_dir, dry_run=dry_run)
+    return 0
+
 def main(argv=None):
     parser = argparse.ArgumentParser(
         prog="sync_motor",
@@ -2368,7 +2575,8 @@ def main(argv=None):
                         choices=["status", "push", "pull", "both",
                                  "conflicts", "init", "select", "nodes",
                                  "add-node", "share", "doctor", "version",
-                                 "probe", "propose", "apply", "agent-status", "backup", "versions", "rollback"])
+                                 "probe", "propose", "apply", "agent-status",
+                                 "backup", "versions", "rollback", "memory"])
     parser.add_argument("hedef", nargs="?",
                         help="add-node: node adı | share: node adı")
     parser.add_argument("--config", default=None,
@@ -2403,6 +2611,8 @@ def main(argv=None):
                         help="rollback: geri alınacak versiyon dosyası (ör: kernel_20260815_120000.tar.gz)")
     parser.add_argument("--force", action="store_true",
                         help="rollback: çakışma dosyası oluşturmadan üzerine yaz")
+    parser.add_argument("--memory-dir", default=None,
+                        help="memory: yerel memory DIF dizini (varsayılan ~/.hermes/memory)")
     args = parser.parse_args(argv)
 
     if args.komut == "version":
@@ -2469,6 +2679,8 @@ def main(argv=None):
         rc = cmd_versions(cfg, node=args.node, hub=args.hub)
     elif args.komut == "rollback":
         rc = cmd_rollback(cfg, args.node, args.version, hub=args.hub, force=args.force)
+    elif args.komut == "memory":
+        rc = cmd_memory(cfg, dry_run=args.dry_run, memory_dir=args.memory_dir)
     elif args.komut == "init":
         cmd_init(cfg)
     elif args.komut == "nodes":
