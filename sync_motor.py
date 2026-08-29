@@ -2222,10 +2222,24 @@ def cmd_restic_backup(cfg, node=None, dry_run=False):
         if dry_run:
             print(f"    [DRY] {n}: restic backup {base} (tag:{n})")
             continue
-        rc, out = _restic(["backup", base, "--tag", n,
-                           "--exclude", ".git", "--exclude", ".env",
-                           "--exclude", "*.key", "--exclude", "*.pem",
-                           "--exclude", "*.pyc", "--exclude", "node_modules"])
+        # Sabit güvenlik/gürültü dışlamaları
+        exc = ["--exclude", ".git", "--exclude", ".env",
+               "--exclude", "*.key", "--exclude", "*.pem",
+               "--exclude", "*.pyc", "--exclude", "node_modules"]
+        # 29 Ağu 2026 FIX (H2): config'teki exclude_dirs/max_size_kb YOKSAYILIYORDU.
+        # Kanıt: hermes node'u = AppData/Local/hermes = 13 GB; config backups(5GB) ve
+        # hermes-agent(3.9GB) dizinlerini dışlıyor ama restic hepsini yüklüyordu
+        # (34 KiB/s GDrive'da ~2-4 gün). Artık config niyeti restic'e aktarılır.
+        if isinstance(dst, dict):
+            seen = {".git", "node_modules"}
+            for d in (dst.get("exclude_dirs") or []):
+                if d and d not in seen:
+                    seen.add(d)
+                    exc += ["--exclude", d]
+            mkb = dst.get("max_size_kb")
+            if mkb:
+                exc += ["--exclude-larger-than", f"{int(mkb)}k"]
+        rc, out = _restic(["backup", base, "--tag", n] + exc)
         if rc == 0:
             # özet satırlarını göster
             for line in out.splitlines():
