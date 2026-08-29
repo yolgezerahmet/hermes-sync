@@ -1,5 +1,33 @@
 # CHANGELOG — Cumulus Sync Motoru / Hermes Sync
 
+## [2.1.1] — 2026-08-29 (OceanAPI denetim kapanışı)
+
+### Düzeltilen — ORTAK HAFIZA GÜVENLİK + SAĞLAMLIK (OceanAPI gpt-5.6-sol
+### denetim bulguları #1-#8 — tamamı kapatıldı, 14 yeni test)
+- scan_payload_for_secrets RECURSIVE: iç içe dict/list değerleri ve
+  ALLOWED_VALUE_FIELDS dışındaki alanlar da taranır (önceden sadece üst
+  seviye alan adları + `value` alanı taranıyordu — nested secret kaçabiliyordu)
+- import_memory_delta artık GELEN her kaydı secret tarar (fail-closed:
+  hit → atla + rejected_secret sayacı; export RED'le göndermez ama bozuk/ele
+  geçirilmiş node'a karşı import tarafı da savunma yapar)
+- Tombstone revision karşılaştırmalı: eski/gecikmiş silme (mevcut rev >
+  tombstone rev) YENİ KAYDI SİLMEZ; eşit rev + farklı hlc'de mevcut kayıt
+  .tombstone. kopyasıyla korunur
+- export delta dosya adı µs + uuid soneki — aynı saniyedeki iki export
+  overwrite olamaz (sıralama ts önekinden korunur)
+- conflict/tombstone dosya adları µs hassasiyetli — aynı saniyede birden
+  çok çakışma birbirinin üzerine yazamaz
+- append_audit_event LOCK dosyası üzerinde atomik (fcntl.flock /
+  msvcrt.locking) — eşzamanlı yazan iki süreç aynı prev_hash okuyamaz,
+  hash-chain kırılamaz; yardımcılar _audit_last_hash/_audit_event_hash/
+  _audit_append_line ayrıştırıldı
+- memory_pull_import hub listeleme HARD hatasında -1 döner (önceden 0 —
+  cron başarı sanıyordu); memory_to_fact_store sqlite bağlantı hatasında
+  -1 döner; cmd_memory ikisini de kontrol edip rc=1 döndürür
+- test_memory_fixes.py: 14 test (nested secret RED, import secret RED,
+  stale tombstone koruması, export/conflict µs dosya adı, audit kilitli
+  zincir, cmd_memory hata yayılımı) — rclone/GDrive mock'lu, dokunmaz
+
 ## [2.1.0] — 2026-08-29
 
 ### Eklenen — ÖNCELİK SINIFLI YEDEK + DOĞRULAMA (C modülü, v2.1)

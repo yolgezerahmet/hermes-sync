@@ -2704,8 +2704,10 @@ def memory_pull_import(cfg, memory_dir, dry_run=False):
                        capture_output=True, text=True, errors="replace",
                        timeout=90)
     if r.returncode != 0:
-        print(f"    ⚠ hub listelenemedi: {r.stderr.strip()[:120]}")
-        return 0
+        # 29 Ağu FIX (OceanAPI #8): -1 = HARD hata — cmd_memory rc=1 döner,
+        # cron görür; hub geçici kapalıysa retry şansı verir.
+        print(f"    ❌ hub listelenemedi: {r.stderr.strip()[:120]}")
+        return -1
     deltas = [f for f in (r.stdout or "").splitlines()
               if f.endswith(".jsonl")]
     total_applied = total_conflicts = total_tomb = 0
@@ -2747,7 +2749,12 @@ def memory_to_fact_store(memory_dir, dry_run=False, db_path=None):
         print("    ⚠ sqlite3 yok — fact yazılmadı")
         return 0
     added = 0
-    conn = sqlite3.connect(db_path)
+    try:
+        conn = sqlite3.connect(db_path)
+    except Exception as e:
+        # 29 Ağu FIX (OceanAPI #8): -1 = HARD hata — cmd_memory rc=1 döner
+        print(f"    ❌ fact_store bağlantı hatası: {e}")
+        return -1
     try:
         for ns in smem.MEMORY_NAMESPACES:
             ns_dir = os.path.join(memory_dir, ns)
@@ -2818,8 +2825,12 @@ def cmd_memory(cfg, dry_run=False, memory_dir=None, memory_db=None):
         return 1  # secret RED veya export hatası
     if not memory_push(cfg, delta, dry_run=False):
         return 1
-    memory_pull_import(cfg, memory_dir, dry_run=False)
-    memory_to_fact_store(memory_dir, dry_run=False, db_path=memory_db)
+    pr = memory_pull_import(cfg, memory_dir, dry_run=False)
+    if isinstance(pr, int) and pr < 0:
+        return 1  # hub hard hata (OceanAPI #8) — pull/import başarısız
+    fs = memory_to_fact_store(memory_dir, dry_run=False, db_path=memory_db)
+    if isinstance(fs, int) and fs < 0:
+        return 1  # fact_store hard hata — cron görsün, retry edebilsin
     return 0
 
 def main(argv=None):

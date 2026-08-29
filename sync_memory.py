@@ -27,6 +27,15 @@ import time
 import uuid
 from datetime import datetime, timezone
 
+try:
+    import fcntl
+except ImportError:          # Windows (H2)
+    fcntl = None
+    try:
+        import msvcrt
+    except ImportError:
+        msvcrt = None
+
 # ─── Secret taraması (GPT-5.6: regex yeterli değil — allowlist + tarama) ───
 SECRET_FIELD_RE = re.compile(
     r"(token|api[_-]?key|secret|password|credential|private[_-]?key|"
@@ -36,16 +45,35 @@ ALLOWED_VALUE_FIELDS = {"subject", "predicate", "value", "value_type"}
 
 
 def scan_payload_for_secrets(record: dict) -> dict:
-    """Secret taraması: bilinen alan adları + değer kalıpları."""
+    """Secret taraması: RECURSIVE — tüm alan adları + tüm string değerler.
+
+    29 Ağu 2026 FIX (OceanAPI denetim bulgusu #2): önceki sürüm yalnız üst
+    seviye alan adlarını ve `value` alanını tarıyordu; iç içe dict/list
+    değerler ve ALLOWED_VALUE_FIELDS dışındaki alanlar (source, metadata
+    vb.) içinde gizlenen secret'lar kaçabiliyordu. Artık ağaç tam gezilir:
+    her alan ADI SECRET_FIELD_RE ile, her string DEĞER kalıp regex'leriyle
+    taranır. Hit → RED (ok=False) — export hiçbir şey yazmaz (fail-closed).
+    """
     hits = []
-    for k, v in (record or {}).items():
-        if SECRET_FIELD_RE.search(str(k)):
-            hits.append(k)
-        if k in ("value",) and isinstance(v, str):
+
+    def walk(node, path=""):
+        if isinstance(node, dict):
+            for k, v in node.items():
+                key = f"{path}.{k}" if path else str(k)
+                if SECRET_FIELD_RE.search(str(k)):
+                    hits.append(key)
+                walk(v, key)
+        elif isinstance(node, list):
+            for i, v in enumerate(node):
+                walk(v, f"{path}[{i}]")
+        elif isinstance(node, str):
             for pat in (r"sk-[A-Za-z0-9]{16,}", r"ghp_[A-Za-z0-9]{30,}",
                         r"AKIA[0-9A-Z]{16}", r"Bearer [A-Za-z0-9._-]+"):
-                if re.search(pat, v):
-                    hits.append(f"value:{pat[:10]}...")
+                if re.search(pat, node):
+                    hits.append(f"{path}:{pat[:10]}...")
+                    break
+
+    walk(record or {})
     return {"hits": sorted(set(hits)), "ok": len(hits) == 0}
 
 
@@ -95,8 +123,11 @@ def export_memory_delta(memory_dir: str, node_id: str, agent_id: str,
         scan = scan_payload_for_secrets(rec)
         if not scan["ok"]:
             raise ValueError(f"SECRET: {rec.get('record_id')} alan {scan['hits']}")
-    ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    out = os.path.join(memory_dir, "deltas", f"{ts}-{node_id}-{since_seq}.jsonl")
+    ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+    # 29 Ağu FIX (OceanAPI #1): aynı saniyedeki iki export çakışmasın —
+    # µs + uuid soneki overwrite'ı imkânsız kılar; sıralama ts önekinden korunur
+    out = os.path.join(memory_dir, "deltas",
+                       f"{ts}-{node_id}-{since_seq}-{uuid.uuid4().hex[:6]}.jsonl")
     os.makedirs(os.path.dirname(out), exist_ok=True)
     with open(out, "w") as f:
         for rec in delta:
@@ -109,8 +140,19 @@ def import_memory_delta(memory_dir: str, delta_path: str,
     """Delta uygula — non-destructive (.conflict~node~ts koru).
     Aynı record_id: revision karşılaştır — yüksek revision kazanır,
     eşitse ikisini koru (çakışma). tombstone=true → kaydı kaldır (fiziksel
-    silme değil — kaldır/ignore)."""
-    applied = conflicts = tombstones = 0
+    silme değil — kaldır/ignore).
+
+    29 Ağu 2026 (OceanAPI denetim bulguları #3/#4/#6):
+    - Gelen her kayıt secret taramasından geçer (fail-closed: hit → atla,
+      rejected_secret sayacı). Export RED'le hiç göndermez ama bir node
+      bozulduysa/ele geçirildiyse import tarafı da savunma yapar.
+    - Tombstone revision karşılaştırmalı: mevcut kayıt daha yeni ise eski
+      silme uygulanmaz (veri kaybı önlendi). Eşit revision + farklı hlc'de
+      mevcut kayıt .tombstone. kopyasıyla korunur.
+    - Conflict/tombstone dosya adları µs hassasiyetli — aynı saniyede
+      birden çok çakışma birbirinin üzerine yazamaz.
+    """
+    applied = conflicts = tombstones = rejected_secret = 0
     if not os.path.exists(delta_path):
         return {"applied": 0, "conflicts": 0, "error": "delta yok"}
     with open(delta_path) as f:
@@ -120,14 +162,28 @@ def import_memory_delta(memory_dir: str, delta_path: str,
             ns = rec.get("namespace", "shared")
             if ns not in MEMORY_NAMESPACES:
                 continue
+            # import tarafı secret savunması (OceanAPI #3)
+            sec = scan_payload_for_secrets(rec)
+            if not sec["ok"]:
+                rejected_secret += 1
+                continue
             ns_dir = os.path.join(memory_dir, ns)
             os.makedirs(ns_dir, exist_ok=True)
             target = os.path.join(ns_dir, f"{rid}.json")
             # tombstone: kayıt silindi — mevcut dosyayı kaldır (fiziksel
             # silme değil: .tombstone işaretleyici)
             if rec.get("tombstone"):
+                # OceanAPI #4: eski/gecikmiş tombstone daha yeni kaydı silmesin
+                cur_rev = 0
                 if os.path.exists(target):
-                    os.replace(target, target + ".tombstone." + node_id)
+                    with open(target) as ef:
+                        existing = json.load(ef)
+                    cur_rev = existing.get("revision", 0)
+                if cur_rev > rec.get("revision", 0):
+                    continue  # eski silme — yeni kayıt korunur
+                if os.path.exists(target):
+                    ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+                    os.replace(target, f"{target}.tombstone.{node_id}.{ts}")
                 tombstones += 1
                 continue
             # mevcut kayıtla karşılaştır
@@ -139,15 +195,15 @@ def import_memory_delta(memory_dir: str, delta_path: str,
                     continue
                 if existing.get("revision", 0) == rec.get("revision", 0) \
                         and existing.get("hlc") != rec.get("hlc"):
-                    # çakışma — ikisini koru
-                    ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+                    # çakışma — ikisini koru (µs dosya adı: overwrite yok)
+                    ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
                     os.replace(target, f"{target}.conflict.{node_id}.{ts}")
                     conflicts += 1
             with open(target, "w") as wf:
                 json.dump(rec, wf, ensure_ascii=False, indent=1)
             applied += 1
     return {"applied": applied, "conflicts": conflicts,
-            "tombstones": tombstones}
+            "tombstones": tombstones, "rejected_secret": rejected_secret}
 
 
 # ─── Audit Log (JSONL + hash-chain — kim ne yaptı, değiştirilemez) ───
@@ -157,7 +213,13 @@ AUDIT_REQUIRED = ("event_id", "timestamp_utc", "node_id", "agent_id",
 
 
 def append_audit_event(audit_dir: str, event: dict) -> str:
-    """Audit olayı ekle — hash-chain (previous_event_hash + event_hash)."""
+    """Audit olayı ekle — hash-chain (previous_event_hash + event_hash).
+
+    29 Ağu 2026 FIX (OceanAPI #7): önceki sürüm "son hash'i oku" + "yaz"ı
+    kilitsiz iki ayrı işlem yapıyordu — aynı makinede eşzamanlı iki süreç
+    aynı prev_hash okuyabilir ve zincir kırılırdı. Artık okuma+yazma
+    LOCK dosyası üzerinde (fcntl.flock / msvcrt.locking) atomik yapılır.
+    """
     os.makedirs(audit_dir, exist_ok=True)
     log_path = os.path.join(audit_dir, datetime.now(timezone.utc).strftime("%Y-%m-%d") + ".jsonl")
     event.setdefault("event_id", str(uuid.uuid4()))
@@ -171,6 +233,46 @@ def append_audit_event(audit_dir: str, event: dict) -> str:
     # Audit log günlük dosya (YYYY-MM-DD.jsonl) olduğundan HER GÜNÜN ilk iki
     # olayı bu hataya düşüyordu. LF/CRLF farkından bağımsız — H1/H3 de etkilenir.
     # Audit log'lar günlük ve küçük; tamamını okumak güvenli ve doğru.
+    lock_path = log_path + ".lock"
+    prev_hash = "0" * 64
+    if fcntl is not None:
+        with open(lock_path, "a") as lf:
+            fcntl.flock(lf, fcntl.LOCK_EX)
+            try:
+                prev_hash = _audit_last_hash(log_path)
+                event["previous_event_hash"] = prev_hash
+                event["event_hash"] = _audit_event_hash(prev_hash, event)
+                _audit_append_line(log_path, event)
+            finally:
+                fcntl.flock(lf, fcntl.LOCK_UN)
+    elif msvcrt is not None:
+        with open(lock_path, "a") as lf:
+            try:
+                msvcrt.locking(lf.fileno(), msvcrt.LK_LOCK, 1)
+                try:
+                    prev_hash = _audit_last_hash(log_path)
+                    event["previous_event_hash"] = prev_hash
+                    event["event_hash"] = _audit_event_hash(prev_hash, event)
+                    _audit_append_line(log_path, event)
+                finally:
+                    lf.seek(0)
+                    msvcrt.locking(lf.fileno(), msvcrt.LK_UNLCK, 1)
+            except OSError:
+                # kilitlenemezse yine de yaz (tek makine senaryosu)
+                prev_hash = _audit_last_hash(log_path)
+                event["previous_event_hash"] = prev_hash
+                event["event_hash"] = _audit_event_hash(prev_hash, event)
+                _audit_append_line(log_path, event)
+    else:
+        prev_hash = _audit_last_hash(log_path)
+        event["previous_event_hash"] = prev_hash
+        event["event_hash"] = _audit_event_hash(prev_hash, event)
+        _audit_append_line(log_path, event)
+    return event["event_hash"]
+
+
+def _audit_last_hash(log_path: str) -> str:
+    """Log dosyasının son satırındaki event_hash — yoksa '0'*64."""
     prev_hash = "0" * 64
     if os.path.exists(log_path):
         try:
@@ -181,15 +283,19 @@ def append_audit_event(audit_dir: str, event: dict) -> str:
                 prev_hash = last.get("event_hash", "0" * 64)
         except Exception:
             prev_hash = "0" * 64
+    return prev_hash
+
+
+def _audit_event_hash(prev_hash: str, event: dict) -> str:
     body = json.dumps({k: event.get(k) for k in AUDIT_REQUIRED},
                       sort_keys=True, ensure_ascii=False)
-    event["previous_event_hash"] = prev_hash
-    event["event_hash"] = hashlib.sha256(
-        (prev_hash + body).encode()).hexdigest()
+    return hashlib.sha256((prev_hash + body).encode()).hexdigest()
+
+
+def _audit_append_line(log_path: str, event: dict) -> None:
     # newline="\n": Windows'ta CRLF yazılmasın (satır sonu tutarlılığı)
     with open(log_path, "a", encoding="utf-8", newline="\n") as f:
         f.write(json.dumps(event, ensure_ascii=False) + "\n")
-    return event["event_hash"]
 
 
 def verify_audit_chain(audit_dir: str) -> dict:
