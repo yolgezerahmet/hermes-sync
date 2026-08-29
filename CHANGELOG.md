@@ -2,6 +2,20 @@
 
 ## [2.1.1] — 2026-08-29 (OceanAPI denetim kapanışı)
 
+### Düzeltilen — 2. TUR (OceanAPI 2. denetim #1-#5 — tombstone/audit kilit)
+- TOMBSTONE INDEX (tombstones/<ns>/<rid>.json): silme işlemi hedef dosya
+  olmasa da kalıcı kaydedilir; normal yazımda index kontrol edilir —
+  index.revision >= gelen.revision ise kayıt YENİDEN OLUŞTURULMAZ
+  (resurrection/veri kaybı önlendi). Daha yüksek revision'lu yeni kayıt
+  meşru diriltmedir: index temizlenir, kayıt yazılır.
+- Eşit revision + farklı hlc tombstone: mevcut kayıt KORUNUR (silme
+  kaybeder, conflict sayılır), tombstone index'e yazılır.
+- msvcrt.locking append modunda EOF pozisyonunu kilitliyordu (iki süreç
+  farklı byte'ları kilitler, dışlamazdı) — lock dosyası 1 byte'a
+  genişletilir, seek(0), byte 0 kilitlenir. Kilit alınamazsa 3 deneme
+  sonra RuntimeError (fail-closed) — kilitsiz yazım yarışı geri gelmez.
+- test_memory_fixes.py: 18 test (14 + 4 tombstone index/resurrection)
+
 ### Düzeltilen — ORTAK HAFIZA GÜVENLİK + SAĞLAMLIK (OceanAPI gpt-5.6-sol
 ### denetim bulguları #1-#8 — tamamı kapatıldı, 14 yeni test)
 - scan_payload_for_secrets RECURSIVE: iç içe dict/list değerleri ve
