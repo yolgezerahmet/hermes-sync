@@ -21,8 +21,25 @@ import uuid
 from pathlib import Path
 
 INBOX_DIR = Path(os.environ.get("A2A_INBOX", "~/.hermes/a2a_inbox")).expanduser()
+TASK_STORE = Path(os.environ.get("A2A_TASK_STORE", "~/.hermes/a2a_tasks.json")).expanduser()
 
-TASKS: dict = {}  # task_id → {status, result, created}
+# ─── Kalıcı görev deposu (asenkron: server restart'ında kaybolmaz) ─────
+def _load_tasks() -> dict:
+    try:
+        if TASK_STORE.exists():
+            return json.loads(TASK_STORE.read_text())
+    except Exception:
+        pass
+    return {}
+
+def _save_tasks(tasks: dict):
+    try:
+        TASK_STORE.parent.mkdir(parents=True, exist_ok=True)
+        TASK_STORE.write_text(json.dumps(tasks, ensure_ascii=False, indent=1), encoding="utf-8")
+    except Exception:
+        pass
+
+TASKS: dict = _load_tasks()
 
 # ─── AgentCard (A2A keşif) ────────────────────────────────────────────
 def agent_card(host: str, port: int) -> dict:
@@ -66,41 +83,68 @@ def execute_task(task: dict):
     fname.write_text(json.dumps({
         "ts": time.time(), "from": task.get("metadata", {}).get("from", "unknown"),
         "text": text, "status": "new", "result": None,
+        "_task_id": task.get("_task_id"),
     }, ensure_ascii=False, indent=2), encoding="utf-8")
     return "completed", {"note": str(fname), "inbox": str(INBOX_DIR)}
 
-# ─── JSON-RPC dispatch ────────────────────────────────────────────────
+# ─── JSON-RPC dispatch (senkron / asenkron / sorgu) ───────────────────
 def dispatch(method: str, params: dict) -> dict:
     if method == "task/send":
         task_id = uuid.uuid4().hex[:12]
-        TASKS[task_id] = {"status": "working", "result": None, "created": time.time()}
+        mode = params.get("mode", "sync")  # sync: anında sonuç | async: task_id + sonradan task/get
+        params["_task_id"] = task_id
+        TASKS[task_id] = {"status": "working", "result": None, "created": time.time(),
+                          "mode": mode}
+        _save_tasks(TASKS)
+        if mode == "async":
+            # arka planda işle (thread); sonuç store'a yazılır, task/get ile alınır
+            import threading
+            def _run():
+                try:
+                    status, result = execute_task(params)
+                    TASKS[task_id] = {"status": status, "result": result,
+                                      "created": time.time(), "mode": "async"}
+                except Exception as e:
+                    TASKS[task_id] = {"status": "failed", "result": {"error": str(e)},
+                                      "created": time.time(), "mode": "async"}
+                _save_tasks(TASKS)
+            threading.Thread(target=_run, daemon=True).start()
+            return {"id": task_id, "status": "working", "result": None, "mode": "async"}
         try:
             status, result = execute_task(params)
-            TASKS[task_id] = {"status": status, "result": result, "created": time.time()}
+            TASKS[task_id] = {"status": status, "result": result, "created": time.time(),
+                              "mode": "sync"}
         except Exception as e:
-            TASKS[task_id] = {"status": "failed", "result": {"error": str(e)}, "created": time.time()}
+            TASKS[task_id] = {"status": "failed", "result": {"error": str(e)},
+                              "created": time.time(), "mode": "sync"}
+        _save_tasks(TASKS)
         return {"id": task_id, "status": TASKS[task_id]["status"], "result": TASKS[task_id]["result"]}
     if method == "task/get":
         tid = params.get("id", "")
         t = TASKS.get(tid)
         if not t:
-            # inbox dosyasından ara
+            # inbox dosyasından ara (_task_id eşleşmesi)
             for f in INBOX_DIR.glob("*.json"):
                 try:
                     d = json.loads(f.read_text())
                     if d.get("_task_id") == tid:
-                        return {"id": tid, "status": "completed", "result": d.get("result") or d}
+                        return {"id": tid, "status": d.get("status", "completed"),
+                                "result": d.get("result") or {"note": str(f)}}
                 except Exception:
                     pass
             raise KeyError(f"task {tid} yok")
-        return {"id": tid, "status": t["status"], "result": t["result"]}
+        return {"id": tid, "status": t["status"], "result": t["result"], "mode": t.get("mode", "sync")}
     if method == "task/cancel":
         tid = params.get("id", "")
         if tid in TASKS:
             TASKS[tid]["status"] = "canceled"
+            _save_tasks(TASKS)
         return {"id": tid, "status": "canceled"}
     if method == "message/send":
-        return {"ok": True, "echo": params.get("message", "")}
+        return {"ok": True, "echo": params.get("message", ""), "mode": "sync"}
+    if method == "message/sendSubscribe":
+        # Canlı mesaj akışı (SSE) — dispatch içinde işlenmez; /stream endpoint'ine yönlendir
+        return {"ok": True, "stream": f"/stream?message={params.get('message', '')[:50]}"}
     raise KeyError(f"bilinmeyen metod: {method}")
 
 # ─── FastAPI uygulaması ───────────────────────────────────────────────
@@ -141,6 +185,26 @@ def build_app(token: str):
     @app.get("/health")
     async def health():
         return {"status": "ok", "tasks": len(TASKS)}
+
+    @app.get("/stream")
+    async def stream(message: str = "", seconds: int = 10):
+        """Canlı (SSE) mesaj akışı — 2 saniyede bir durum/mesaj yayınlar.
+        Kullanım: GET /stream?message=selam&seconds=10
+        (canlı görüşme kanalı; ajan bu akışı dinleyerek eşzamanlı konuşur)
+        """
+        from fastapi.responses import StreamingResponse
+
+        async def gen():
+            import asyncio as _asyncio
+            start = time.time()
+            yield "event: open\ndata: {\"status\": \"connected\"}\n\n"
+            i = 0
+            while time.time() - start < seconds:
+                yield (f"event: message\ndata: {json.dumps({'t': i, 'echo': message, 'ts': time.strftime('%H:%M:%S')}, ensure_ascii=False)}\n\n")
+                i += 1
+                await _asyncio.sleep(2)
+            yield "event: done\ndata: {}\n\n"
+        return StreamingResponse(gen(), media_type="text/event-stream")
 
     return app
 
