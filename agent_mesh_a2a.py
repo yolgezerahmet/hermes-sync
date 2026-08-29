@@ -15,6 +15,7 @@ Client : a2a_cli.py send <host> <task> --token ...   /   a2a_cli.py get <host> <
 import argparse
 import json
 import os
+import socket
 import sys
 import time
 import uuid
@@ -41,11 +42,42 @@ def _save_tasks(tasks: dict):
 
 TASKS: dict = _load_tasks()
 
+
+# ─── Platform yardımcıları (29 Ağu 2026 — H2/Windows portu) ───────────
+# Orijinal kod 3 Linux'a özgü çağrı kullanıyordu, Windows'ta ÇÖKÜYORDU:
+#   os.uname().nodename      → AttributeError (Windows'ta os.uname YOK)
+#                              agent_card() ve status action ikisi de patlıyordu
+#   os.stat("/proc/1")       → FileNotFoundError (/proc yok) → status 500
+#   shutil.disk_usage("/")   → MSYS/Windows'ta kök disk belirsiz
+# Linux/macOS davranışı AYNEN korunur; sadece fallback eklenir.
+def _hostname() -> str:
+    try:
+        return os.uname().nodename          # Linux/macOS
+    except AttributeError:
+        return os.environ.get("COMPUTERNAME") or socket.gethostname()
+
+
+def _root_path() -> str:
+    if os.name == "nt":
+        return os.environ.get("SystemDrive", "C:") + os.sep
+    return "/"
+
+
+def _uptime_s():
+    """Açılıştan beri geçen saniye. Windows: GetTickCount64 (bağımlılıksız)."""
+    try:
+        if os.name == "nt":
+            import ctypes
+            return round(ctypes.windll.kernel32.GetTickCount64() / 1000.0, 0)
+        return round(time.time() - os.stat("/proc/1").st_mtime, 0)
+    except Exception:
+        return None
+
 # ─── AgentCard (A2A keşif) ────────────────────────────────────────────
 def agent_card(host: str, port: int) -> dict:
     return {
         "protocolVersion": "1.0",
-        "name": f"cumulus-agent-{os.uname().nodename}",
+        "name": f"cumulus-agent-{_hostname()}",
         "description": "CumulusNET agent mesh — görev alır, yerel inbox'a yazar, durum döner",
         "url": f"http://{host}:{port}/",
         "capabilities": {"streaming": False, "pushNotifications": False, "stateTransitionHistory": True},
@@ -69,12 +101,12 @@ def execute_task(task: dict):
     action = payload.get("action", "note")
     if action == "status":
         import shutil
-        disk = shutil.disk_usage("/")
+        disk = shutil.disk_usage(_root_path())
         return "completed", {
-            "host": os.uname().nodename,
+            "host": _hostname(),
             "time": time.strftime("%Y-%m-%dT%H:%M:%S"),
             "disk_gb": round(disk.free / 1e9, 1),
-            "uptime_s": round(time.time() - os.stat("/proc/1").st_mtime, 0),
+            "uptime_s": _uptime_s(),
         }
     # note: inbox'a yaz (Hermes/otonom cron okur, işler, sonucu task sonucuna ekler)
     text = payload.get("text", json.dumps(payload, ensure_ascii=False))
