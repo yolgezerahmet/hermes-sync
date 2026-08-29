@@ -2159,6 +2159,68 @@ def _tar_node(cfg, node, outdir, ts):
             h.update(chunk)
     return tarp, h.hexdigest()
 
+RESTIC_REPO_URL = os.environ.get("RESTIC_REPO_URL", "rest:http://127.0.0.1:8443/")
+RESTIC_PASS_ENV = "RESTIC_PASSWORD"
+
+def _restic(args, timeout=3600, cwd=None):
+    """restic CLI sarmalayıcı — env'den repo+şifre (.env'den okur)."""
+    env = dict(os.environ)
+    # ~/.hermes/.env'den RESTIC_* değerlerini yükle (cron ortamında .env export edilmeyebilir)
+    try:
+        with open(os.path.expanduser("~/.hermes/.env")) as f:
+            for line in f:
+                line = line.strip()
+                if line.startswith("RESTIC_") and "=" in line:
+                    k, v = line.split("=", 1)
+                    env.setdefault(k.strip(), v.strip())
+    except Exception:
+        pass
+    if not env.get("RESTIC_REPOSITORY"):
+        env["RESTIC_REPOSITORY"] = RESTIC_REPO_URL
+    if not env.get(RESTIC_PASS_ENV):
+        print("    ❌ RESTIC_PASSWORD .env'de yok — restic çalışmaz")
+        return None, "RESTIC_PASSWORD yok"
+    r = subprocess.run(["restic", *args], capture_output=True, text=True,
+                       timeout=timeout, env=env, cwd=cwd)
+    return r.returncode, r.stdout + r.stderr
+
+def cmd_restic_backup(cfg, node=None, dry_run=False):
+    """Restic incremental backup (v2.0 — B modülü, 28 Ağu 2026).
+
+    rclone serve restic gdrive:restic-backup --addr 127.0.0.1:8443
+    (systemd servisi olarak çalışır; GDrive = object store, CDC dedup,
+    çoklu makine aynı repo → cross-system dedup).
+
+    Her node: tag:node + exclude .git/.env/.key/.pem.
+    Retention: restic forget --keep-daily 7 --keep-weekly 4 --keep-monthly 6.
+    """
+    nodes = [node] if node else list(cfg["dirs"].keys())
+    print(f"\n  💾 RESTIC INCREMENTAL YEDEK — {RESTIC_REPO_URL}")
+    for n in nodes:
+        dst = cfg["dirs"][n]
+        base = dst["path"] if isinstance(dst, dict) else dst
+        if not os.path.exists(base):
+            print(f"    ⚠ {n}: kaynak yok — atlandı"); continue
+        if dry_run:
+            print(f"    [DRY] {n}: restic backup {base} (tag:{n})")
+            continue
+        rc, out = _restic(["backup", base, "--tag", n,
+                           "--exclude", ".git", "--exclude", ".env",
+                           "--exclude", "*.key", "--exclude", "*.pem",
+                           "--exclude", "*.pyc", "--exclude", "node_modules"])
+        if rc == 0:
+            # özet satırlarını göster
+            for line in out.splitlines():
+                if line.startswith(("Files:", "Added to", "snapshot", "processed")):
+                    print(f"    ✅ {n}: {line.strip()}")
+        else:
+            print(f"    ❌ {n}: {out.strip()[-200:]}")
+    # retention (tüm repo)
+    if not dry_run:
+        rc, out = _restic(["forget", "--keep-daily", "7", "--keep-weekly", "4",
+                           "--keep-monthly", "6", "--prune"])
+        print(f"    🧹 retention: {'OK' if rc == 0 else out.strip()[-150:]}")
+
 def cmd_backup(cfg, node=None, hub=None, dry_run=False):
     """GDrive versiyon takipli yedek (timestamp snapshot; silmez).
 
@@ -2364,7 +2426,13 @@ def main(argv=None):
     elif args.komut == "agent-status":
         cmd_agent_status(cfg)
     elif args.komut == "backup":
-        rc = cmd_backup(cfg, node=args.node, hub=args.hub, dry_run=args.dry_run)
+        # v2.0 (28 Ağu): restic entegre — backup komutu artık incremental restic
+        # yedekler (CDC dedup + snapshot + restore). Eski tar tabanlı davranış
+        # --legacy-tar ile korunur (henüz eklenmedi; eski snapshot'lar duruyor).
+        if os.environ.get("SYNC_BACKUP_ENGINE", "restic") == "restic":
+            rc = cmd_restic_backup(cfg, node=args.node, dry_run=args.dry_run)
+        else:
+            rc = cmd_backup(cfg, node=args.node, hub=args.hub, dry_run=args.dry_run)
     elif args.komut == "versions":
         rc = cmd_versions(cfg, node=args.node, hub=args.hub)
     elif args.komut == "rollback":
