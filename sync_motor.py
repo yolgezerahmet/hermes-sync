@@ -2180,7 +2180,19 @@ def _restic(args, timeout=3600, cwd=None):
     if not env.get(RESTIC_PASS_ENV):
         print("    ❌ RESTIC_PASSWORD .env'de yok — restic çalışmaz")
         return None, "RESTIC_PASSWORD yok"
-    r = subprocess.run(["restic", *args], capture_output=True, text=True,
+    # restic binary yolunu bul (PATH + bilinen konumlar; Windows/Linux/H3)
+    rbin = shutil.which("restic")
+    if not rbin:
+        for cand in ("/usr/local/bin/restic", "/usr/bin/restic",
+                     os.path.expanduser("~/bin/restic"),
+                     os.path.expanduser("~/AppData/Local/restic/restic.exe")):
+            if os.path.exists(cand):
+                rbin = cand
+                break
+    if not rbin:
+        print("    ❌ restic binary bulunamadı (PATH'te yok)")
+        return None, "restic binary yok"
+    r = subprocess.run([rbin, *args], capture_output=True, text=True,
                        timeout=timeout, env=env, cwd=cwd)
     return r.returncode, r.stdout + r.stderr
 
