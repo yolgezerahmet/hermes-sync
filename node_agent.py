@@ -195,7 +195,20 @@ def run_backup() -> tuple:
         print(f"  ⚠ yedek rc={rc}: {err.strip()[:200]}")
     return rc, out, err
 
-def run_once(do_sync=True, do_backup=True, report=True):
+def run_memory() -> tuple:
+    """Ortak hafıza (D modülü v2.1+): export → hub push → pull/import → fact_store."""
+    if _ver_tuple(motor_version()) < (2, 1, 0):
+        print("  🧠 ORTAK HAFIZA: motor eski (no-op — memory yalnız v2.1+)")
+        return 0, "", "memory yalnız v2.1+ — no-op"
+    print("  🧠 ORTAK HAFIZA: sync_motor memory")
+    rc, out, err = motor("memory", timeout=600)
+    if rc == 0:
+        print("  ✅ ortak hafıza tamam")
+    else:
+        print(f"  ⚠ ortak hafıza rc={rc}: {err.strip()[:200]}")
+    return rc, out, err
+
+def run_once(do_sync=True, do_backup=True, do_memory=True, report=True):
     """Tek otonom koşu — cron/Task Scheduler bu fonksiyonu çağırır."""
     status = collect_status()
     print(f"╔{'═'*52}╗")
@@ -210,6 +223,10 @@ def run_once(do_sync=True, do_backup=True, report=True):
     if do_backup:
         rc, out, err = run_backup()
         status["backup"] = {"rc": rc, "ts": now_iso(),
+                            "out_tail": out.strip()[-200:], "err_tail": err.strip()[-200:]}
+    if do_memory:
+        rc, out, err = run_memory()
+        status["memory"] = {"rc": rc, "ts": now_iso(),
                             "out_tail": out.strip()[-200:], "err_tail": err.strip()[-200:]}
 
     # son-koşu kaydı (web paneli okur)
@@ -278,6 +295,7 @@ def main(argv=None):
     ap.add_argument("--interval", type=int, default=5400, help="daemon: saniye (varsayılan 5400=90dk)")
     ap.add_argument("--no-sync", action="store_true", help="once: eşitleme atla")
     ap.add_argument("--no-backup", action="store_true", help="once: yedek atla")
+    ap.add_argument("--no-memory", action="store_true", help="once: ortak hafıza atla (v2.1)")
     ap.add_argument("--no-report", action="store_true", help="once: hub raporu atla")
     ap.add_argument("--json", action="store_true", help="status: JSON çıktı")
     args = ap.parse_args(argv)
@@ -285,6 +303,7 @@ def main(argv=None):
     if args.komut == "once":
         return run_once(do_sync=not args.no_sync,
                         do_backup=not args.no_backup,
+                        do_memory=not args.no_memory,
                         report=not args.no_report)
     if args.komut == "status":
         st = collect_status()

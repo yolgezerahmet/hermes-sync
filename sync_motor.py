@@ -2542,28 +2542,41 @@ def memory_to_fact_store(memory_dir, dry_run=False, db_path=None):
     finally:
         conn.close()
     if added:
-        print(f"    ✅ fact_store: +{added} kayıt ({db_path})")
+        if dry_run:
+            print(f"    [DRY] fact_store: {added} kayıt adayı (yazılmaz)")
+        else:
+            print(f"    ✅ fact_store: +{added} kayıt ({db_path})")
     return added
 
 
-def cmd_memory(cfg, dry_run=False, memory_dir=None):
+def cmd_memory(cfg, dry_run=False, memory_dir=None, memory_db=None):
     """Ortak hafıza D modülü: export → push → pull/import → fact_store.
 
     Kullanım: sync_motor.py memory [--dry-run] [--memory-dir <dir>]
     Cron bağlantısı: node_agent.py once içinde 'memory' adımı (v2.1).
+    memory_db: fact_store hedefi (varsayılan ~/.hermes/memory_store.db;
+    testler geçici DB verir — gerçek DB'ye yazılmaz).
     """
     memory_dir = memory_dir or DEFAULT_MEMORY_DIR
     os.makedirs(memory_dir, exist_ok=True)
     print(f"\n  🧠 ORTAK HAFIZA (D) — {_memory_hub(cfg)}")
     print(f"    yerel: {memory_dir}")
 
-    delta = memory_export(memory_dir, cfg, dry_run=dry_run)
-    if delta is None and not dry_run:
+    if dry_run:
+        # export hiçbir şey üretmez (None); tüm adımlar simüle edilir
+        memory_export(memory_dir, cfg, dry_run=True)
+        memory_push(cfg, None, dry_run=True)
+        memory_pull_import(cfg, memory_dir, dry_run=True)
+        memory_to_fact_store(memory_dir, dry_run=True, db_path=memory_db)
+        return 0
+
+    delta = memory_export(memory_dir, cfg, dry_run=False)
+    if delta is None:
         return 1  # secret RED veya export hatası
-    if not memory_push(cfg, delta, dry_run=dry_run):
+    if not memory_push(cfg, delta, dry_run=False):
         return 1
-    memory_pull_import(cfg, memory_dir, dry_run=dry_run)
-    memory_to_fact_store(memory_dir, dry_run=dry_run)
+    memory_pull_import(cfg, memory_dir, dry_run=False)
+    memory_to_fact_store(memory_dir, dry_run=False, db_path=memory_db)
     return 0
 
 def main(argv=None):

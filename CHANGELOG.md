@@ -1,5 +1,25 @@
 # CHANGELOG — Cumulus Sync Motoru / Hermes Sync
 
+## [2.1.0] — 2026-08-29
+
+### Eklenen — ORTAK HAFIZA (D modülü, v2.1)
+- `memory` komutu: sync_memory.py v0.1 → v1.0 AKTİF bağlandı.
+  Akış: export (memory DIF → JSONL delta, secret allowlist RED) →
+  push (rclone copy → gdrive:hermes-sync/<user>/shared/memory/) →
+  pull/import (uzak deltaları çek, conflict_policy='preserve' ile uygula;
+  tombstone kaldırma, eşit revision+farklı hlc → .conflict korunur) →
+  fact_store (memory_store.db facts tablosuna INSERT OR IGNORE, dedup)
+- `--memory-dir` parametresi (varsayılan ~/.hermes/memory)
+- `--dry-run` desteği (hiçbir şey yazmaz)
+- node_agent.py `once` döngüsüne `memory` adımı + `--no-memory` flag'i
+  (motor v2.1+ gerektirir; eski sürüm no-op)
+- test_memory_cmd.py: 14 test (export/secret RED, push mock, pull/import
+  conflict, fact_store dedup, dry-run) — gerçek GDrive'a dokunmaz
+
+### Düzeltilen
+- sync_memory import'u sys.path'e _HERE eklenerek cwd'den bağımsız yapıldı
+- fact_store dry-run mesajı yanıltıcıydı ("+N kayıt" → "[DRY] N aday")
+
 ## [1.6.0] — 2026-08-13
 
 ### Eklenen — AKILLI KURULUM (Kaynak Farkındalıklı Öneri)
