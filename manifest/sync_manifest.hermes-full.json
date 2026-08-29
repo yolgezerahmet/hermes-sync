@@ -1,7 +1,7 @@
 {
  "node": "hermes-full",
- "ts": "2026-08-29T10:19:41",
- "revision": "529ecfc5b7e4",
+ "ts": "2026-08-29T10:27:45",
+ "revision": "4c374a87c769",
  "file_count": 23281,
  "files": {
   "config.yaml": {
@@ -29,9 +29,9 @@
    "machine": "H1"
   },
   "auth.json": {
-   "sha": "c1eca64922287d9f5175b378c88cfc4395311d3f4be1ec418add6d50f413f58b",
+   "sha": "90741c50a5fdb0c5cb04f2b00098bdaf6ad1d7c1c0bb50ade0c6bde4b49b8513",
    "size": 14056,
-   "mtime": 1787984377,
+   "mtime": 1787987987,
    "machine": "H1"
   },
   "provider_models_cache.json": {
@@ -71,9 +71,9 @@
    "machine": "H1"
   },
   "channel_directory.json": {
-   "sha": "29775f2bb22c5190865fbfa7bdda55541afe0eb08c3892abb30980124d5e588a",
+   "sha": "34f9e7183eedeceb73fe75bb2e9ff25924fc3603099a2bb6127feb3b37d5a30b",
    "size": 67,
-   "mtime": 1787987686,
+   "mtime": 1787988288,
    "machine": "H1"
   },
   "ollama_cloud_models_cache.json": {
@@ -83,9 +83,9 @@
    "machine": "H1"
   },
   "cron/jobs.json": {
-   "sha": "7fcb53623bbdfec70145c45b546e4cabc251f700ef8c3ba5dcbc0d731c7c52c5",
-   "size": 91620,
-   "mtime": 1787987978,
+   "sha": "aa83bb6e3ccc35d4b474b08a2f9bbe6ea38563c94fc0dd19bbf114c86f083ca5",
+   "size": 91494,
+   "mtime": 1787988459,
    "machine": "H1"
   },
   "cron/output/a21097370390/2026-08-28_17-17-22.md": {
@@ -4672,12 +4672,6 @@
    "mtime": 1787986298,
    "machine": "H1"
   },
-  "cron/output/6897d56a0662/2026-08-29_05-27-33.md": {
-   "sha": "d54ce07e7e73996bfd759470fc0b6c31c8b735f3c818cd89e3e070d10d213689",
-   "size": 775,
-   "mtime": 1787970453,
-   "machine": "H1"
-  },
   "cron/output/6897d56a0662/2026-08-29_06-51-35.md": {
    "sha": "a87035900024c566681b02a74c6325b89a0b8396e499204c4149dcc2280022da",
    "size": 775,
@@ -4738,10 +4732,10 @@
    "mtime": 1787975135,
    "machine": "H1"
   },
-  "cron/output/6897d56a0662/2026-08-29_05-21-33.md": {
-   "sha": "efe669367dc9501cf330c3fc909fb7b14d40f910c422c0a917c34388274b9883",
+  "cron/output/6897d56a0662/2026-08-29_10-21-39.md": {
+   "sha": "155cff13270ad02ed226e6836342ac404c51055bf1d470fba1cd1ccd269276db",
    "size": 775,
-   "mtime": 1787970093,
+   "mtime": 1787988099,
    "machine": "H1"
   },
   "cron/output/6897d56a0662/2026-08-29_09-39-38.md": {
@@ -4814,6 +4808,12 @@
    "sha": "edd029f6606c504ea703c00d10238c141a61ae2925ff36b759bf14b9349ee8ac",
    "size": 775,
    "mtime": 1787981617,
+   "machine": "H1"
+  },
+  "cron/output/6897d56a0662/2026-08-29_10-27-39.md": {
+   "sha": "c95a1d66183b96388066fce28b1449b126dc8dc2c0f2dc769b5f28437a909e26",
+   "size": 775,
+   "mtime": 1787988459,
    "machine": "H1"
   },
   "cron/output/6897d56a0662/2026-08-29_10-09-39.md": {
@@ -5200,6 +5200,12 @@
    "mtime": 1787943291,
    "machine": "H1"
   },
+  "cron/output/8b1a738e790c/2026-08-29_10-23-41.md": {
+   "sha": "b983fd49058d04d9826b9ddca0b671595bbdba619b90489464e46093cf85e7b8",
+   "size": 152,
+   "mtime": 1787988221,
+   "machine": "H1"
+  },
   "cron/output/8b1a738e790c/2026-08-28_20-22-50.md": {
    "sha": "304dc78c808be050817d212a85c6b6b7f6697f1fd706b96257d4193bff6eff5d",
    "size": 152,
@@ -5276,12 +5282,6 @@
    "sha": "f08ee0d68e1562d7269daa3ca60c24f46c6927595af7f8f2f4f19293bf2d3098",
    "size": 152,
    "mtime": 1787922870,
-   "machine": "H1"
-  },
-  "cron/output/8b1a738e790c/2026-08-25_21-30-47.md": {
-   "sha": "42327643cf695c85cbea2cf2094f189072a640037207f983ed61094e412fdf15",
-   "size": 152,
-   "mtime": 1787682647,
    "machine": "H1"
   },
   "cron/output/8b1a738e790c/2026-08-28_13-12-34.md": {
@@ -138797,9 +138797,9 @@
    "machine": "H1"
   },
   "shared/nous_auth.json": {
-   "sha": "6dc8646d583bded2fb99f42c80b334e7449a3bda3732d203742cf04c8d0a8c43",
+   "sha": "8aea3894eb70af9334a480869897247df49764a688eba01cd160739c76a85eba",
    "size": 2240,
-   "mtime": 1787984377,
+   "mtime": 1787987987,
    "machine": "H1"
   },
   "checkpoints/store/ledgers/e379fc9d8a074ec0.json": {
