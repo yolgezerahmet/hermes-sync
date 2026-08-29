@@ -153,17 +153,17 @@ def dispatch(method: str, params: dict) -> dict:
         return {"id": task_id, "status": TASKS[task_id]["status"], "result": TASKS[task_id]["result"]}
     if method == "task/get":
         tid = params.get("id", "")
+        # ÖNCE inbox: worker işlenmişse güncel sonuç oradadır (H1 görev sonucu)
+        for f in INBOX_DIR.glob("*.json"):
+            try:
+                d = json.loads(f.read_text())
+                if d.get("_task_id") == tid:
+                    return {"id": tid, "status": d.get("status", "completed"),
+                            "result": d.get("result") or {"note": str(f)}}
+            except Exception:
+                pass
         t = TASKS.get(tid)
         if not t:
-            # inbox dosyasından ara (_task_id eşleşmesi)
-            for f in INBOX_DIR.glob("*.json"):
-                try:
-                    d = json.loads(f.read_text())
-                    if d.get("_task_id") == tid:
-                        return {"id": tid, "status": d.get("status", "completed"),
-                                "result": d.get("result") or {"note": str(f)}}
-                except Exception:
-                    pass
             raise KeyError(f"task {tid} yok")
         return {"id": tid, "status": t["status"], "result": t["result"], "mode": t.get("mode", "sync")}
     if method == "task/cancel":
