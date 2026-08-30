@@ -2950,6 +2950,64 @@ def cmd_memory(cfg, dry_run=False, memory_dir=None, memory_db=None):
         return 1  # fact_store hard hata — cron görsün, retry edebilsin
     return 0
 
+
+def cmd_identity(cfg, aksiyon="show", peer="", channel="cli", label=""):
+    """Kimlik + sohbet etiketleme (30 Ağu 2026).
+
+    Kopyalanamaz-kanıtlı ajan kimliği (Ed25519 + donanım bağı + klon tespiti)
+    ve sohbet kayıt defteri: hangi ajan hangi karşı tarafla hangi kanalda
+    konuştu, asla karışmaz. Ayrıntı: agent_identity.py.
+    """
+    try:
+        import agent_identity as AI
+    except Exception as e:
+        print(f"agent_identity yüklenemedi: {e}")
+        return 1
+    ident = AI.AgentIdentity.load_or_create()
+
+    if aksiyon == "show":
+        card = ident.card()
+        print(f"agent_id    : {card['agent_id']}")
+        print(f"runtime     : {card['runtime']}  (makine: {card['machine_label']})")
+        print(f"kullanıcı   : {card['user_id']}")
+        print(f"donanım fp  : {card['hw_fingerprint']} [{card['hw_strength']}]")
+        print(f"klon durumu : {card['clone_state']}  boot: {card['boot_count']}")
+        print(f"kurulum     : {ident.meta.get('created')}")
+        print(f"dizin       : {ident.dir}")
+        if card["clone_state"] != "clean":
+            print("UYARI: donanım parmak izi uyuşmuyor — meşruysa "
+                  "'sync_motor.py identity rekey --confirm'")
+        peers = AI.load_peers(ident.runtime)
+        convs = AI.list_conversations(ident.runtime)
+        print(f"\ntanınan ajan : {len(peers)}")
+        print(f"sohbetler    : {len(convs)} "
+              f"(kullanıcı={sum(1 for c in convs if c['kind']=='user')}, "
+              f"ajan={sum(1 for c in convs if c['kind']=='agent')})")
+        return 0
+
+    if aksiyon == "rekey":
+        ident.rekey(confirm=True, reason="user_request")
+        print(f"yeni kimlik: {ident.agent_id}")
+        return 0
+
+    if aksiyon == "fingerprint":
+        import json as _json
+        print(_json.dumps(AI.hw_fingerprint(), ensure_ascii=False, indent=1))
+        return 0
+
+    if aksiyon == "conv":
+        if not peer:
+            for r in AI.list_conversations(ident.runtime):
+                print(f"{r['kind']:6} {r['msg_count']:>4}  {r['channel']:10} "
+                      f"{r['peer_id'][:20]:20} {r['conv_id']}")
+            return 0
+        cid = AI.open_conversation("user", peer, channel, label, identity=ident)
+        print(cid)
+        return 0
+
+    print("identity: show | rekey | fingerprint | conv")
+    return 1
+
 def main(argv=None):
     parser = argparse.ArgumentParser(
         prog="sync_motor",
@@ -2960,7 +3018,8 @@ def main(argv=None):
                                  "conflicts", "init", "select", "nodes",
                                  "add-node", "share", "doctor", "version",
                                  "probe", "propose", "apply", "agent-status",
-                                 "backup", "versions", "rollback", "memory", "mesh", "discover", "task"])
+                                 "backup", "versions", "rollback", "memory",
+                                 "mesh", "discover", "task", "identity"])
     parser.add_argument("hedef", nargs="?",
                         help="add-node: node adı | share: node adı")
     parser.add_argument("--config", default=None,
@@ -3080,6 +3139,10 @@ def main(argv=None):
                           force=args.force, dry_run=args.dry_run)
     elif args.komut == "memory":
         rc = cmd_memory(cfg, dry_run=args.dry_run, memory_dir=args.memory_dir)
+    elif args.komut == "identity":
+        # identity show | rekey | fingerprint | conv [peer] (--node kanal, --path etiket)
+        rc = cmd_identity(cfg, args.hedef or "show", args.node or "",
+                          args.path or "cli", args.include)
     elif args.komut == "init":
         cmd_init(cfg)
     elif args.komut == "nodes":

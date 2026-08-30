@@ -11,20 +11,67 @@ Kullanım:
 
 Host örnekleri: 100.103.44.107 (H3), 100.92.2.47 (H1), 100.76.82.46 (H2)
 """
+# pyright: reportOptionalMemberAccess=false
 import argparse
 import json
 import sys
 import urllib.parse
 import urllib.request
+from pathlib import Path
 
-def rpc(host: str, method: str, params: dict, token: str, port: int = 8643):
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:
+    import agent_identity as AI
+    IDENTITY_OK = True
+except Exception:
+    AI = None
+    IDENTITY_OK = False
+
+_IDENT = None
+
+
+def identity():
+    """Yerel kimlik (imza için). Yoksa imzasız gönderilir (eski davranış)."""
+    global _IDENT
+    if _IDENT is None and IDENTITY_OK:
+        try:
+            _IDENT = AI.AgentIdentity.load_or_create()
+        except Exception:
+            return None
+    return _IDENT
+
+
+def rpc(host: str, method: str, params: dict, token: str, port: int = 8643,
+        sign: bool = True, conv_id: str = ""):
     url = f"http://{host}:{port}/"
     body = json.dumps({"jsonrpc": "2.0", "id": 1, "method": method, "params": params}).encode()
     req = urllib.request.Request(url, data=body, headers={"Content-Type": "application/json"})
     if token:
         req.add_header("Authorization", f"Bearer {token}")
+    ident = identity() if sign else None
+    if ident:
+        # Klon şüphesinde kendi kimliğimizle mesaj GÖNDERMEYİZ (fail-closed)
+        ident.assert_not_clone()
+        for k, v in ident.sign_request(method, body).items():
+            req.add_header(k, v)
+        req.add_header("X-Agent-Label", ident.meta.get("machine_label", ""))
+        if conv_id:
+            req.add_header("X-Conversation-Id", conv_id)
     with urllib.request.urlopen(req, timeout=120) as resp:
-        return json.loads(resp.read().decode())
+        out = json.loads(resp.read().decode())
+    # Giden mesajı yerel sohbet defterine işle (karşı tarafın agent_id'si ile)
+    peer = ((out.get("result") or {}).get("served_by") or "") if isinstance(out, dict) else ""
+    if ident and peer.startswith(("hx-", "oc-")):
+        try:
+            cid = conv_id or AI.open_conversation("agent", peer, "a2a", identity=ident)
+            mid = AI.log_message(cid, "out", body, peer_id=peer,
+                                 meta={"method": method, "host": host})
+            if isinstance(out, dict):
+                out["_local_conversation_id"] = cid
+                out["_local_message_id"] = mid
+        except Exception:
+            pass
+    return out
 
 def main():
     ap = argparse.ArgumentParser()
@@ -36,19 +83,24 @@ def main():
     ap.add_argument("--port", type=int, default=8643)
     ap.add_argument("--mode", choices=["sync", "async"], default="sync")
     ap.add_argument("--seconds", type=int, default=8)
+    ap.add_argument("--no-sign", action="store_true", help="imzasız gönder (eski uyum)")
+    ap.add_argument("--conv", default="", help="mevcut sohbet ID'si ile devam et")
     args = ap.parse_args()
+    sign = not args.no_sign
 
     try:
         if args.komut == "send":
             r = rpc(args.host, "task/send", {"payload": {"action": "note", "text": args.gorev},
-                                             "mode": args.mode}, args.token, args.port)
+                                             "mode": args.mode}, args.token, args.port,
+                    sign=sign, conv_id=args.conv)
             print(json.dumps(r, ensure_ascii=False, indent=2))
         elif args.komut == "send-status":
             r = rpc(args.host, "task/send", {"payload": {"action": "status"}, "mode": args.mode},
-                    args.token, args.port)
+                    args.token, args.port, sign=sign, conv_id=args.conv)
             print(json.dumps(r, ensure_ascii=False, indent=2))
         elif args.komut == "get":
-            r = rpc(args.host, "task/get", {"id": args.task_id}, args.token, args.port)
+            r = rpc(args.host, "task/get", {"id": args.task_id}, args.token, args.port,
+                    sign=sign, conv_id=args.conv)
             print(json.dumps(r, ensure_ascii=False, indent=2))
         elif args.komut == "card":
             req = urllib.request.Request(f"http://{args.host}:{args.port}/.well-known/agent.json")

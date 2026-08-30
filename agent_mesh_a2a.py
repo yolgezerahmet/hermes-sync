@@ -12,6 +12,7 @@ Linux Foundation A2A protokolünün JSON-RPC 2.0 alt kümesi:
 Kurulum: python3 agent_mesh_a2a.py --port 8643 --token <TOKEN>
 Client : a2a_cli.py send <host> <task> --token ...   /   a2a_cli.py get <host> <task_id>
 """
+# pyright: reportOptionalMemberAccess=false
 import argparse
 import json
 import os
@@ -20,6 +21,33 @@ import sys
 import time
 import uuid
 from pathlib import Path
+
+# ─── Ajan kimliği (30 Ağu 2026) ────────────────────────────────────────
+# Kopyalanamaz-kanıtlı kimlik + imzalı istek + sohbet etiketleme.
+# Modül yoksa sunucu ESKİ davranışla (yalnız Bearer token) çalışmaya devam eder,
+# böylece H2/H3 güncellenene kadar mesh kopmaz.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:
+    import agent_identity as AI
+    IDENTITY_OK = True
+except Exception as _e:  # pragma: no cover
+    AI = None
+    IDENTITY_OK = False
+    _IDENT_ERR = str(_e)
+
+_IDENT = None            # AgentIdentity (lazy)
+REQUIRE_SIG = os.environ.get("A2A_REQUIRE_SIG", "").lower() in ("1", "true", "yes")
+
+
+def identity():
+    """Yerel ajan kimliği (tek kez yüklenir). Kimlik modülü yoksa None."""
+    global _IDENT
+    if _IDENT is None and IDENTITY_OK:
+        try:
+            _IDENT = AI.AgentIdentity.load_or_create()
+        except Exception:
+            return None
+    return _IDENT
 
 INBOX_DIR = Path(os.environ.get("A2A_INBOX", "~/.hermes/a2a_inbox")).expanduser()
 TASK_STORE = Path(os.environ.get("A2A_TASK_STORE", "~/.hermes/a2a_tasks.json")).expanduser()
@@ -75,7 +103,7 @@ def _uptime_s():
 
 # ─── AgentCard (A2A keşif) ────────────────────────────────────────────
 def agent_card(host: str, port: int) -> dict:
-    return {
+    card = {
         "protocolVersion": "1.0",
         "name": f"cumulus-agent-{_hostname()}",
         "description": "CumulusNET agent mesh — görev alır, yerel inbox'a yazar, durum döner",
@@ -88,6 +116,14 @@ def agent_card(host: str, port: int) -> dict:
         "defaultInputModes": ["text/plain"],
         "defaultOutputModes": ["text/plain"],
     }
+    # Kriptografik kimlik: karşı taraf bu açık anahtarla imzamızı doğrular (TOFU)
+    ident = identity()
+    if ident:
+        card["identity"] = ident.card()
+        card["name"] = f"cumulus-{ident.runtime}-{ident.short}"
+        card["capabilities"]["signedRequests"] = True
+        card["capabilities"]["requireSignature"] = REQUIRE_SIG
+    return card
 
 # ─── Görev işleme ─────────────────────────────────────────────────────
 def execute_task(task: dict):
@@ -102,22 +138,46 @@ def execute_task(task: dict):
     if action == "status":
         import shutil
         disk = shutil.disk_usage(_root_path())
-        return "completed", {
+        out = {
             "host": _hostname(),
             "time": time.strftime("%Y-%m-%dT%H:%M:%S"),
             "disk_gb": round(disk.free / 1e9, 1),
             "uptime_s": _uptime_s(),
         }
+        ident = identity()
+        if ident:
+            out.update({"agent_id": ident.agent_id, "runtime": ident.runtime,
+                        "clone_state": ident.meta.get("clone_state")})
+        return "completed", out
     # note: inbox'a yaz (Hermes/otonom cron okur, işler, sonucu task sonucuna ekler)
     text = payload.get("text", json.dumps(payload, ensure_ascii=False))
+    meta = task.get("metadata", {}) or {}
+    peer = meta.get("from", "unknown")
+    # Sohbet etiketi: hangi ajanla hangi kanalda konuştuğumuz kalıcı kaydedilir.
+    # peer doğrulanmış agent_id ise "agent" sohbeti; değilse etiketsiz bırakılır
+    # (uydurma kimlikle sohbet defteri kirletilmez).
+    conv_id, msg_id = meta.get("conversation_id", ""), ""
+    ident = identity()
+    if ident and peer.startswith(("hx-", "oc-")) and meta.get("verified"):
+        try:
+            conv_id = conv_id or AI.open_conversation(
+                "agent", peer, meta.get("channel", "a2a"), identity=ident)
+            msg_id = AI.log_message(conv_id, "in", text, peer_id=peer,
+                                    meta={"task_id": task.get("_task_id")})
+        except Exception:
+            pass
     INBOX_DIR.mkdir(parents=True, exist_ok=True)
     fname = INBOX_DIR / f"{int(time.time())}_{uuid.uuid4().hex[:8]}.json"
     fname.write_text(json.dumps({
-        "ts": time.time(), "from": task.get("metadata", {}).get("from", "unknown"),
+        "ts": time.time(), "from": peer,
+        "from_verified": bool(meta.get("verified")),
+        "conversation_id": conv_id, "message_id": msg_id,
+        "to_agent": ident.agent_id if ident else "",
         "text": text, "status": "new", "result": None,
         "_task_id": task.get("_task_id"),
     }, ensure_ascii=False, indent=2), encoding="utf-8")
-    return "completed", {"note": str(fname), "inbox": str(INBOX_DIR)}
+    return "completed", {"note": str(fname), "inbox": str(INBOX_DIR),
+                         "conversation_id": conv_id, "message_id": msg_id}
 
 # ─── JSON-RPC dispatch (senkron / asenkron / sorgu) ───────────────────
 def dispatch(method: str, params: dict) -> dict:
@@ -199,15 +259,46 @@ def build_app(token: str):
     async def rpc(request: Request):
         if not check_auth(request):
             return JSONResponse({"jsonrpc": "2.0", "error": {"code": -32001, "message": "unauthorized"}}, status_code=401)
+        raw = await request.body()
         try:
-            body = await request.json()
+            body = json.loads(raw)
         except Exception:
             return JSONResponse({"jsonrpc": "2.0", "error": {"code": -32700, "message": "parse error"}}, status_code=400)
         method = body.get("method")
         params = body.get("params", {})
         req_id = body.get("id", 1)
+
+        # ── Kimlik katmanı ────────────────────────────────────────────
+        # 1) Kendi kimliğimiz klon şüphesindeyse hiç görev almayız (fail-closed):
+        #    kopyalanmış bir kurulum mesh'te iş yapamaz.
+        ident = identity()
+        if ident and ident.meta.get("clone_state") == "suspected":
+            return JSONResponse({"jsonrpc": "2.0", "id": req_id, "error": {
+                "code": -32003, "message": "local_identity_clone_suspected",
+                "data": ident.meta.get("clone_detail", {})}}, status_code=403)
+        # 2) Karşı tarafın imzasını doğrula (Ed25519 + TOFU + replay koruması).
+        vr = {"ok": True, "agent_id": "anonymous", "reason": "identity_module_off"}
+        if IDENTITY_OK:
+            vr = AI.verify_request(dict(request.headers), method or "", raw,
+                                   require=REQUIRE_SIG)
+            if not vr["ok"]:
+                return JSONResponse({"jsonrpc": "2.0", "id": req_id, "error": {
+                    "code": -32002, "message": f"identity_rejected:{vr['reason']}",
+                    "data": {"agent_id": vr.get("agent_id")}}}, status_code=403)
+        # 3) Doğrulanmış kimliği göreve işle → sohbet etiketi buradan üretilir
+        if isinstance(params, dict):
+            md = dict(params.get("metadata", {}) or {})
+            md["from"] = vr["agent_id"] if vr["reason"] == "verified" else md.get("from", "unknown")
+            md["verified"] = vr["reason"] == "verified"
+            md.setdefault("channel", "a2a")
+            if request.headers.get("x-conversation-id"):
+                md["conversation_id"] = request.headers["x-conversation-id"]
+            params["metadata"] = md
+
         try:
             result = dispatch(method, params)
+            if isinstance(result, dict) and ident:
+                result["served_by"] = ident.agent_id
             return JSONResponse({"jsonrpc": "2.0", "id": req_id, "result": result})
         except KeyError as e:
             return JSONResponse({"jsonrpc": "2.0", "id": req_id, "error": {"code": -32601, "message": str(e)}}, status_code=400)
@@ -216,7 +307,30 @@ def build_app(token: str):
 
     @app.get("/health")
     async def health():
-        return {"status": "ok", "tasks": len(TASKS)}
+        ident = identity()
+        out = {"status": "ok", "tasks": len(TASKS), "host": _hostname()}
+        if ident:
+            out.update({"agent_id": ident.agent_id, "runtime": ident.runtime,
+                        "clone_state": ident.meta.get("clone_state"),
+                        "require_signature": REQUIRE_SIG})
+            if ident.meta.get("clone_state") == "suspected":
+                out["status"] = "degraded"
+        return out
+
+    @app.get("/identity")
+    async def identity_endpoint():
+        """Açık kimlik + tanınan ajanlar + sohbet sayacı (özel anahtar YOK)."""
+        ident = identity()
+        if not ident:
+            return JSONResponse({"error": "identity_module_off"}, status_code=503)
+        convs = AI.list_conversations(ident.runtime, limit=200)
+        return {"identity": ident.card(),
+                "peers": {k: {kk: vv for kk, vv in v.items() if kk != "public_key"}
+                          for k, v in AI.load_peers(ident.runtime).items()},
+                "conversations": {"total": len(convs),
+                                  "user": sum(1 for c in convs if c["kind"] == "user"),
+                                  "agent": sum(1 for c in convs if c["kind"] == "agent"),
+                                  "recent": convs[:10]}}
 
     @app.get("/stream")
     async def stream(message: str = "", seconds: int = 10):
@@ -245,10 +359,20 @@ def main():
     ap.add_argument("--port", type=int, default=8643)
     ap.add_argument("--host", default="0.0.0.0")  # Tailscale arayüzünde dinle; dış UFW kapalı
     ap.add_argument("--token", default=os.environ.get("A2A_TOKEN", ""))
+    ap.add_argument("--require-signature", action="store_true",
+                    help="imzasız istekleri REDDET (tüm node'lar güncellendikten sonra aç)")
     args = ap.parse_args()
+    global REQUIRE_SIG
+    if args.require_signature:
+        REQUIRE_SIG = True
     import uvicorn
     app = build_app(args.token)
-    print(f"A2A mesh server: http://{args.host}:{args.port} (token={'var' if args.token else 'YOK'})")
+    ident = identity()
+    kimlik = (f"{ident.agent_id} [{ident.runtime}] klon={ident.meta.get('clone_state')}"
+              if ident else f"KİMLİK YOK ({_IDENT_ERR if not IDENTITY_OK else 'yüklenemedi'})")
+    print(f"A2A mesh server: http://{args.host}:{args.port} "
+          f"(token={'var' if args.token else 'YOK'}, imza_zorunlu={REQUIRE_SIG})")
+    print(f"  kimlik: {kimlik}")
     uvicorn.run(app, host=args.host, port=args.port, log_level="warning")
 
 if __name__ == "__main__":
