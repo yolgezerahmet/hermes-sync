@@ -1,8 +1,8 @@
 {
  "node": "openclaw",
- "ts": "2026-08-30T16:39:52",
- "revision": "3f6beb630fe0",
- "file_count": 10,
+ "ts": "2026-08-30T17:51:58",
+ "revision": "6c027b333733",
+ "file_count": 12,
  "files": {
   "skills/cumulus-sync-motor/config.openclaw.json": {
    "sha": "609cc904be50fac879d173d138983cf8ed6f4e659da1cb6023eb422c8b57848d",
@@ -11,9 +11,9 @@
    "machine": "H1"
   },
   "skills/cumulus-sync-motor/SKILL.md": {
-   "sha": "2e8138e7bd137f6a14b8fc5bba9651be97a253168d9c2934deec2d66e197c1d4",
-   "size": 7512,
-   "mtime": 1788094935,
+   "sha": "f69105d98e442110187622f2c4420bc4aa543cd9c54b9e02a899779693b0700f",
+   "size": 8746,
+   "mtime": 1788097605,
    "machine": "H1"
   },
   "skills/cumulus-sync-motor/config.example.json": {
@@ -32,6 +32,18 @@
    "sha": "468c51319c58704a0d05e56b5bfef8478bbd5428a708e9177e1c54cbc2c27b6d",
    "size": 17852,
    "mtime": 1788094939,
+   "machine": "H1"
+  },
+  "skills/cumulus-sync-motor/scripts/gpu_agent.py": {
+   "sha": "82ab6fad45a0f3683025468bba10e951e45f6ca96b9fe4f5bfd53e628691a3a1",
+   "size": 6699,
+   "mtime": 1788098553,
+   "machine": "H1"
+  },
+  "skills/cumulus-sync-motor/scripts/conversation_bridge.py": {
+   "sha": "685a7374e1d484aaccafec8904143585103e26e94a9715b49b111ee5ee9c4490",
+   "size": 8525,
+   "mtime": 1788098553,
    "machine": "H1"
   },
   "skills/cumulus-sync-motor/scripts/agent_identity.py": {
