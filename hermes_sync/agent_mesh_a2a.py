@@ -122,6 +122,7 @@ def agent_card(host: str, port: int) -> dict:
         card["identity"] = ident.card()
         card["name"] = f"cumulus-{ident.runtime}-{ident.short}"
         card["capabilities"]["signedRequests"] = True
+        card["capabilities"]["encryptedRequests"] = True
         card["capabilities"]["requireSignature"] = REQUIRE_SIG
     return card
 
@@ -260,13 +261,7 @@ def build_app(token: str):
         if not check_auth(request):
             return JSONResponse({"jsonrpc": "2.0", "error": {"code": -32001, "message": "unauthorized"}}, status_code=401)
         raw = await request.body()
-        try:
-            body = json.loads(raw)
-        except Exception:
-            return JSONResponse({"jsonrpc": "2.0", "error": {"code": -32700, "message": "parse error"}}, status_code=400)
-        method = body.get("method")
-        params = body.get("params", {})
-        req_id = body.get("id", 1)
+        req_id = 1  # parse'tan önce varsayılan (erken hata yolları için)
 
         # ── Kimlik katmanı ────────────────────────────────────────────
         # 1) Kendi kimliğimiz klon şüphesindeyse hiç görev almayız (fail-closed):
@@ -276,9 +271,51 @@ def build_app(token: str):
             return JSONResponse({"jsonrpc": "2.0", "id": req_id, "error": {
                 "code": -32003, "message": "local_identity_clone_suspected",
                 "data": ident.meta.get("clone_detail", {})}}, status_code=403)
-        # 2) Karşı tarafın imzasını doğrula (Ed25519 + TOFU + replay koruması).
-        vr = {"ok": True, "agent_id": "anonymous", "reason": "identity_module_off"}
-        if IDENTITY_OK:
+
+        # 2a) ŞİFRELİ GÖVDE (X-Agent-Enc: v1) — X25519 ECDH + AES-GCM + imza.
+        #     Dinleme/saldırı koruması: gövde ağ üzerinde ŞİFRELİ taşınır.
+        enc_flag = request.headers.get("x-agent-enc", "")
+        if enc_flag and ident and IDENTITY_OK:
+            try:
+                outer = json.loads(raw)
+                env = outer.get("enc")
+                if not env:
+                    raise ValueError("enc alanı yok")
+                real_raw = AI.AgentIdentity.open_secure_payload(env, ident)
+                # TOFU peer kaydı (şifreli paketteki kimlikle)
+                peers = AI.load_peers(ident.runtime)
+                peers[env["agent_id"]] = {
+                    "public_key": env.get("public_key", ""),
+                    "x25519_public": env.get("x25519_public", ""),
+                    "runtime": env.get("runtime", "hermes"),
+                    "label": env.get("machine_label", ""),
+                    "first_seen": peers.get(env.get("agent_id"), {}).get(
+                        "first_seen") or time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+                    "last_seen": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+                    "msg_count": int(peers.get(env.get("agent_id"), {}).get(
+                        "msg_count", 0)) + 1,
+                }
+                AI.save_peers(peers, ident.runtime)
+                raw = real_raw
+                vr = {"ok": True, "agent_id": env["agent_id"],
+                      "reason": "verified_encrypted"}
+            except Exception as e:
+                return JSONResponse({"jsonrpc": "2.0", "id": req_id, "error": {
+                    "code": -32002, "message": f"identity_rejected:encrypted:{e}",
+                    "data": {}}}, status_code=403)
+        else:
+            vr = {"ok": True, "agent_id": "anonymous", "reason": "identity_module_off"}
+
+        try:
+            body = json.loads(raw)
+        except Exception:
+            return JSONResponse({"jsonrpc": "2.0", "error": {"code": -32700, "message": "parse error"}}, status_code=400)
+        method = body.get("method")
+        params = body.get("params", {})
+        req_id = body.get("id", 1)
+
+        # 2b) Şifresiz gövde → imza doğrula (Ed25519 + TOFU + replay koruması).
+        if IDENTITY_OK and vr["reason"] != "verified_encrypted":
             vr = AI.verify_request(dict(request.headers), method or "", raw,
                                    require=REQUIRE_SIG)
             if not vr["ok"]:
@@ -288,8 +325,8 @@ def build_app(token: str):
         # 3) Doğrulanmış kimliği göreve işle → sohbet etiketi buradan üretilir
         if isinstance(params, dict):
             md = dict(params.get("metadata", {}) or {})
-            md["from"] = vr["agent_id"] if vr["reason"] == "verified" else md.get("from", "unknown")
-            md["verified"] = vr["reason"] == "verified"
+            md["from"] = vr["agent_id"] if vr["reason"].startswith("verified") else md.get("from", "unknown")
+            md["verified"] = vr["reason"].startswith("verified")
             md.setdefault("channel", "a2a")
             if request.headers.get("x-conversation-id"):
                 md["conversation_id"] = request.headers["x-conversation-id"]
