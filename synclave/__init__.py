@@ -1,6 +1,8 @@
-"""hermes_sync — Hermes Agent sync + agent mesh paketi (v2.3.1)."""
+"""synclave — encrypted multi-node backup, replication, and agent mesh (A2A).
 
-__version__ = "2.3.1"
+Eski ad: hermes-sync (v2.3.1) → rebrand: synclave (v1.0.0).
+"""
+__version__ = "1.0.0"
 
 from . import (
     sync_motor,

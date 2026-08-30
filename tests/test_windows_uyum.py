@@ -17,9 +17,9 @@ from pathlib import Path
 import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import hermes_sync.sync_motor as sm
-import hermes_sync.a2a_cli as cli
-import hermes_sync.agent_mesh_a2a as a2a_srv
+import synclave.sync_motor as sm
+import synclave.a2a_cli as cli
+import synclave.agent_mesh_a2a as a2a_srv
 
 
 # ─── (a) Kilit yolu + msvcrt.locking ────────────────────────────

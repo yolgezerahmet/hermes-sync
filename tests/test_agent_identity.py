@@ -24,7 +24,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-sys.path.insert(0, str(Path(__file__).parent.parent / "hermes_sync"))
+sys.path.insert(0, str(Path(__file__).parent.parent / "synclave"))
 import agent_identity as AI  # noqa: E402
 
 

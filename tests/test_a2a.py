@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import hermes_sync.agent_mesh_a2a as a2a
+import synclave.agent_mesh_a2a as a2a
 
 
 @pytest.fixture

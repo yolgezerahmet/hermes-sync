@@ -1,8 +1,9 @@
-# Hermes Sync (hermes-sync)
+# Synclave — Encrypted Multi-Node Agent Mesh
 
-Hermes Agent ağları için **çok nokta yedekleme + senkronizasyon + ajan mesh** motoru.
+Hermes/OpenClaw ağları için **şifreli çok nokta yedekleme + senkronizasyon + ajan mesh** motoru.
 Non-destructive, versiyonlu, sınırsız node. **MIT** lisansı.
 
+> Eski ad: `hermes-sync` (v2.3.1) → rebrand: **Synclave** (v1.0.0).
 > Özel CumulusNET kopyası: `cumulus-sync-motor` (private). Bu repo (public) evrensel
 > Hermes/OpenClaw kullanımı içindir.
 
@@ -125,7 +126,7 @@ Retention: forget keep-daily 7 / weekly 4 / monthly 6 — prune yalnız birincil
 ### Kurulum (yeni node)
 
 ```bash
-python3 sync_motor.py init              # config üret (gdrive:hermes-sync/<user>/)
+python3 sync_motor.py init              # config üret (gdrive:synclave/<user>/)
 python3 sync_motor.py add-node <ad> --path <dizin> [--include '*.md'] [--max-kb 1024]
 python3 sync_motor.py both              # push + pull
 python3 sync_motor.py mesh status       # tüm node'ların A2A durumu
@@ -143,7 +144,7 @@ python3 sync_motor.py mesh status       # tüm node'ların A2A durumu
 python --version
 
 # 2) Paket + CLI kur
-pip install hermes-sync
+pip install synclave
 pip install rclone                # veya winget install Rclone.Rclone
 pip install restic                # veya restic.net binary → PATH'e ekle
 pip install uvicorn fastapi       # A2A server için (opsiyonel)
@@ -166,9 +167,9 @@ winget install syncthing.syncthing
 setx A2A_TOKEN "test-a2a-mesh-2026"     # kendi ortak değerinizle değiştirin
 
 # 7) İlk senkron
-python -m hermes_sync.sync_motor init    # config üret
-python -m hermes_sync.sync_motor both    # push + pull
-python -m hermes_sync.sync_motor mesh status
+python -m synclave.sync_motor init    # config üret
+python -m synclave.sync_motor both    # push + pull
+python -m synclave.sync_motor mesh status
 ```
 
 Windows notları:

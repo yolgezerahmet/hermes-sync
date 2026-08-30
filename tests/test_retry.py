@@ -17,8 +17,8 @@ from pathlib import Path
 import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import hermes_sync.sync_common_knowledge as ck
-import hermes_sync.sync_motor as sm
+import synclave.sync_common_knowledge as ck
+import synclave.sync_motor as sm
 
 
 class _FakeResult:

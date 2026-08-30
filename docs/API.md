@@ -1,4 +1,4 @@
-# API — hermes-sync v2.3
+# API — Synclave v1.0
 
 A2A mesh (port 8643) — OpenAPI 3.1 şartnamesi otomatik: `http://<host>:8643/docs`
 

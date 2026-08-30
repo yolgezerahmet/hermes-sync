@@ -1,4 +1,4 @@
-# Mimarî — hermes-sync v2.3
+# Mimari — Synclave v1.0
 
 ## Genel Bakış
 

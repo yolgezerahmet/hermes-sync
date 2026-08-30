@@ -1,4 +1,13 @@
-# CHANGELOG — Cumulus Sync Motoru / Hermes Sync
+# CHANGELOG — Synclave (eski ad: hermes-sync)
+
+## [1.0.0] — 2026-08-30 (REBRAND: hermes-sync → Synclave)
+
+- Yeni isim: **Synclave** (sync + enclave — sifreli guvenli bolge)
+- PyPI: `pip install synclave` - CLI: `synclave`, `synclave-a2a`, `synclave-worker`
+- Modul: `synclave/` (eski `hermes_sync/`)
+- Icerik: v2.3.1'in birebir aynisi + OceanAPI guvenlik denetim fix'leri
+- Eski paket `hermes-sync` PyPI'da deprecated olarak durur
+
 
 ## [2.1.1] — 2026-08-30
 
