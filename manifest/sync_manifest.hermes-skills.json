@@ -1,8 +1,8 @@
 {
  "node": "hermes-skills",
- "ts": "2026-08-30T22:00:11",
- "revision": "03f650744ae6",
- "file_count": 15987,
+ "ts": "2026-08-30T22:48:13",
+ "revision": "ec2d8070dea3",
+ "file_count": 16001,
  "files": {
   ".curator_state": {
    "sha": "079c2ea53d6f78ecbb5d78833dce63a2b6463c311e1a7404ccea655311127d42",
@@ -13,13 +13,13 @@
   ".bundled_manifest": {
    "sha": "b1c6fe80b9d718fe9d9868be6eb2f1e0eda0af9dce4fa500dfd351e7b6c10a19",
    "size": 3877,
-   "mtime": 1788116299,
+   "mtime": 1788119147,
    "machine": "H1"
   },
   ".usage.json": {
-   "sha": "761f448d0db01afb33b3cd1a171b0733f556cabf9fe51858014e7bf771c7a0dc",
+   "sha": "7863de80a07d16886c6ea05fd56ca671468d9faba7ad509b3067b9af810baee9",
    "size": 193261,
-   "mtime": 1788103169,
+   "mtime": 1788118079,
    "machine": "H1"
   },
   "cumulus-unutma-checklist.md": {
@@ -53807,9 +53807,9 @@
    "machine": "H1"
   },
   "hermes-provider-management/SKILL.md": {
-   "sha": "8e76e3d02b94e628cb4b5bd5be5792f4a9fd70103b8149a82db76d0de68c838c",
-   "size": 59939,
-   "mtime": 1787764069,
+   "sha": "eaca5cca8dabba43b9ecef710cfe322530ed282e281688734a64b3a9c85d760b",
+   "size": 61329,
+   "mtime": 1788118079,
    "machine": "H1"
   },
   "hermes-provider-management/scripts/fix-custom-providers-format.py": {
@@ -53924,6 +53924,12 @@
    "sha": "900bf36796d4282c6e6b24515362a8211fbf67be12549b7c7a5294f019583640",
    "size": 3023,
    "mtime": 1784448674,
+   "machine": "H1"
+  },
+  "hermes-provider-management/references/oceanapi-kod-denetim-parcali-20260830.md": {
+   "sha": "200cf9bf38333bbfdf2cddaa4307167b8d99398eb35681e33ba450992b6bd53b",
+   "size": 2130,
+   "mtime": 1788118066,
    "machine": "H1"
   },
   "hermes-provider-management/references/oceanapi-test-generation-20260813.md": {
@@ -66395,9 +66401,9 @@
    "machine": "H1"
   },
   "devops/agent-mesh/SKILL.md": {
-   "sha": "f8d580636b2dc93f4697658d38a19a4c8f3a284b7b1e08ec11c70c248cb73624",
-   "size": 20809,
-   "mtime": 1788101566,
+   "sha": "a5222ae086cd953820a8f9b2563edb8cbd03fedfb27eb23833200aec6090ec10",
+   "size": 21236,
+   "mtime": 1788118055,
    "machine": "H1"
   },
   "devops/agent-mesh/references/ortak-akil-gorev-failover-20260829.md": {
@@ -66422,6 +66428,12 @@
    "sha": "b4c9a1548ac1a7a211f6fb3682e602c8d523b1c6bd212e61a195d40b222fbf9d",
    "size": 5906,
    "mtime": 1788095551,
+   "machine": "H1"
+  },
+  "devops/agent-mesh/references/oceanapi-denetim-rebrand-20260830.md": {
+   "sha": "fdff04aeb8ebf8de539429d3dd02133f55fd69f3e3aefa6adf1ec745a31fe448",
+   "size": 5331,
+   "mtime": 1788118048,
    "machine": "H1"
   },
   "devops/agent-mesh/references/acik-kaynak-sunum-git-temizligi-20260830.md": {
@@ -92786,6 +92798,78 @@
    "sha": "599212d356fcb84dc3057354be9a55b041b0bb2d017d7548ca3fb899173b3a9f",
    "size": 1813,
    "mtime": 1782051761,
+   "machine": "H1"
+  },
+  "cumulus-sync-motor/config.openclaw.json": {
+   "sha": "609cc904be50fac879d173d138983cf8ed6f4e659da1cb6023eb422c8b57848d",
+   "size": 2930,
+   "mtime": 1785772360,
+   "machine": "H1"
+  },
+  "cumulus-sync-motor/SKILL.md": {
+   "sha": "f69105d98e442110187622f2c4420bc4aa543cd9c54b9e02a899779693b0700f",
+   "size": 8746,
+   "mtime": 1788097605,
+   "machine": "H1"
+  },
+  "cumulus-sync-motor/config.example.json": {
+   "sha": "34a399faf2cf482736f9d671cc9116e537c571f57c8e6f064a47dcd4aff0498f",
+   "size": 1448,
+   "mtime": 1785762310,
+   "machine": "H1"
+  },
+  "cumulus-sync-motor/scripts/a2a_cli.py": {
+   "sha": "533b69ef770ad0e8859f69d4629fb2cf0f504919f54d1f3a19904972ab505904",
+   "size": 5439,
+   "mtime": 1788094939,
+   "machine": "H1"
+  },
+  "cumulus-sync-motor/scripts/agent_mesh_a2a.py": {
+   "sha": "468c51319c58704a0d05e56b5bfef8478bbd5428a708e9177e1c54cbc2c27b6d",
+   "size": 17852,
+   "mtime": 1788094939,
+   "machine": "H1"
+  },
+  "cumulus-sync-motor/scripts/gpu_agent.py": {
+   "sha": "82ab6fad45a0f3683025468bba10e951e45f6ca96b9fe4f5bfd53e628691a3a1",
+   "size": 6699,
+   "mtime": 1788098553,
+   "machine": "H1"
+  },
+  "cumulus-sync-motor/scripts/conversation_bridge.py": {
+   "sha": "685a7374e1d484aaccafec8904143585103e26e94a9715b49b111ee5ee9c4490",
+   "size": 8525,
+   "mtime": 1788098553,
+   "machine": "H1"
+  },
+  "cumulus-sync-motor/scripts/agent_identity.py": {
+   "sha": "db1108a874416f9fdb7f6d5186407f11f7c66098b7597ef7901890d23c4efa9d",
+   "size": 27892,
+   "mtime": 1788094939,
+   "machine": "H1"
+  },
+  "cumulus-sync-motor/scripts/sync_motor.py": {
+   "sha": "b2d3b43339cfb14388f92fd385dc5759c8db5c257b7d79af350009d5b91e6f0d",
+   "size": 133008,
+   "mtime": 1788090946,
+   "machine": "H1"
+  },
+  "cumulus-sync-motor/scripts/hermes_full_backup.py": {
+   "sha": "8091f94423026c28df8d87b536f93cac3ef36893078f48df8c3f756d04d79e05",
+   "size": 4443,
+   "mtime": 1787845103,
+   "machine": "H1"
+  },
+  "cumulus-sync-motor/scripts/__pycache__/sync_motor.cpython-312.pyc": {
+   "sha": "7d3e9de70b25ab22f3dcecca3dc0e58c1514f313e24fda8e811cfd55fb385cc2",
+   "size": 55095,
+   "mtime": 1785762338,
+   "machine": "H1"
+  },
+  "cumulus-sync-motor/tests/test_sync_motor.py": {
+   "sha": "9461cbb0ff0ffecfe8b57153619d2883adff31dd3dd6aa64fc256464bc5005b4",
+   "size": 4519,
+   "mtime": 1785763481,
    "machine": "H1"
   },
   "deep-research/SKILL.md": {
