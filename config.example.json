@@ -1,0 +1,28 @@
+{
+  "identity": {
+    "user_id": "benim-kullanici-adim",
+    "machine_id": ""
+  },
+  "github": {
+    "repo": "benim-org/hermes-sync-manifest",
+    "branch": "main"
+  },
+  "gdrive": {
+    "remote": "gdrive",
+    "backup_root": "hermes-sync"
+  },
+  "network": {
+    "timeout_s": 10
+  },
+  "dirs": {
+    "kernel": "~/projeler/kernel",
+    "patent": "~/projeler/patent",
+    "scripts": "~/.hermes/scripts",
+    "pcb": "~/projeler/pcb",
+    "hermes": "~/.hermes"
+  },
+  "state": {
+    "manifest_local": "~/.hermes/state/sync_motor_manifest.json",
+    "logfile": "~/.hermes/state/sync_motor.log"
+  }
+}

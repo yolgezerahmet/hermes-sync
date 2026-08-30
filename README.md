@@ -6,6 +6,51 @@ Non-destructive, versiyonlu, sınırsız node. **MIT** lisansı.
 > Özel CumulusNET kopyası: `cumulus-sync-motor` (private). Bu repo (public) evrensel
 > Hermes/OpenClaw kullanımı içindir.
 
+## v2.3 — 30 Ağu 2026: Kriptografik Kimlik + Şifreli Mesh + Sohbet Köprüsü
+
+**Yeni yetenekler (bu sürümde):**
+- **Kopyalanamaz-kanıtlı ajan kimliği** (`agent_identity.py`): her çalışma
+  zamanı (Hermes/OpenClaw) kendi Ed25519 kimliğine sahiptir; agent_id = açık
+  anahtar özeti (`hx-` / `oc-`), donanım parmak izine bağlıdır, klon şüphesinde
+  mesh 403 ile reddeder (fail-closed). Meşru taşıma için `rekey --confirm`.
+- **Uçtan uca şifreli A2A**: X25519 ECDH + AES-GCM (her mesajda ephemeral →
+  Perfect Forward Secrecy) + Ed25519 imza + ts/nonce replay koruması.
+  Aradaki dinleyici içeriği çözemez; kurcalama/replay reddedilir.
+- **Sohbet köprüsü** (`conversation_bridge.py`): Hermes state.db'deki tüm
+  kullanıcı sohbetleri (telegram/cli/whatsapp) kalıcı sohbet defterine akar;
+  içerik saklanmaz (sadece sha256). Sohbet ID: `u.<agent>.<kanal>.<peer>.<ulid>`
+  (kullanıcı) / `a.<agent>~<peer>.<kanal>.<ulid>` (ajan-ajan).
+- **GPU analiz kanalı** (`gpu_agent.py` + `gpu_task.py`): GPU'lu node (örn.
+  Windows + RTX) analiz görevlerini yerel kartta işler; sonuçlar mesh ile
+  yayılır.
+- **Rate limiting**: 429 Too Many Requests (IP+agent, 120 req/60s, env ile
+  ölçeklenir) — brute-force koruması.
+- **Ölçek**: her node kendi anahtarına sahip → 3/20 node aynı model
+  (mac/windows/linux); ortak token tek başına yetmez, kimlik anahtar tabanlı.
+
+```bash
+# kimlik + şifreli sohbet
+python3 agent_identity.py show                 # kimlik göster/üret
+python3 agent_identity.py verify-self          # imza + ID doğrula
+python3 a2a_cli.py send <host> "görev" --token <A2A_TOKEN>   # otomatik şifreli
+
+# sohbet köprüsü (her 15 dk / cron)
+python3 conversation_bridge.py --full          # ilk kurulum (tüm geçmiş)
+python3 conversation_bridge.py                 # artımlı (watermark)
+
+# GPU analiz (H2 RTX örnek)
+python3 gpu_task.py status                     # H2 GPU durumu
+python3 gpu_task.py task "PCB BGA fanout analizi"   # GPU'da işle
+```
+
+### Güvenlik özeti (v2.3)
+- Kimlik: agent_id = pubkey özeti; donanım bağı + klon fail-closed
+- Bütünlük: Ed25519 imza (gövde + ts + nonce)
+- Gizlilik: X25519 ECDH + AES-GCM (PFS)
+- Replay: ts (±120s) + nonce tekrarı reddi
+- Brute-force: rate limit (429)
+- Eski sunucularla geriye uyum: imzalı ama düz gövde (otomatik seçim)
+
 ## v2.1 — 29 Ağu 2026: Ajan Mesh + Restic
 
 ```
@@ -39,6 +84,10 @@ Non-destructive, versiyonlu, sınırsız node. **MIT** lisansı.
 | Ortak hafıza | `sync_memory.py` | Memory DIF'leri JSONL + audit hash-chain |
 | Retention | `sync_retention.py` | Snapshot yaşam döngüsü |
 | Akıllı kurulum | `probe/propose/apply` | Kaynak farkındalıklı kurulum önerisi |
+| Ajan kimliği | `agent_identity.py` | Ed25519 + X25519 kimlik, klon tespiti, sohbet defteri |
+| Şifreli mesh | `agent_mesh_a2a.py` | A2A + X-Agent-Enc şifreli gövde + rate limit |
+| Sohbet köprüsü | `conversation_bridge.py` | state.db → sohbet defteri (watermark) |
+| GPU analiz | `gpu_agent.py` / `gpu_task.py` | GPU'lu node'da analiz görevi |
 
 ### 3 Katmanlı Akıllı Kanal Mimarisi
 
