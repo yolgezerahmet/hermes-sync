@@ -87,3 +87,12 @@
 ## [1.0.x] — 2026-08-02
 
 - İlk sürüm: GitHub manifest merkezi + GDrive versiyonlu yedek + H1↔H2 sync.
+
+## v2.1.0 (29 Ağu 2026)
+- restic incremental backup engine (CDC dedup, snapshot, restore, retention)
+- A2A mesh: agent-to-agent (JSON-RPC) — sync/async/canlı(SSE) 3 mod
+- Syncthing P2P kanal + akıllı kanal seçici (görev→A2A, dosya→Syncthing, arşiv→GDrive)
+- Inbox worker (allowlist görev işleyici) + ortak görev dağıtımı (claim/failover)
+- Otomatik keşif (state.json) + ortak akıl (HLC) + ortak hafıza
+- FAILOVER: stale task devralma, max_attempts, terminal state koruma
+- Paketleme: pip (hermes_sync + CLI), 56 test, GitHub Actions CI
