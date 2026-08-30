@@ -14,6 +14,9 @@ Host örnekleri: 100.103.44.107 (H3), 100.92.2.47 (H1), 100.76.82.46 (H2)
 # pyright: reportOptionalMemberAccess=false
 import argparse
 import json
+import os
+import socket
+import subprocess
 import sys
 import time
 import urllib.parse
@@ -65,6 +68,12 @@ def peer_card(host: str, port: int = 8643):
 def rpc(host: str, method: str, params: dict, token: str, port: int = 8643,
         sign: bool = True, conv_id: str = "", encrypt: bool = True):
     url = f"http://{host}:{port}/"
+    # GERÇEK ZAMANLI (30 Ağu 2026): async görev gönderirken kendi callback
+    # adresimizi ekle → karşı taraf görev bitince BİZE push eder (polling yok).
+    if method == "task/send" and isinstance(params, dict):
+        md = dict(params.get("metadata", {}) or {})
+        md.setdefault("callback", f"{_self_addr()}:8643")
+        params["metadata"] = md
     body = json.dumps({"jsonrpc": "2.0", "id": 1, "method": method, "params": params}).encode()
     req = urllib.request.Request(url, data=body, headers={"Content-Type": "application/json"})
     if token:
@@ -110,6 +119,33 @@ def rpc(host: str, method: str, params: dict, token: str, port: int = 8643,
         except Exception:
             pass
     return out
+
+
+def _self_addr() -> str:
+    """Kendi (gönderen) Tailscale/IP adresini bul — push bildiriminin hedefi.
+    Öncelik: A2A_CALLBACK env > Tailscale IP (tailscale ip -4) > 100.x ağı."""
+    env = os.environ.get("A2A_CALLBACK", "")
+    if env and ":" in env:
+        return env.split(":")[0]
+    try:
+        r = subprocess.run(["tailscale", "ip", "-4"], capture_output=True,
+                           text=True, timeout=5)
+        if r.returncode == 0 and r.stdout.strip():
+            ip = r.stdout.strip().split()[0]
+            if ip.startswith("100."):
+                return ip
+    except Exception:
+        pass
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("100.64.0.1", 9))  # Tailscale ağına bağlan (dışarı paket yok)
+        ip = s.getsockname()[0]
+        s.close()
+        if ip.startswith("100."):
+            return ip
+    except Exception:
+        pass
+    return "127.0.0.1"
 
 def main():
     ap = argparse.ArgumentParser()
