@@ -1,5 +1,44 @@
 # CHANGELOG — Cumulus Sync Motoru / Hermes Sync
 
+## [2.2.0] — 2026-08-30 (Ajan Kimliği + Sohbet Etiketleme)
+
+### Yeni — Kopyalanamaz-kanıtlı ajan kimliği (agent_identity.py)
+- **Ed25519 kimlik**: `agent_id` = açık anahtar özeti → `hx-...` (Hermes) /
+  `oc-...` (OpenClaw). Her kurulum (H1/H2/H3/OpenClaw) kendi kimliğini üretir.
+- **Donanım parmak izi bağı**: machine-id/DMI UUID/board-serial/MAC/arch
+  (Linux/macOS/Windows). Anahtar başka donanıma kopyalanırsa
+  `clone_state=suspected` → mesh 403 RED (fail-closed).
+- **rekey**: meşru donanım taşıması → `rekey --confirm`; eski kimlik
+  `identity_history.json`'da `superseded_by` ile arşivlenir.
+- **Peer defteri (TOFU)**: `peers.json` — ilk görülen ajan kaydedilir;
+  agent_id değişmezse anahtar değişimi = taklit RED (`peer_key_mismatch`).
+- **İmza doğrulama**: `agent|ts|nonce|method|sha256(body)` Ed25519 imzası,
+  ±120s pencere + nonce tekrarı koruması (replay RED).
+- **ID = anahtar özeti** zorunlu — uydurma agent_id kabul edilmez
+  (`id_key_mismatch`).
+
+### Yeni — Sohbet etiketleme (kullanıcı + ajanlar arası AYRI)
+- `u.<agent8>.<kanal>.<peer8>.<ulid>` → kullanıcı sohbeti
+- `a.<agent8>~<peer8>.<kanal>.<ulid>` → ajanlar arası (iki taraf simetrik)
+- Aynı kapsam idempotent; mesajlar `<conv_id>#<seq>` monoton; içerik
+  saklanmaz (sadece sha256+boyut) — `conversations.db` (SQLite/WAL).
+- A2A inbox'a `conversation_id` + `message_id` yazılır; imzasız istekler
+  defteri kirletmez (`from_verified=False`).
+
+### Entegrasyon
+- `agent_mesh_a2a.py`: AgentCard `identity` alanı, `/health` agent_id +
+  clone_state, `/identity` endpoint (açık anahtar SIZMAZ), istek imza
+  doğrulaması, klon şüphesinde 403.
+- `a2a_cli.py`: varsayılan İMZALI gönderim, `--no-sign` geriye uyum,
+  `X-Conversation-Id`, yerel sohbet defteri kaydı.
+- `sync_motor.py identity show|rekey|fingerprint|conv`.
+- `--require-signature` (tüm node'lar güncellenince) imzasız istekleri RED.
+- Kimlik modülü olmayan sunucular eski (token) davranışıyla çalışır.
+
+### Test
+- test_agent_identity.py: 33 test (klon tespiti, rekey arşivi, imza,
+  replay, taklit, TOFU, sohbet idempotansı, seq monotonluğu, ULID).
+
 ## [2.1.1] — 2026-08-29 (OceanAPI denetim kapanışı)
 
 ### Düzeltilen — 2. TUR (OceanAPI 2. denetim #1-#5 — tombstone/audit kilit)

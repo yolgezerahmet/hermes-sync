@@ -182,4 +182,34 @@ MIT — bkz. [LICENSE](LICENSE)
 
 ## Akıllı Aktarım (v1.6.1)
 `python3 smart_sync.py both --hub gdrive:cumulusos-backups/smart --machine <h1|h2>`
+
+## Ajan Kimliği + Sohbet Etiketleme (v2.2 — 30 Ağu 2026)
+
+Mesh'e bağlı her çalışma zamanı (Hermes, OpenClaw) kendi kriptografik kimliğine
+sahiptir: `agent_identity.py` (Ed25519 + donanım parmak izi bağı + klon tespiti).
+
+```bash
+python3 agent_identity.py show                 # kimlik göster/üret
+python3 agent_identity.py verify-self          # imza + ID-anahtar doğrulaması
+python3 agent_identity.py fingerprint          # donanım parmak izi kaynakları
+python3 sync_motor.py identity show            # sync entegre kimlik
+
+# Sohbet etiketleme (kullanıcı ve ajanlar arası AYRI, karışmaz):
+python3 agent_identity.py conv-open --kind user  --peer ahmet --channel telegram
+python3 agent_identity.py conv-open --kind agent --peer hx-...  --channel a2a
+python3 agent_identity.py conv-list
+```
+
+### Kimlik formatları
+- `agent_id` = açık anahtar özeti: `hx-...` (Hermes) / `oc-...` (OpenClaw)
+- Sohbet: `u.<agent8>.<kanal>.<peer8>.<ulid>` (kullanıcı) |
+  `a.<agent8>~<peer8>.<kanal>.<ulid>` (ajanlar arası)
+- Mesaj: `<conv_id>#<seq>`; içerik saklanmaz (sadece sha256)
+
+### Güvenlik
+- Anahtar başka donanıma kopyalanırsa `clone_state=suspected` → mesh 403
+- Meşru taşıma için `rekey --confirm` (eski kimlik arşivlenir)
+- A2A istekleri Ed25519 imzalı (replay koruması: ts+nonce, ±120s)
+- Peer defteri TOFU: anahtar değişirse taklit RED
+- `--require-signature` (tüm node'lar güncellenince) imzasız istekleri REDDEDİR
 GDrive hub üzerinden KARŞILIKLI aktif iş/veri transferi (non-destructive .conflict merge). Detay: smart_sync.py docstring.
