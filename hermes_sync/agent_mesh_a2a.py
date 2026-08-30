@@ -168,6 +168,10 @@ def execute_task(task: dict):
         except Exception:
             pass
     INBOX_DIR.mkdir(parents=True, exist_ok=True)
+    try:
+        os.chmod(INBOX_DIR, 0o700)   # OCEANAPI DENETİMİ: dünya-okunabilir olmasın
+    except Exception:
+        pass
     fname = INBOX_DIR / f"{int(time.time())}_{uuid.uuid4().hex[:8]}.json"
     fname.write_text(json.dumps({
         "ts": time.time(), "from": peer,
@@ -355,8 +359,12 @@ def build_app(token: str):
         return out
 
     @app.get("/identity")
-    async def identity_endpoint():
-        """Açık kimlik + tanınan ajanlar + sohbet sayacı (özel anahtar YOK)."""
+    async def identity_endpoint(request: Request):
+        """Açık kimlik + tanınan ajanlar + sohbet sayacı (özel anahtar YOK).
+        OCEANAPI DENETİMİ: endpoint yetkilendirme gerektirir — konuşma
+        metadata'sı dışarı sızmasın (401 reddi)."""
+        if not check_auth(request):
+            return JSONResponse({"error": "unauthorized"}, status_code=401)
         ident = identity()
         if not ident:
             return JSONResponse({"error": "identity_module_off"}, status_code=503)
@@ -374,8 +382,12 @@ def build_app(token: str):
         """Canlı (SSE) mesaj akışı — 2 saniyede bir durum/mesaj yayınlar.
         Kullanım: GET /stream?message=selam&seconds=10
         (canlı görüşme kanalı; ajan bu akışı dinleyerek eşzamanlı konuşur)
+        OCEANAPI DENETİMİ: message/seconds sınırlandı (kaynak tüketimi engeli).
         """
         from fastapi.responses import StreamingResponse
+
+        seconds = min(max(int(seconds), 1), 60)   # 1..60s üst sınır
+        message = message[:200]                    # 200 char üst sınır
 
         async def gen():
             import asyncio as _asyncio
@@ -402,6 +414,12 @@ def main():
     global REQUIRE_SIG
     if args.require_signature:
         REQUIRE_SIG = True
+    # OCEANAPI DENETİMİ: boş token fail-closed uyarısı — doğrulama imza
+    # katmanına düşer; production'da token zorunlu önerilir.
+    if not args.token:
+        print("UYARI: A2A_TOKEN boş — doğrulama yalnız imza/rate-limit katmanına "
+              "dayanır. Production'da --token veya A2A_TOKEN env zorunlu.",
+              file=sys.stderr)
     try:
         import uvicorn
     except ImportError:
