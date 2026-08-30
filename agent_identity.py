@@ -91,6 +91,19 @@ def _c32_encode(num: int, length: int) -> str:
     return "".join(reversed(out))
 
 
+def _atomic_write(path: Path, data: bytes):
+    """Atomik yazma — OCEANAPI denetimi #3 (ORTA): kısmi dosya/crash koruması.
+    Geçici dosyaya yaz → fsync → os.replace (aynı dizinde atomik rename)."""
+    tmp = path.with_name(path.name + ".tmp")
+    fd = os.open(str(tmp), os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    try:
+        os.write(fd, data)
+        os.fsync(fd)
+    finally:
+        os.close(fd)
+    os.replace(str(tmp), str(path))
+
+
 def ulid() -> str:
     """Zaman sıralı 26 karakter ID (48-bit ms + 80-bit rastgele).
     UUID4'ten farkı: kronolojik sıralanır → sohbetler zaman sırasında durur."""
@@ -226,6 +239,22 @@ class AgentIdentity:
         if key_f.exists() and meta_f.exists():
             priv = Ed25519PrivateKey.from_private_bytes(key_f.read_bytes()[:32])
             meta = json.loads(meta_f.read_text())
+            # ── OCEANAPI DENETİMİ #1 (YÜKSEK): meta ↔ özel anahtar doğrulaması
+            # Metadata değiştirilmişse (sahte public_key/agent_id) fail-closed:
+            # kimlik dosyaları tutarsız → yükleme REDDEDİLİR, sessiz kabul YOK.
+            try:
+                derived_pub = priv.public_key().public_bytes(
+                    encoding=serialization.Encoding.Raw,
+                    format=serialization.PublicFormat.Raw)
+                if _b64(derived_pub) != meta.get("public_key"):
+                    raise ValueError("public_key metadata ile özel anahtar uyuşmuyor")
+                if AgentIdentity._derive_id(runtime, derived_pub) != meta.get("agent_id"):
+                    raise ValueError("agent_id metadata ile anahtar uyuşmuyor")
+            except Exception as e:
+                raise RuntimeError(
+                    f"kimlik tutarsız (meta-anahtar doğrulaması): {e} — "
+                    "düzeltme: kimlik dizinini yedekleyip agent_identity.py rekey --confirm "
+                    "çalıştırın") from e
             # X25519 (şifreleme) anahtarı eksikse oluştur (v1.1 yükseltmesi)
             xk_f = d / "agent_x25519.key"
             if not xk_f.exists() or "x25519_public" not in meta:
@@ -233,14 +262,22 @@ class AgentIdentity:
                 xpub = xpriv.public_key().public_bytes(
                     encoding=serialization.Encoding.Raw,
                     format=serialization.PublicFormat.Raw)
-                xk_f.write_bytes(xpriv.private_bytes(
+                _atomic_write(xk_f, xpriv.private_bytes(
                     encoding=serialization.Encoding.Raw,
                     format=serialization.PrivateFormat.Raw,
                     encryption_algorithm=serialization.NoEncryption()))
-                os.chmod(xk_f, 0o600)
                 meta["x25519_public"] = _b64(xpub)
-                (d / "agent_identity.json").write_text(
-                    json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
+                _atomic_write(d / "agent_identity.json",
+                              json.dumps(meta, ensure_ascii=False, indent=2).encode("utf-8"))
+            else:
+                # ── OCEANAPI DENETİMİ #2 (ORTA): X25519 public ↔ özel anahtar
+                xpriv = X25519PrivateKey.from_private_bytes(xk_f.read_bytes()[:32])
+                derived_x = xpriv.public_key().public_bytes(
+                    encoding=serialization.Encoding.Raw,
+                    format=serialization.PublicFormat.Raw)
+                if _b64(derived_x) != meta.get("x25519_public"):
+                    raise RuntimeError(
+                        "x25519_public metadata ile özel anahtar uyuşmuyor — rekey gerekli")
             ident = cls(meta, priv, d)
             ident._refresh_clone_state(save=True)
             if strict:
@@ -279,15 +316,13 @@ class AgentIdentity:
             "clone_state": "clean",
             "boot_count": 1,
         }
-        key_f.write_bytes(raw_priv)
-        os.chmod(key_f, 0o600)
+        _atomic_write(key_f, raw_priv)
         xk_f = d / "agent_x25519.key"
-        xk_f.write_bytes(xpriv.private_bytes(
+        _atomic_write(xk_f, xpriv.private_bytes(
             encoding=serialization.Encoding.Raw,
             format=serialization.PrivateFormat.Raw,
             encryption_algorithm=serialization.NoEncryption()))
-        os.chmod(xk_f, 0o600)
-        meta_f.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
+        _atomic_write(meta_f, json.dumps(meta, ensure_ascii=False, indent=2).encode("utf-8"))
         os.chmod(meta_f, 0o644)
         return cls(meta, priv, d)
 
@@ -318,8 +353,8 @@ class AgentIdentity:
         self.meta["hw_strength"] = hw["strength"]
         self.meta["boot_count"] = int(self.meta.get("boot_count", 0)) + (1 if save else 0)
         if save:
-            (self.dir / "agent_identity.json").write_text(
-                json.dumps(self.meta, ensure_ascii=False, indent=2), encoding="utf-8")
+            _atomic_write(self.dir / "agent_identity.json",
+                          json.dumps(self.meta, ensure_ascii=False, indent=2).encode("utf-8"))
         return {"state": state, "detail": detail}
 
     def assert_not_clone(self):
@@ -333,23 +368,60 @@ class AgentIdentity:
         """Donanım meşru şekilde değiştiyse YENİ kimlik üret; eskisini arşivle."""
         if not confirm:
             raise ValueError("rekey için --confirm gerekli (yeni agent_id üretilir)")
+        # ── OCEANAPI DENETİMİ #4 (ORTA→YÜKSEK): güvenli geçiş.
+        # Eski dosyalar SİLİNMEDEN önce yeni kimlik geçici dosyalarda üretilir;
+        # hepsi hazır olduktan sonra atomik taşınır. Her an geçerli kimlik var —
+        # crash/kısmi hata durumunda kimlik KAYBI yaşanmaz.
         hist_f = self.dir / "identity_history.json"
         hist = json.loads(hist_f.read_text()) if hist_f.exists() else []
         old = dict(self.meta)
         old["superseded_at"] = time.strftime("%Y-%m-%dT%H:%M:%S%z")
         old["supersede_reason"] = reason or "hardware_change"
+        # 1) Yeni anahtar çiftleri üret (geçici dosyalara)
+        new_priv = Ed25519PrivateKey.generate()
+        new_xpriv = X25519PrivateKey.generate()
+        new_pub = new_priv.public_key().public_bytes(
+            encoding=serialization.Encoding.Raw,
+            format=serialization.PublicFormat.Raw)
+        new_xpub = new_xpriv.public_key().public_bytes(
+            encoding=serialization.Encoding.Raw,
+            format=serialization.PublicFormat.Raw)
+        new_id = AgentIdentity._derive_id(self.runtime, new_pub)
+        new_meta = dict(self.meta)
+        new_meta.update({
+            "agent_id": new_id,
+            "public_key": _b64(new_pub),
+            "x25519_public": _b64(new_xpub),
+            "supersedes": old["agent_id"],
+            "created": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+            "install_epoch": int(time.time()),
+            "clone_state": "clean",
+            "boot_count": 1,
+        })
+        tmp_key = self.dir / "agent_ed25519.key.new"
+        tmp_xkey = self.dir / "agent_x25519.key.new"
+        tmp_meta = self.dir / "agent_identity.json.new"
+        _atomic_write(tmp_key, new_priv.private_bytes(
+            encoding=serialization.Encoding.Raw,
+            format=serialization.PrivateFormat.Raw,
+            encryption_algorithm=serialization.NoEncryption()))
+        _atomic_write(tmp_xkey, new_xpriv.private_bytes(
+            encoding=serialization.Encoding.Raw,
+            format=serialization.PrivateFormat.Raw,
+            encryption_algorithm=serialization.NoEncryption()))
+        _atomic_write(tmp_meta, json.dumps(new_meta, ensure_ascii=False, indent=2).encode("utf-8"))
+        # 2) Eski kimliği arşivle (superseded_by = yeni id) — atomik
+        old["superseded_by"] = new_id
         hist.append(old)
-        for f in ("agent_ed25519.key", "agent_identity.json"):
-            p = self.dir / f
-            if p.exists():
-                p.unlink()
-        new = AgentIdentity.load_or_create(self.runtime, self.meta.get("user_id", ""))
-        hist[-1]["superseded_by"] = new.agent_id
-        hist_f.write_text(json.dumps(hist, ensure_ascii=False, indent=2), encoding="utf-8")
-        new.meta["supersedes"] = old["agent_id"]
-        (new.dir / "agent_identity.json").write_text(
-            json.dumps(new.meta, ensure_ascii=False, indent=2), encoding="utf-8")
-        return new
+        _atomic_write(hist_f, json.dumps(hist, ensure_ascii=False, indent=2).encode("utf-8"))
+        # 3) Yeni dosyaları ATOMIK taşı (her an geçerli kimlik)
+        os.replace(str(tmp_key), str(self.dir / "agent_ed25519.key"))
+        os.replace(str(tmp_xkey), str(self.dir / "agent_x25519.key"))
+        os.replace(str(tmp_meta), str(self.dir / "agent_identity.json"))
+        os.chmod(self.dir / "agent_ed25519.key", 0o600)
+        os.chmod(self.dir / "agent_x25519.key", 0o600)
+        # 4) Yeni nesneyi döndür
+        return AgentIdentity(new_meta, new_priv, self.dir)
 
     # ---- özellikler ----
     @property
@@ -503,7 +575,7 @@ def load_peers(runtime: str | None = None) -> dict:
 def save_peers(peers: dict, runtime: str | None = None):
     p = peers_path(runtime)
     p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(json.dumps(peers, ensure_ascii=False, indent=2), encoding="utf-8")
+    _atomic_write(p, json.dumps(peers, ensure_ascii=False, indent=2).encode("utf-8"))
 
 
 def verify_request(headers: dict, method: str, body: bytes,
