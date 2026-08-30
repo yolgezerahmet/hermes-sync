@@ -1,386 +1,386 @@
 {
  "node": "sim",
- "ts": "2026-08-30T21:15:07",
- "revision": "1f2e88a85db9",
+ "ts": "2026-08-30T21:36:35",
+ "revision": "93b4aa939a0c",
  "file_count": 63,
  "files": {
-  "enhanced_attestation.py": {
-   "sha": "480276e87519b4eba8e0edbcc12e10670e4fe29ed61138dd550dc3515020da58",
-   "size": 11838,
-   "mtime": 1779229280,
-   "machine": "H1"
-  },
-  "test_trp3.py": {
-   "sha": "e2c203f6cf085ac835e777c473f1baff5b497b1a9dafe68c0563aa00e0b37ebf",
-   "size": 8330,
-   "mtime": 1779129697,
-   "machine": "H1"
-  },
-  "advanced_swarm.py": {
-   "sha": "531f4dccd2d3bc2cdd1506eba06a6f3812140796c38f7624abc63a4166b30097",
-   "size": 12453,
-   "mtime": 1779286627,
-   "machine": "H1"
-  },
-  "hierarchical_mesh.py": {
-   "sha": "71ba1721f11421013305dc8b1b48b5c82aca1e9bf6a896932f2c5a881b169291",
-   "size": 10864,
-   "mtime": 1779142011,
-   "machine": "H1"
-  },
-  "lora_hard_conditions.py": {
-   "sha": "6f58fd03a7d8f11650ef779ec06c1ce1ed37b608bfa35cc4132eb874b320aa6a",
-   "size": 13371,
-   "mtime": 1779223466,
-   "machine": "H1"
-  },
-  "test_trp4.py": {
-   "sha": "99dd86f07c59a8ba6e3c843dedbd76a3ff470dc4453cdcbd451ae249fe3112b7",
-   "size": 5342,
-   "mtime": 1779134814,
-   "machine": "H1"
-  },
-  "quick_verify.py": {
-   "sha": "b0d928cb61bb466c4063618fe92bcbe03b74c79cb85032cdc9a06900df6f71d6",
-   "size": 2335,
-   "mtime": 1779228821,
-   "machine": "H1"
-  },
-  "platform_secure_mesh_sim.py": {
-   "sha": "7775a4aa592132072646c4e99508e95ac84a308aea06f0c4c7208b6c1f4716cd",
-   "size": 19204,
-   "mtime": 1779283105,
-   "machine": "H1"
-  },
-  "wcet_budget.py": {
-   "sha": "01f8b8e43c59480804dc1273c5b0684ce3f709fa6291a676d7253ff7e5bcbf69",
-   "size": 8481,
-   "mtime": 1779135537,
-   "machine": "H1"
+  "scale_and_improve.py": {
+   "sha": "58594e10dd2e6d8a9869b563cc6eb8f0087f8814b23c06d4ffdead0dff54c1ad",
+   "size": 6064,
+   "mtime": 1779396077,
+   "machine": "H3"
   },
   "full_integrated_sim.py": {
    "sha": "3769f26482190683199019307f2c4fe53d0c05afc5d0bb61c544f6d0c306a035",
    "size": 27616,
    "mtime": 1779176038,
-   "machine": "H1"
-  },
-  "e3_validation.py": {
-   "sha": "534f4fb3c348734a26d1c94755d502d245ea611040703c721d651ade381cba16",
-   "size": 6357,
-   "mtime": 1779139755,
-   "machine": "H1"
-  },
-  "full_mechanism_check.py": {
-   "sha": "76428dd19b464be3d97100e60c659547e15aec5a4ab58e8d50162503bd77cdc5",
-   "size": 30728,
-   "mtime": 1780389960,
-   "machine": "H1"
-  },
-  "full_integrated_sim_v4.py": {
-   "sha": "01e097d9e0f98ad1c6d8264ef1689eacc88d18292e92c9f3077795fa950bf175",
-   "size": 10802,
-   "mtime": 1779177963,
-   "machine": "H1"
-  },
-  "v3_full_test.py": {
-   "sha": "3a2e91055f459b8ec6066e78046160cbbd49cf1318e11933712b8a363ed47739",
-   "size": 10562,
-   "mtime": 1779539775,
-   "machine": "H1"
-  },
-  "scale_sim.py": {
-   "sha": "5b65b4fb525c87ea97a3392f9dd21f6525e72f2b57f970b7775b5969444ce46c",
-   "size": 5427,
-   "mtime": 1779180346,
-   "machine": "H1"
-  },
-  "scale_and_improve.py": {
-   "sha": "58594e10dd2e6d8a9869b563cc6eb8f0087f8814b23c06d4ffdead0dff54c1ad",
-   "size": 6064,
-   "mtime": 1779396077,
-   "machine": "H1"
-  },
-  "complete_sim.py": {
-   "sha": "cd49c3ce6c3e92f5f69e957166d71c8f87de9c76cec49916f442c2575ea9ea94",
-   "size": 23876,
-   "mtime": 1779285548,
-   "machine": "H1"
-  },
-  "cumulus_final.py": {
-   "sha": "b15a83f0d16fd0d247ee8accb70c8c0ee4eab00e6732e89ce525f8b8e78c3b92",
-   "size": 11356,
-   "mtime": 1779295290,
-   "machine": "H1"
-  },
-  "kuramoto_fixed.py": {
-   "sha": "f991d388970912ca353f2ffe5663a55dece560b8bead7e775f5640fdb6571cea",
-   "size": 3689,
-   "mtime": 1779136574,
-   "machine": "H1"
-  },
-  "test_suite.py": {
-   "sha": "067d921524585a23bc393c9cf2e18d1f06adb6231caf07c800dc1fac663e6573",
-   "size": 7107,
-   "mtime": 1779108232,
-   "machine": "H1"
-  },
-  "test_trp5.py": {
-   "sha": "046d2f54bd1cb2d74009a56ec3c0df61f26066ae17cd4cde88dc0fc2e5c136be",
-   "size": 7147,
-   "mtime": 1779134166,
-   "machine": "H1"
-  },
-  "full_simulation.py": {
-   "sha": "4d59f6b7288b5f7a867c414c180125fc75daa844b91a70eedb710041f845c971",
-   "size": 11334,
-   "mtime": 1779394672,
-   "machine": "H1"
-  },
-  "build_canonical.py": {
-   "sha": "599e4e0f78b1ba3876d19e99d12e11b351b63c9bdc7d6274c2b7cf362aa53f60",
-   "size": 2763,
-   "mtime": 1779108090,
-   "machine": "H1"
-  },
-  "test_suite_v2.py": {
-   "sha": "7b700a79809edba13bce25f113da75877cd023269dabfeb8da3cb3b981582782",
-   "size": 3653,
-   "mtime": 1779108304,
-   "machine": "H1"
-  },
-  "cumulus_env.py": {
-   "sha": "c82ad24ed3f6b7fb1e612dc03050819b8c37dee43c2c23fc2a657f14f5213e7e",
-   "size": 8688,
-   "mtime": 1779108008,
-   "machine": "H1"
-  },
-  "comprehensive_sim.py": {
-   "sha": "d896f90c55207bb0665d6cb320303a1035c787611be331c3894f7cdadb5a8dd2",
-   "size": 19865,
-   "mtime": 1779223745,
-   "machine": "H1"
-  },
-  "all_features_sim.py": {
-   "sha": "cd81015e0efde3e0e074a8eaf770fe3b0df0f980b808578b9f100c3bd3b2470c",
-   "size": 18622,
-   "mtime": 1779293719,
-   "machine": "H1"
-  },
-  "rubble_detection.py": {
-   "sha": "e93314649bbfd1decb7b6800178f9568b5352373d7665708582cb24cb5bf77f1",
-   "size": 13004,
-   "mtime": 1779541131,
-   "machine": "H1"
-  },
-  "cumulus_v16.py": {
-   "sha": "9866728da20ffcf01133c9ae291c84a0f8c197112946fad831a3e9175762c3b2",
-   "size": 8425,
-   "mtime": 1779114116,
-   "machine": "H1"
+   "machine": "H3"
   },
   "swarm_12.py": {
    "sha": "b30da68cf05793f8ad87b963cfa1f35231946466987a39146aa542b204d54173",
    "size": 13579,
    "mtime": 1779287911,
-   "machine": "H1"
-  },
-  "P_lyap.npy": {
-   "sha": "62358e2f0570c0b725ba5c686613ec5f553fa71a389e3adc830c306b9725fbf4",
-   "size": 3328,
-   "mtime": 1779108099,
-   "machine": "H1"
-  },
-  "full_integrated_sim_v2.py": {
-   "sha": "43cd328bf5370a8cb4b0fd6e5a31ffa557a6272c3b671de3322ab3fca739789d",
-   "size": 10640,
-   "mtime": 1779176332,
-   "machine": "H1"
-  },
-  "red_team_stress.py": {
-   "sha": "cb29958198fc9633e4f6670c82c3a030a740b768fa378d0fcef4364a98718111",
-   "size": 7965,
-   "mtime": 1779624012,
-   "machine": "H1"
-  },
-  "hacker_attack.py": {
-   "sha": "83e172ba0a5409ed84382208ded2af9482d8f68acebbe81fe6861a6d4e21dca8",
-   "size": 7628,
-   "mtime": 1779625199,
-   "machine": "H1"
-  },
-  "full_integrated_sim_v3.py": {
-   "sha": "a1043ad34bcbfcb3ae81ceed8629dc550dcd0385f6d072c68eb2fd35b45e7ba3",
-   "size": 27722,
-   "mtime": 1779177630,
-   "machine": "H1"
-  },
-  "cumulus_foundations.py": {
-   "sha": "353a2ecb927a667b9ba1db0e88469282250f5912f4627c5f9916791a726970e7",
-   "size": 32105,
-   "mtime": 1780389560,
-   "machine": "H1"
-  },
-  "smart_sim.py": {
-   "sha": "09690d9f2da42f52101042d7bb8f687f6547a49cc382cdb7d033e5fbabcf0bc7",
-   "size": 10992,
-   "mtime": 1779178999,
-   "machine": "H1"
+   "machine": "H3"
   },
   "disaster_sim.py": {
    "sha": "ad181a19c5b7581196db5157285c4230f05ed0c5adfa2b7cee7bc25ca736cf96",
    "size": 14004,
    "mtime": 1779540632,
-   "machine": "H1"
+   "machine": "H3"
   },
-  "innovative_sim.py": {
-   "sha": "94a7fca4c947fc86e7b1b397f0c5417e41066b254ad0195cef8f655f150354c7",
-   "size": 13877,
-   "mtime": 1779294536,
-   "machine": "H1"
-  },
-  "cumulus_v15.py": {
-   "sha": "0e4e1d76050353924fca137d0f079b822192e042c4ec77d72372478fe6084c15",
-   "size": 9135,
-   "mtime": 1779113015,
-   "machine": "H1"
-  },
-  "dgk_tier2.py": {
-   "sha": "07ccda5a88647897848e89d0c107ced4cdf08bf0a32e6f8e4f0b5ee3f2ceb975",
-   "size": 5893,
-   "mtime": 1779136510,
-   "machine": "H1"
-  },
-  "sim_10k_final.py": {
-   "sha": "0d33e6aae3ed3a75d3414c64ce3daeec95417783217fc26bf7362d237baeff77",
-   "size": 15506,
-   "mtime": 1779291552,
-   "machine": "H1"
-  },
-  "sim_10k_final_v2.py": {
-   "sha": "19eb8a5ebbb510277573f8822c91d935a8f9c76a92350c076031d0292b88c0d8",
-   "size": 9374,
-   "mtime": 1779295691,
-   "machine": "H1"
-  },
-  "pyramid_decoder.py": {
-   "sha": "e1adb2f6c316b5442eb9d5367f1c88f43c26f765c9efb97117cefa5eaebb3330",
-   "size": 36952,
-   "mtime": 1780335604,
-   "machine": "H1"
-  },
-  "math_motor_uyum.py": {
-   "sha": "efc7a0734d66649157f338f38877067ac3d15469ceec33badb7fd6ef1994d64a",
-   "size": 6566,
-   "mtime": 1779258815,
-   "machine": "H1"
+  "platform_secure_mesh_sim.py": {
+   "sha": "7775a4aa592132072646c4e99508e95ac84a308aea06f0c4c7208b6c1f4716cd",
+   "size": 19204,
+   "mtime": 1779283105,
+   "machine": "H3"
   },
   "final_integration.py": {
    "sha": "50e516743d774e3cffe593b43d50fa92b1b966bd893487d87f739e51c1629638",
    "size": 10208,
    "mtime": 1780336673,
-   "machine": "H1"
+   "machine": "H3"
   },
-  "all_scenarios.py": {
-   "sha": "b2fa22ac381912a71f27137517ee92cd92d55ebb016cd646c85da239e01dfb40",
-   "size": 5765,
-   "mtime": 1779395552,
-   "machine": "H1"
+  "full_integrated_sim_v3.py": {
+   "sha": "a1043ad34bcbfcb3ae81ceed8629dc550dcd0385f6d072c68eb2fd35b45e7ba3",
+   "size": 27722,
+   "mtime": 1779177630,
+   "machine": "H3"
   },
-  "new_capabilities_math.py": {
-   "sha": "b45b0948c2c14584b7c709ad2d19b3edf7ba2f44b9f9d43351298e413373cfcc",
-   "size": 14133,
-   "mtime": 1779228652,
-   "machine": "H1"
+  "kuramoto_fixed.py": {
+   "sha": "f991d388970912ca353f2ffe5663a55dece560b8bead7e775f5640fdb6571cea",
+   "size": 3689,
+   "mtime": 1779136574,
+   "machine": "H3"
   },
-  "A_canon.npy": {
-   "sha": "99717b2b693e491690b2aa57b254081390dff5997787c0e7249fc79c0d8b384a",
-   "size": 3328,
-   "mtime": 1779108099,
-   "machine": "H1"
+  "rubble_detection.py": {
+   "sha": "e93314649bbfd1decb7b6800178f9568b5352373d7665708582cb24cb5bf77f1",
+   "size": 13004,
+   "mtime": 1779541131,
+   "machine": "H3"
   },
-  "engine_demo.py": {
-   "sha": "5fd101d819c24b0428ca2dff24e95f1db249c42b1e229ee6f16763bf0583a612",
-   "size": 4874,
-   "mtime": 1780287242,
-   "machine": "H1"
+  "hacker_attack.py": {
+   "sha": "83e172ba0a5409ed84382208ded2af9482d8f68acebbe81fe6861a6d4e21dca8",
+   "size": 7628,
+   "mtime": 1779625199,
+   "machine": "H3"
   },
-  "complete_final.py": {
-   "sha": "8ca36442af16d1f185c32f80160fa9d7e9387f948626f3205a33d0d6ec2acd0b",
-   "size": 12039,
-   "mtime": 1779285969,
-   "machine": "H1"
+  "cumulus_v16.py": {
+   "sha": "9866728da20ffcf01133c9ae291c84a0f8c197112946fad831a3e9175762c3b2",
+   "size": 8425,
+   "mtime": 1779114116,
+   "machine": "H3"
   },
-  "FULL_SIMULATION_REPORT.md": {
-   "sha": "ae2d12350459df42e008e5a17e66711e910f0dc03d9b48a4f529f28b310a501a",
-   "size": 2704,
-   "mtime": 1779394681,
-   "machine": "H1"
-  },
-  "lora_efficiency.py": {
-   "sha": "514a8e3ff8325e9b11f5e540f0b3c341a93aede781bd4654a812a7554211e9ca",
-   "size": 8804,
-   "mtime": 1779222762,
-   "machine": "H1"
-  },
-  "test_jammer.py": {
-   "sha": "ccac8e9ed745144032019e7b35663d7141b4ff9197d4c3a41c14293c9bdb5f13",
-   "size": 8475,
-   "mtime": 1779108779,
-   "machine": "H1"
-  },
-  "mesh_routing.py": {
-   "sha": "afcdbf3dcfa5f0a9011fc0f68807d73f8f5f21eab7b4abefa729e4da76db044d",
-   "size": 11636,
-   "mtime": 1779395123,
-   "machine": "H1"
+  "test_trp3.py": {
+   "sha": "e2c203f6cf085ac835e777c473f1baff5b497b1a9dafe68c0563aa00e0b37ebf",
+   "size": 8330,
+   "mtime": 1779129697,
+   "machine": "H3"
   },
   "scale_test.py": {
    "sha": "2a8a8499f55650d6a86906537d5f94b58612c99003b34c7b27c1c604eeeb9aa5",
    "size": 7513,
    "mtime": 1779463626,
-   "machine": "H1"
+   "machine": "H3"
+  },
+  "wcet_budget.py": {
+   "sha": "01f8b8e43c59480804dc1273c5b0684ce3f709fa6291a676d7253ff7e5bcbf69",
+   "size": 8481,
+   "mtime": 1779135537,
+   "machine": "H3"
   },
   "cumulus_engine.py": {
    "sha": "521ba335aa748d63c7969131c2bdfc57e21a08f3045d12359a1bcf9a15dd4c1b",
    "size": 343138,
    "mtime": 1780409172,
-   "machine": "H1"
+   "machine": "H3"
+  },
+  "test_jammer.py": {
+   "sha": "ccac8e9ed745144032019e7b35663d7141b4ff9197d4c3a41c14293c9bdb5f13",
+   "size": 8475,
+   "mtime": 1779108779,
+   "machine": "H3"
+  },
+  "lora_efficiency.py": {
+   "sha": "514a8e3ff8325e9b11f5e540f0b3c341a93aede781bd4654a812a7554211e9ca",
+   "size": 8804,
+   "mtime": 1779222762,
+   "machine": "H3"
+  },
+  "cumulus_foundations.py": {
+   "sha": "353a2ecb927a667b9ba1db0e88469282250f5912f4627c5f9916791a726970e7",
+   "size": 32105,
+   "mtime": 1780389560,
+   "machine": "H3"
+  },
+  "quick_verify.py": {
+   "sha": "b0d928cb61bb466c4063618fe92bcbe03b74c79cb85032cdc9a06900df6f71d6",
+   "size": 2335,
+   "mtime": 1779228821,
+   "machine": "H3"
+  },
+  "lora_hard_conditions.py": {
+   "sha": "6f58fd03a7d8f11650ef779ec06c1ce1ed37b608bfa35cc4132eb874b320aa6a",
+   "size": 13371,
+   "mtime": 1779223466,
+   "machine": "H3"
+  },
+  "enhanced_attestation.py": {
+   "sha": "480276e87519b4eba8e0edbcc12e10670e4fe29ed61138dd550dc3515020da58",
+   "size": 11838,
+   "mtime": 1779229280,
+   "machine": "H3"
+  },
+  "full_integrated_sim_v4.py": {
+   "sha": "01e097d9e0f98ad1c6d8264ef1689eacc88d18292e92c9f3077795fa950bf175",
+   "size": 10802,
+   "mtime": 1779177963,
+   "machine": "H3"
+  },
+  "all_scenarios.py": {
+   "sha": "b2fa22ac381912a71f27137517ee92cd92d55ebb016cd646c85da239e01dfb40",
+   "size": 5765,
+   "mtime": 1779395552,
+   "machine": "H3"
+  },
+  "dgk_tier2.py": {
+   "sha": "07ccda5a88647897848e89d0c107ced4cdf08bf0a32e6f8e4f0b5ee3f2ceb975",
+   "size": 5893,
+   "mtime": 1779136510,
+   "machine": "H3"
+  },
+  "complete_sim.py": {
+   "sha": "cd49c3ce6c3e92f5f69e957166d71c8f87de9c76cec49916f442c2575ea9ea94",
+   "size": 23876,
+   "mtime": 1779285548,
+   "machine": "H3"
+  },
+  "sim_10k_final_v2.py": {
+   "sha": "19eb8a5ebbb510277573f8822c91d935a8f9c76a92350c076031d0292b88c0d8",
+   "size": 9374,
+   "mtime": 1779295691,
+   "machine": "H3"
+  },
+  "test_trp4.py": {
+   "sha": "99dd86f07c59a8ba6e3c843dedbd76a3ff470dc4453cdcbd451ae249fe3112b7",
+   "size": 5342,
+   "mtime": 1779134814,
+   "machine": "H3"
+  },
+  "all_features_sim.py": {
+   "sha": "cd81015e0efde3e0e074a8eaf770fe3b0df0f980b808578b9f100c3bd3b2470c",
+   "size": 18622,
+   "mtime": 1779293719,
+   "machine": "H3"
+  },
+  "FULL_SIMULATION_REPORT.md": {
+   "sha": "ae2d12350459df42e008e5a17e66711e910f0dc03d9b48a4f529f28b310a501a",
+   "size": 2704,
+   "mtime": 1779394681,
+   "machine": "H3"
+  },
+  "build_canonical.py": {
+   "sha": "599e4e0f78b1ba3876d19e99d12e11b351b63c9bdc7d6274c2b7cf362aa53f60",
+   "size": 2763,
+   "mtime": 1779108090,
+   "machine": "H3"
+  },
+  "test_trp5.py": {
+   "sha": "046d2f54bd1cb2d74009a56ec3c0df61f26066ae17cd4cde88dc0fc2e5c136be",
+   "size": 7147,
+   "mtime": 1779134166,
+   "machine": "H3"
+  },
+  "advanced_swarm.py": {
+   "sha": "531f4dccd2d3bc2cdd1506eba06a6f3812140796c38f7624abc63a4166b30097",
+   "size": 12453,
+   "mtime": 1779286627,
+   "machine": "H3"
+  },
+  "e3_validation.py": {
+   "sha": "534f4fb3c348734a26d1c94755d502d245ea611040703c721d651ade381cba16",
+   "size": 6357,
+   "mtime": 1779139755,
+   "machine": "H3"
+  },
+  "test_suite.py": {
+   "sha": "067d921524585a23bc393c9cf2e18d1f06adb6231caf07c800dc1fac663e6573",
+   "size": 7107,
+   "mtime": 1779108232,
+   "machine": "H3"
+  },
+  "P_lyap.npy": {
+   "sha": "62358e2f0570c0b725ba5c686613ec5f553fa71a389e3adc830c306b9725fbf4",
+   "size": 3328,
+   "mtime": 1779108099,
+   "machine": "H3"
+  },
+  "test_suite_v2.py": {
+   "sha": "c891bf001f4a804ebf16854fd45c331f00c44f65ee36589395bfce8a22729f95",
+   "size": 3677,
+   "mtime": 1787652558,
+   "machine": "H3"
+  },
+  "cumulus_env.py": {
+   "sha": "c82ad24ed3f6b7fb1e612dc03050819b8c37dee43c2c23fc2a657f14f5213e7e",
+   "size": 8688,
+   "mtime": 1779108008,
+   "machine": "H3"
+  },
+  "math_motor_uyum.py": {
+   "sha": "efc7a0734d66649157f338f38877067ac3d15469ceec33badb7fd6ef1994d64a",
+   "size": 6566,
+   "mtime": 1779258815,
+   "machine": "H3"
+  },
+  "comprehensive_sim.py": {
+   "sha": "d896f90c55207bb0665d6cb320303a1035c787611be331c3894f7cdadb5a8dd2",
+   "size": 19865,
+   "mtime": 1779223745,
+   "machine": "H3"
+  },
+  "smart_sim.py": {
+   "sha": "09690d9f2da42f52101042d7bb8f687f6547a49cc382cdb7d033e5fbabcf0bc7",
+   "size": 10992,
+   "mtime": 1779178999,
+   "machine": "H3"
+  },
+  "engine_demo.py": {
+   "sha": "5fd101d819c24b0428ca2dff24e95f1db249c42b1e229ee6f16763bf0583a612",
+   "size": 4874,
+   "mtime": 1780287242,
+   "machine": "H3"
+  },
+  "cumulus_v15.py": {
+   "sha": "0e4e1d76050353924fca137d0f079b822192e042c4ec77d72372478fe6084c15",
+   "size": 9135,
+   "mtime": 1779113015,
+   "machine": "H3"
+  },
+  "mesh_routing.py": {
+   "sha": "afcdbf3dcfa5f0a9011fc0f68807d73f8f5f21eab7b4abefa729e4da76db044d",
+   "size": 11636,
+   "mtime": 1779395123,
+   "machine": "H3"
+  },
+  "full_mechanism_check.py": {
+   "sha": "76428dd19b464be3d97100e60c659547e15aec5a4ab58e8d50162503bd77cdc5",
+   "size": 30728,
+   "mtime": 1780389960,
+   "machine": "H3"
+  },
+  "full_integrated_sim_v2.py": {
+   "sha": "43cd328bf5370a8cb4b0fd6e5a31ffa557a6272c3b671de3322ab3fca739789d",
+   "size": 10640,
+   "mtime": 1779176332,
+   "machine": "H3"
+  },
+  "sim_10k_final.py": {
+   "sha": "0d33e6aae3ed3a75d3414c64ce3daeec95417783217fc26bf7362d237baeff77",
+   "size": 15506,
+   "mtime": 1779291552,
+   "machine": "H3"
+  },
+  "scale_sim.py": {
+   "sha": "5b65b4fb525c87ea97a3392f9dd21f6525e72f2b57f970b7775b5969444ce46c",
+   "size": 5427,
+   "mtime": 1779180346,
+   "machine": "H3"
+  },
+  "cumulus_final.py": {
+   "sha": "b15a83f0d16fd0d247ee8accb70c8c0ee4eab00e6732e89ce525f8b8e78c3b92",
+   "size": 11356,
+   "mtime": 1779295290,
+   "machine": "H3"
+  },
+  "innovative_sim.py": {
+   "sha": "94a7fca4c947fc86e7b1b397f0c5417e41066b254ad0195cef8f655f150354c7",
+   "size": 13877,
+   "mtime": 1779294536,
+   "machine": "H3"
+  },
+  "hierarchical_mesh.py": {
+   "sha": "71ba1721f11421013305dc8b1b48b5c82aca1e9bf6a896932f2c5a881b169291",
+   "size": 10864,
+   "mtime": 1779142011,
+   "machine": "H3"
+  },
+  "complete_final.py": {
+   "sha": "8ca36442af16d1f185c32f80160fa9d7e9387f948626f3205a33d0d6ec2acd0b",
+   "size": 12039,
+   "mtime": 1779285969,
+   "machine": "H3"
+  },
+  "A_canon.npy": {
+   "sha": "99717b2b693e491690b2aa57b254081390dff5997787c0e7249fc79c0d8b384a",
+   "size": 3328,
+   "mtime": 1779108099,
+   "machine": "H3"
+  },
+  "v3_full_test.py": {
+   "sha": "3a2e91055f459b8ec6066e78046160cbbd49cf1318e11933712b8a363ed47739",
+   "size": 10562,
+   "mtime": 1779539775,
+   "machine": "H3"
+  },
+  "new_capabilities_math.py": {
+   "sha": "b45b0948c2c14584b7c709ad2d19b3edf7ba2f44b9f9d43351298e413373cfcc",
+   "size": 14133,
+   "mtime": 1779228652,
+   "machine": "H3"
+  },
+  "full_simulation.py": {
+   "sha": "4d59f6b7288b5f7a867c414c180125fc75daa844b91a70eedb710041f845c971",
+   "size": 11334,
+   "mtime": 1779394672,
+   "machine": "H3"
+  },
+  "pyramid_decoder.py": {
+   "sha": "e1adb2f6c316b5442eb9d5367f1c88f43c26f765c9efb97117cefa5eaebb3330",
+   "size": 36952,
+   "mtime": 1780335604,
+   "machine": "H3"
+  },
+  "red_team_stress.py": {
+   "sha": "cb29958198fc9633e4f6670c82c3a030a740b768fa378d0fcef4364a98718111",
+   "size": 7965,
+   "mtime": 1779624012,
+   "machine": "H3"
   },
   "cumulus_sim/__init__.py": {
    "sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
    "size": 0,
    "mtime": 1779389938,
-   "machine": "H1"
-  },
-  "cumulus_sim/rf/__init__.py": {
-   "sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-   "size": 0,
-   "mtime": 1779389938,
-   "machine": "H1"
-  },
-  "cumulus_sim/rf/models.py": {
-   "sha": "fb1b812c57b0b3dbe4155d5fb2750e8524a535ac8ca77ed2368c20e00edf53e8",
-   "size": 19655,
-   "mtime": 1779390148,
-   "machine": "H1"
-  },
-  "cumulus_sim/scenarios/__init__.py": {
-   "sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-   "size": 0,
-   "mtime": 1779389938,
-   "machine": "H1"
+   "machine": "H3"
   },
   "cumulus_sim/scenarios/runner.py": {
    "sha": "2206f6b6cddce6b1adefe3413c582f59a2a364545a9fedc13fe8f0509a480275",
    "size": 19113,
    "mtime": 1779390353,
-   "machine": "H1"
+   "machine": "H3"
+  },
+  "cumulus_sim/scenarios/__init__.py": {
+   "sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "size": 0,
+   "mtime": 1779389938,
+   "machine": "H3"
   },
   "cumulus_sim/core/__init__.py": {
    "sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
    "size": 0,
    "mtime": 1779389938,
-   "machine": "H1"
+   "machine": "H3"
+  },
+  "cumulus_sim/rf/models.py": {
+   "sha": "fb1b812c57b0b3dbe4155d5fb2750e8524a535ac8ca77ed2368c20e00edf53e8",
+   "size": 19655,
+   "mtime": 1779390148,
+   "machine": "H3"
+  },
+  "cumulus_sim/rf/__init__.py": {
+   "sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "size": 0,
+   "mtime": 1779389938,
+   "machine": "H3"
   }
  }
 }
