@@ -87,6 +87,49 @@ python3 sync_motor.py mesh status       # tüm node'ların A2A durumu
 - Python 3.10+, rclone (GDrive remote), restic 0.19+ (yedek), fastapi+uvicorn (A2A server)
 - Tailscale veya doğrudan erişim (A2A 8643, Syncthing 22000/8384)
 
+### Windows Kurulum (H2 + Windows 10/11)
+
+```powershell
+# 1) Python 3.10+ (python.org — PATH'e ekle) + git
+python --version
+
+# 2) Paket + CLI kur
+pip install hermes-sync
+pip install rclone                # veya winget install Rclone.Rclone
+pip install restic                # veya restic.net binary → PATH'e ekle
+pip install uvicorn fastapi       # A2A server için (opsiyonel)
+
+# 3) rclone — GDrive remote (tek seferlik OAuth)
+rclone config
+#    remote adı: gdrive
+#    (client_id paylaşılmışsa "shared client_id" uyarısı — kendi client_id'niz
+#     Google Cloud OAuth'da daha hızlı ve 2026 sonrası zorunlu)
+
+# 4) restic — GDrive object store'u mount et (arka plan servisi)
+rclone serve restic gdrive:restic-backup --addr 127.0.0.1:8443
+#    Windows: `schtasks /create` veya NSSM ile oturum açılışında başlat
+
+# 5) Syncthing — P2P dosya kanalı (opsiyonel ama önerilir)
+winget install syncthing.syncthing
+#    GUI 127.0.0.1:8384 → H1/H3 cihazları eşleştir (device ID'ler)
+
+# 6) A2A token — H1/H3 ile aynı ortak token'ı .env/ortam değişkenine yaz
+setx A2A_TOKEN "test-a2a-mesh-2026"     # kendi ortak değerinizle değiştirin
+
+# 7) İlk senkron
+python -m hermes_sync.sync_motor init    # config üret
+python -m hermes_sync.sync_motor both    # push + pull
+python -m hermes_sync.sync_motor mesh status
+```
+
+Windows notları:
+- Kilit dosyası `%TEMP%\cumulus_sync.lock` kullanılır (`/tmp` yok) — msvcrt.locking.
+- `sync_motor.py` / `sync_common_knowledge.py` path'leri `os.path.join` ile kurar;
+  sabit `/` ayracı yoktur.
+- A2A istemcisi (`a2a_cli.py`) yalnızca `urllib` kullanır — ek bağımlılık gerekmez.
+- A2A server `uvicorn` bulunamazsa net hata mesajı basar ve çıkar (traceback değil).
+- Uzaktan kurulum için hazır betikler: `remote_hermes_setup.ps1` (SSH/Tailscale).
+
 ### Güvenlik
 
 - `.env`, `*.key`, `*.pem`, token içeren dosyalar ASLA kapsama alınmaz (secret filtre)
