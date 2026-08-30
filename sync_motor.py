@@ -41,18 +41,39 @@ Geliştiren: CumulusNET Mühendislik — 2026
 """
 
 import argparse
+import filecmp
+import glob
+try:
+    import fcntl
+except ImportError:      # Windows (H2): fcntl yok → msvcrt ile lock
+    fcntl = None
+    try:
+        import msvcrt
+    except ImportError:
+        msvcrt = None
 import hashlib
 import json
 import logging
 import os
+import re
+import shlex
 import shutil
 import subprocess
 import sys
 import time
-from datetime import datetime
+import tarfile
+import tempfile
+from datetime import datetime, timezone
 from pathlib import Path
 
-__version__ = "1.6.0"
+# ── v2.1 (29 Ağu 2026): sync_memory modülü (D — ortak hafıza) ──
+# sync_memory.py aynı dizinde; farklı cwd'den çalışınca da bulunabilsin.
+_HERE = os.path.dirname(os.path.abspath(__file__))
+if _HERE not in sys.path:
+    sys.path.insert(0, _HERE)
+import sync_memory as smem
+
+__version__ = "2.1.0"
 __author__ = "CumulusNET Engineering"
 __license__ = "MIT"
 
@@ -87,8 +108,27 @@ def setup_logging(level=logging.INFO, logfile=None):
     root.setLevel(level)
     root.handlers.clear()
 
+    # GPT-5.6 P1 (15 Ağu): token/secret log redaction — çıktıya sızmasın
+    import re as _re
+    _SENSITIVE_PATTERNS = [_re.compile(r"ghp_[A-Za-z0-9_]{30,}"),
+                           _re.compile(r"github_pat_[A-Za-z0-9_]{20,}"),
+                           _re.compile(r"(?i)(token|secret|password)=\S+")]
+
+    class RedactFilter(logging.Filter):
+        def filter(self, record):
+            try:
+                msg = record.getMessage()
+                for pat in _SENSITIVE_PATTERNS:
+                    msg = pat.sub("[REDACTED]", msg)
+                record.msg = msg
+                record.args = ()
+            except Exception:
+                pass
+            return True
+
     console = logging.StreamHandler(sys.stdout)
     console.setFormatter(ColoredFormatter("%(levelname)-8s %(message)s"))
+    console.addFilter(RedactFilter())
     root.addHandler(console)
 
     if logfile:
@@ -96,6 +136,7 @@ def setup_logging(level=logging.INFO, logfile=None):
         fh = logging.FileHandler(logfile, encoding="utf-8")
         fh.setFormatter(logging.Formatter(
             "%(asctime)s [%(levelname)s] %(message)s"))
+        fh.addFilter(RedactFilter())
         root.addHandler(fh)
 
     return root
@@ -130,6 +171,7 @@ DEFAULT_CONFIG = {
     "machines": {
         "h1_hostnames": ["CumulusNET-Hermes-1", "hal-server-801964"],
         "h2_hostnames": ["H2-Windows-RTX5070Ti"],
+        "h3_hostnames": ["hermesagent03", "H3-LOCAL-HERMES"],
         "openclaw_hostnames": ["openclaw"],
     },
     "dirs": {
@@ -273,19 +315,31 @@ DEFAULT_CONFIG = {
 }
 
 
-def detect_machine(hostname=None):
-    """H1 mi H2 mi OpenClaw mu? hostname + OS kombinasyonu ile."""
+def detect_machine(hostname=None, machines=None):
+    """H1 mi H2 mi H3 mü OpenClaw mu? hostname + OS kombinasyonu ile.
+
+    29 Ağu 2026 FIX (H2 bulgusu): h3_hostnames HİÇ KONTROL EDİLMİYORDU ve liste
+    daima DEFAULT_CONFIG'ten okunuyordu (kullanıcının config.json'undaki machines
+    bloğu yoksayılıyordu). Sonuç: H3 (hermesagent03, Linux) OS fallback'ine düşüp
+    kendini "H1" sanıyordu → retention_machine="H1" ayarında H1 VE H3 birlikte
+    prune deniyor, aynı restic repoyu kilitliyorlardı.
+    `machines` verilmezse eski davranış korunur (geriye uyumlu).
+    """
     hostname = hostname or (os.uname().nodename if os.name != "nt"
                             else os.environ.get("COMPUTERNAME", ""))
     hn = hostname.lower()
+    m = machines or DEFAULT_CONFIG["machines"]
 
-    for h1 in DEFAULT_CONFIG["machines"]["h1_hostnames"]:
+    for h1 in m.get("h1_hostnames", []):
         if h1.lower() in hn:
             return "H1"
-    for h2 in DEFAULT_CONFIG["machines"]["h2_hostnames"]:
+    for h2 in m.get("h2_hostnames", []):
         if h2.lower() in hn:
             return "H2"
-    for oc in DEFAULT_CONFIG["machines"].get("openclaw_hostnames", []):
+    for h3 in m.get("h3_hostnames", []):
+        if h3.lower() in hn:
+            return "H3"
+    for oc in m.get("openclaw_hostnames", []):
         if oc.lower() in hn:
             return "OPENCLAW"
     # OS fallback
@@ -299,11 +353,15 @@ def load_config(path=None):
                                 "config.json")
     if os.path.exists(path):
         try:
-            with open(path) as f:
+            with open(path, encoding="utf-8", errors="replace") as f:
                 user_cfg = json.load(f)
-            # Derin birleştirme (basit: üst seviye)
+            # Derin birleştirme: kullanıcı config'i varsa 'dirs' TAMAMEN kullanıcının
+            # değeriyle değiştirilir (DEFAULT_CONFIG node'ları Windows'ta path'siz
+            # kalıp gereksiz yere koşmaz / geri gelmez — hermes-full örneği).
             for section, values in user_cfg.items():
-                if isinstance(values, dict) and section in cfg:
+                if section == "dirs" and isinstance(values, dict):
+                    cfg["dirs"] = values
+                elif isinstance(values, dict) and section in cfg:
                     cfg[section].update(values)
                 else:
                     cfg[section] = values
@@ -311,7 +369,9 @@ def load_config(path=None):
             log.warning(f"config.json okunamadı ({e}), default kullanılıyor")
 
     # Makine tespiti
-    cfg["machine"] = detect_machine()
+    # 29 Ağu 2026: kullanıcının config.json'undaki machines bloğu artık kullanılır
+    # (önce daima DEFAULT_CONFIG okunuyordu → H3 tanınmıyordu).
+    cfg["machine"] = detect_machine(machines=cfg.get("machines"))
     cfg["is_h1"] = cfg["machine"] == "H1"
 
     # Kimlik: user_id + machine_id (GDrive yolu buna bağlı)
@@ -327,12 +387,20 @@ def load_config(path=None):
         f"gdrive:hermes-sync/{user_id}/{machine_id}/versiyonlu")
     cfg["gdrive"]["user_root"] = f"gdrive:hermes-sync/{user_id}"
 
-    # Windows'ta dizin yollarını çevir
+    # Windows'ta dizin yollarını çevir — SADECE config.json'da tanımlanmamışsa.
+    # (Öncesi patent'i her zaman C:\ProjectCumulus ile eziyordu; kullanıcı
+    # config'inde gerçek yol varken yanlış dizine bakıyordu — H2 29 Ağu 2026.)
     if os.name == "nt":
-        cfg["dirs"]["kernel"]["paths"] = [r"C:\cumulusos"]
-        cfg["dirs"]["patent"]["path"] = r"C:\ProjectCumulus"
-        cfg["dirs"]["scripts"]["path"] = str(Path.home() / ".hermes" / "scripts")
-        cfg["dirs"]["openclaw"]["path"] = str(Path.home() / ".openclaw")
+        _d = cfg.get("dirs", {})
+        if "kernel" in _d and "paths" not in _d["kernel"]:
+            _d["kernel"]["paths"] = ([_d["kernel"]["path"]] if _d["kernel"].get("path")
+                                     else [r"C:\cumulusos"])
+        if "patent" in _d and not _d["patent"].get("path"):
+            _d["patent"]["path"] = r"C:\ProjectCumulus"
+        if "scripts" in _d and not _d["scripts"].get("path"):
+            _d["scripts"]["path"] = str(Path.home() / ".hermes" / "scripts")
+        if "openclaw" in _d and not _d["openclaw"].get("path"):
+            _d["openclaw"]["path"] = str(Path.home() / ".openclaw")
 
     # Yol genişlet (~ → home)
     for k in ("manifest_local", "logfile"):
@@ -393,10 +461,47 @@ def scan_directory(label, dir_cfg):
     # GÜVENLİK: hassas dizin adları — yol bileşeninden reddedilir
     SECRET_DIRS = ("secrets", "credentials", "service-account",
                    ".aws", ".ssh", "private", "keys", "tokens")
+    # GPU POLİTİKASI (26 Ağu, OceanAPI #5): H2 model ağırlıkları senkron DIŞINDA
+    # Büyük model dosyaları yalnız metadata olarak işaretlenir, içerik taşınmaz
+    GPU_SKIP_PATTERNS = ("*.gguf", "*.safetensors", "*.pt", "*.pth",
+                         "*.ckpt", "*.onnx", "*.bin", "*.h5", "*.pb",
+                         "*.tflite", "*.model", "*.lora", "*.adapter")
+    GPU_MAX_KB = 51200  # 50MB üzeri model dosyası senkron dışı (metadata-only)
+    # GPT-5.6 P0 (15 Ağu): İÇERİK taraması — dosya adı filtresi yetmez;
+    # riskli adaylarda token/anahtar pattern'leri taranır (≤64KB, performans)
+    CONTENT_SCAN_NAMES = ("config.json", "settings.yaml", "settings.yml",
+                          "tokens.db", "rclone.conf", "backup.tar",
+                          "credentials.txt", "secrets.txt", "token.db")
+    CONTENT_PATTERNS = (b"BEGIN PRIVATE KEY", b"BEGIN OPENSSH PRIVATE KEY",
+                        b"ghp_", b"github_pat_", b"AKIA[0-9A-Z]{16}",
+                        b"xox[baprs]-", b"sk-[A-Za-z0-9]{20,}",
+                        b"-----BEGIN")
 
     def is_secret(fname):
         import fnmatch
         return any(fnmatch.fnmatch(fname, p) for p in SECRET_PATTERNS)
+
+    def is_gpu_skip(fname, fsize):
+        """GPU/model dosyası politikası: büyük model ağırlıkları senkron dışı."""
+        import fnmatch
+        if any(fnmatch.fnmatch(fname, p) for p in GPU_SKIP_PATTERNS):
+            return True
+        if fsize > GPU_MAX_KB * 1024 and os.path.splitext(fname)[1].lower() in (
+                ".bin", ".dat", ".raw", ".npy", ".npz"):
+            return True
+        return False
+
+    def content_scan(fpath, fname):
+        """Yalnızca riskli aday isimlerinde içerik taraması (performans korunur)."""
+        base_name = os.path.basename(fname).lower()
+        if base_name not in CONTENT_SCAN_NAMES:
+            return False
+        try:
+            with open(fpath, "rb") as f:
+                head = f.read(65536)
+            return any(p in head for p in CONTENT_PATTERNS)
+        except OSError:
+            return False
 
     inventory = {}
     for base in paths:
@@ -410,11 +515,11 @@ def scan_directory(label, dir_cfg):
                        if not should_exclude_dir(d, exclude_dirs)
                        and d.lower() not in SECRET_DIRS]
             for fname in files:
-                # GÜVENLİK: secret dosyaları atla
-                if is_secret(fname):
-                    log.debug(f"Güvenlik: {fname} atlandı")
-                    continue
                 fpath = os.path.join(root, fname)
+                # GÜVENLİK: secret dosyaları atla (ad + İÇERİK taraması)
+                if is_secret(fname) or content_scan(fpath, fname):
+                    log.debug(f"Güvenlik: {fname} atlandı (ad veya içerik)")
+                    continue
                 try:
                     stat = os.stat(fpath)
                 except OSError:
@@ -463,7 +568,7 @@ def load_manifest(cfg):
     path = cfg["state"]["manifest_local"]
     if os.path.exists(path):
         try:
-            with open(path) as f:
+            with open(path, encoding="utf-8", errors="replace") as f:
                 return json.load(f)
         except Exception:
             pass
@@ -472,10 +577,15 @@ def load_manifest(cfg):
 
 
 def save_manifest(cfg, mf):
+    # GPT-5.6 P1 (15 Ağu): manifest meta — rollback/replay koruması başlangıcı
+    mf.setdefault("schema", 2)
+    mf["machine_id"] = detect_machine()
+    mf["created_at"] = datetime.now().isoformat()
+    mf["generation"] = int(mf.get("generation", 0)) + 1
     path = cfg["state"]["manifest_local"]
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     tmp = path + ".tmp"
-    with open(tmp, "w") as f:
+    with open(tmp, "w", encoding="utf-8") as f:
         json.dump(mf, f, indent=1, ensure_ascii=False)
     os.replace(tmp, path)   # atomik yaz
 
@@ -518,10 +628,14 @@ def run_cmd(cmd, timeout=60, shell=False):
     try:
         if shell:
             r = subprocess.run(cmd, shell=True, capture_output=True,
-                               text=True, timeout=timeout)
+                               text=True, errors="replace", timeout=timeout)
+        elif isinstance(cmd, (list, tuple)):
+            # LIST komut doğrudan geç (split ETME — split list'te patlar)
+            r = subprocess.run(list(cmd), capture_output=True,
+                               text=True, errors="replace", timeout=timeout)
         else:
             r = subprocess.run(cmd.split(), capture_output=True,
-                               text=True, timeout=timeout)
+                               text=True, errors="replace", timeout=timeout)
         return r.stdout.strip(), r.returncode
     except subprocess.TimeoutExpired:
         return "timeout", -1
@@ -703,67 +817,86 @@ def gh_ensure_repo(cfg):
 def gh_push_manifest(cfg, mf):
     """Manifest'i GitHub'a API ile push et (repo clone'suz).
     Doğrudan urllib ile çağrılır — shell argüman limiti sorununu aşar.
-    GitHub content API limiti ~1MB — manifest küçük tutulmalı."""
+    GitHub content API limiti ~1MB — manifest küçük tutulmalı.
+
+    v1.8.0 (28 Ağu, OceanAPI #1): SHARD manifest — 27MB tek dosya yerine
+    node başına ayrı JSON. Sadece değişen node'un shard'ı push edilir.
+    """
     import base64
     import urllib.request
     import urllib.error
 
     repo = cfg["github"]["repo"]
-    mfile = cfg["github"]["manifest_file"]
     token = _gh_token()
     if not token:
         log.error("gh token alınamadı — gh auth status kontrol")
         return False
 
-    content = json.dumps(mf, indent=1, ensure_ascii=False)
-    b64 = base64.b64encode(content.encode()).decode()
+    # Shard'lama: her node ayrı dosya
+    import hashlib
+    ts = datetime.now().isoformat(timespec="seconds")
+    pushed = 0
+    for node, node_files in _split_by_node(mf):
+        if not node_files:
+            continue
+        shard = {
+            "node": node,
+            "ts": ts,
+            "revision": hashlib.sha256(json.dumps(node_files, sort_keys=True).encode()).hexdigest()[:12],
+            "file_count": len(node_files),
+            "files": node_files,
+        }
+        content = json.dumps(shard, indent=1, ensure_ascii=False)
+        b64 = base64.b64encode(content.encode()).decode()
+        mfile = f"manifest/sync_manifest.{node}.json"
 
-    # Mevcut SHA
-    sha = None
-    url_get = f"https://api.github.com/repos/{repo}/contents/{mfile}"
-    req_get = urllib.request.Request(url_get,
-                                     headers={"Authorization": f"Bearer {token}",
-                                              "User-Agent": "sync-motor"})
-    try:
-        with urllib.request.urlopen(req_get, timeout=20) as resp:
-            data = json.loads(resp.read().decode())
-            sha = data.get("sha")
-    except urllib.error.HTTPError as e:
-        if e.code != 404:
-            log.warning(f"manifest GET {e.code}")
-    except Exception as e:
-        log.warning(f"manifest GET: {e}")
+        # Mevcut SHA
+        sha = None
+        url_get = f"https://api.github.com/repos/{repo}/contents/{mfile}"
+        req_get = urllib.request.Request(url_get,
+                headers={"Authorization": f"Bearer {token}", "User-Agent": "sync-motor"})
+        try:
+            with urllib.request.urlopen(req_get, timeout=20) as resp:
+                data = json.loads(resp.read().decode())
+                sha = data.get("sha")
+        except urllib.error.HTTPError as e:
+            if e.code != 404:
+                log.warning(f"shard GET {e.code} {node}")
+        except Exception as e:
+            log.warning(f"shard GET: {e}")
 
-    payload = {
-        "message": f"sync {datetime.now().isoformat()}",
-        "content": b64,
-    }
-    if sha:
-        payload["sha"] = sha
+        payload = {"message": f"sync {ts} {node}", "content": b64}
+        if sha:
+            payload["sha"] = sha
+        url_put = f"https://api.github.com/repos/{repo}/contents/{mfile}"
+        req_put = urllib.request.Request(url_put,
+                data=json.dumps(payload).encode(),
+                headers={"Authorization": f"Bearer {token}", "User-Agent": "sync-motor",
+                         "Content-Type": "application/json"},
+                method="PUT")
+        try:
+            with urllib.request.urlopen(req_put, timeout=30) as resp:
+                resp.read()
+                pushed += 1
+        except Exception as e:
+            log.warning(f"shard PUT {node}: {e}")
+    log.info(f"Shard push: {pushed} node güncellendi")
+    return pushed > 0
 
-    data = json.dumps(payload).encode()
-    req_put = urllib.request.Request(
-        url_get, data=data, method="PUT",
-        headers={"Authorization": f"Bearer {token}",
-                 "Content-Type": "application/json",
-                 "User-Agent": "sync-motor"})
-    try:
-        with urllib.request.urlopen(req_put, timeout=30) as resp:
-            result = json.loads(resp.read().decode())
-            log.info(f"Manifest GitHub'a push edildi "
-                     f"({len(mf['files'])} dosya, sha={result.get('sha','')[:8]})")
-            return True
-    except urllib.error.HTTPError as e:
-        body = e.read().decode(errors="ignore")[:200]
-        log.error(f"Manifest push başarısız: HTTP {e.code} {body}")
-        return False
-    except Exception as e:
-        log.error(f"Manifest push başarısız: {e}")
-        return False
+def _split_by_node(mf):
+    """Manifest'i node öneklerine göre böl (shard)."""
+    nodes = sorted({p.split("/")[0] for p in (mf.get("files", {}) or {})})
+    for node in nodes:
+        prefix = f"{node}/"
+        node_files = {p[len(prefix):]: info for p, info in (mf.get("files", {}) or {}).items()
+                      if p.startswith(prefix)}
+        yield node, node_files
 
 
 def gh_fetch_manifest(cfg):
-    """GitHub'dan uzak manifest çek (urllib ile)."""
+    """GitHub'dan uzak manifest çek (urllib ile).
+    v1.8.0 (28 Ağu): SHARD destekli — manifest/*.json dosyalarını birleştir.
+    Eski tek dosya (sync_manifest.json) da desteklenir (geriye uyum)."""
     import base64
     import urllib.request
     import urllib.error
@@ -774,6 +907,37 @@ def gh_fetch_manifest(cfg):
     if not token:
         return None
 
+    merged = {"files": {}}
+
+    # 1) Shard'ları dene (manifest/ dizini)
+    url = f"https://api.github.com/repos/{repo}/contents/manifest"
+    req = urllib.request.Request(
+        url, headers={"Authorization": f"Bearer {token}", "User-Agent": "sync-motor"})
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            shard_list = json.loads(resp.read().decode())
+        for item in shard_list:
+            if item.get("type") != "file" or not item["name"].endswith(".json"):
+                continue
+            dl_url = item.get("download_url")
+            if not dl_url:
+                continue
+            req2 = urllib.request.Request(
+                dl_url, headers={"Authorization": f"Bearer {token}",
+                                 "User-Agent": "sync-motor"})
+            with urllib.request.urlopen(req2, timeout=60) as resp2:
+                shard = json.loads(resp2.read().decode())
+            node = shard.get("node", item["name"].replace("sync_manifest.", "").replace(".json", ""))
+            for fpath, finfo in (shard.get("files", {}) or {}).items():
+                merged["files"][f"{node}/{fpath}"] = finfo
+        if merged["files"]:
+            return merged
+    except urllib.error.HTTPError:
+        pass  # manifest/ yok — eski tek dosyaya düş
+    except Exception as e:
+        log.debug(f"shard manifest GET: {e}")
+
+    # 2) Eski tek dosya (geriye uyum)
     url = f"https://api.github.com/repos/{repo}/contents/{mfile}"
     req = urllib.request.Request(
         url, headers={"Authorization": f"Bearer {token}",
@@ -821,6 +985,41 @@ def rclone_available():
     return rc == 0
 
 
+def _pack_node(base, pkg, include, exclude_dirs, limit=5000):
+    """Node dizinini .tar.gz'e paketle — saf Python, kabuk yok.
+
+    include: fnmatch desenleri (dosya adı üzerinde)
+    exclude_dirs: atlanacak dizin adları
+    Dönüş: 0 başarı, 255 hata/boş (eski kabuk sözleşmesiyle uyumlu).
+    """
+    import tarfile as _tf
+    import fnmatch
+    exc = {d.lower().strip("*/") for d in (exclude_dirs or [])}
+    picked = []
+    for root, dirs, files in os.walk(base):
+        dirs[:] = [d for d in dirs if d.lower() not in exc]
+        for f in files:
+            if any(fnmatch.fnmatch(f, p) for p in (include or ["*"])):
+                picked.append(os.path.join(root, f))
+                if len(picked) >= limit:
+                    break
+        if len(picked) >= limit:
+            break
+    if not picked:
+        return 255
+    try:
+        with _tf.open(pkg, "w:gz") as tf:
+            for fp in picked:
+                try:
+                    tf.add(fp, arcname=os.path.relpath(fp, base))
+                except OSError:
+                    continue          # kilitli/okunamayan dosya paketi bozmasın
+    except Exception as e:
+        log.debug(f"_pack_node: {e}")
+        return 255
+    return 0 if os.path.exists(pkg) and os.path.getsize(pkg) > 0 else 255
+
+
 def gdrive_snapshot(cfg, node=None):
     """
     Seçilen node'ların GDrive'da versiyonlu snapshot'ını al.
@@ -832,7 +1031,7 @@ def gdrive_snapshot(cfg, node=None):
         return None
 
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-    workdir = "/tmp/sync_motor_snapshot"
+    workdir = os.path.join(tempfile.gettempdir(), "sync_motor_snapshot")
     shutil.rmtree(workdir, ignore_errors=True)
     os.makedirs(workdir, exist_ok=True)
 
@@ -870,10 +1069,11 @@ def gdrive_snapshot(cfg, node=None):
         find_cmd = " -o ".join(find_expr)
         excl_find = " ".join(f"-not -path '*/{d}/*'" for d in excl)
 
-        out, rc = run_cmd(
-            f'cd "{base_expanded}" && find . {excl_find} '
-            f'\\( {find_cmd} \\) -type f 2>/dev/null | head -5000 | '
-            f'tar -czf "{pkg}" -T - 2>/dev/null', timeout=120, shell=True)
+        # Paketleme: Python tarfile (platformdan bağımsız).
+        # Eski hal find|head|tar boru hattıydı — Windows'ta shell=True cmd.exe'ye
+        # düşüyor, find/head/tar bulunmuyordu (rc=255). Aynı semantik korunur:
+        # include pattern eşleşmesi, exclude_dirs budama, 5000 dosya sınırı.
+        rc = _pack_node(base_expanded, pkg, include, excl, limit=5000)
         if rc != 0 or not os.path.exists(pkg) or os.path.getsize(pkg) == 0:
             log.warning(f"{label}: paket oluşturulamadı "
                         f"(rc={rc}, boyut={os.path.exists(pkg) and os.path.getsize(pkg)})")
@@ -922,7 +1122,7 @@ def announce(cfg, msg):
     local = "/tmp/hermes_uploads" if cfg["is_h1"] else "/tmp"
     os.makedirs(local, exist_ok=True)
     try:
-        with open(os.path.join(local, fname), "w") as f:
+        with open(os.path.join(local, fname), "w", encoding="utf-8", errors="replace") as f:
             f.write(f"[{datetime.now().isoformat()}] {msg}\n")
     except OSError:
         pass
@@ -964,13 +1164,20 @@ def list_conflicts(cfg):
 # KOMUTLAR
 # ═══════════════════════════════════════════════════════════════
 
-def cmd_push(cfg, node=None, dry_run=False):
+def cmd_push(cfg, node=None, dry_run=False, skip_unchanged=False):
     print(f"\n  🔄 PUSH — {cfg['machine']}"
           + (f" [node: {node}]" if node else " [tüm node'lar]")
           + (" [DRY-RUN]" if dry_run else ""))
     if node and node not in cfg["dirs"]:
         log.error(f"Bilinmeyen node: {node} — mevcut: {list(cfg['dirs'].keys())}")
         return
+    _skip_guard_done = False
+    if skip_unchanged:
+        fp = node_fingerprint(cfg, node)
+        last = load_last_push(cfg).get(node)
+        if last == fp:
+            print(f"    ⏭ skip (değişiklik yok): {node}")
+            return
 
     if node:
         # Tek node: sadece o dizini tara
@@ -1078,6 +1285,12 @@ def detect_changes_node(cfg, node):
     return new, changed, deleted, local
 
 
+    # v1.6.2: delta push — başarılı push sonrası parmak izini kaydet
+    if node and not dry_run:
+        save_last_push(cfg, node, node_fingerprint(cfg, node))
+    return 0
+
+
 def cmd_add_node(cfg, name, path, include="*", max_kb=1024):
     """
     Yeni node ekle — config.json'a yazar. Node sayısı SINIRSIZ.
@@ -1090,7 +1303,7 @@ def cmd_add_node(cfg, name, path, include="*", max_kb=1024):
     user_cfg = {}
     if os.path.exists(config_path):
         try:
-            with open(config_path) as f:
+            with open(config_path, encoding="utf-8", errors="replace") as f:
                 user_cfg = _json.load(f)
         except Exception:
             user_cfg = {}
@@ -1107,7 +1320,7 @@ def cmd_add_node(cfg, name, path, include="*", max_kb=1024):
         "gdrive": True,
     }
 
-    with open(config_path, "w") as f:
+    with open(config_path, "w", encoding="utf-8") as f:
         _json.dump(user_cfg, f, indent=2, ensure_ascii=False)
     log.info(f"Node eklendi: {name} → {path} (config.json)")
     log.info("Şimdi: python3 sync_motor.py push --node " + name)
@@ -1205,7 +1418,7 @@ def cmd_select(cfg):
 def cmd_status(cfg):
     print("\n" + "═" * 60)
     print(f"  CUMULUS SYNC MOTOR v{__version__} — DURUM")
-    print(f"  Makine: {cfg['machine']} ({cfg['is_h1'] and 'H1 VPS' or 'H2 Desktop'})")
+    print(f"  Makine: {cfg['machine']} ({ {'H1': 'H1 VPS', 'H2': 'H2 Desktop', 'H3': 'H3 Node', 'OPENCLAW': 'OpenClaw'}.get(cfg['machine'], cfg['machine']) })")
     print("═" * 60)
 
     peer = peer_status(cfg)
@@ -1248,7 +1461,7 @@ def gdrive_pull_latest(cfg, node):
         f'rclone lsd {cfg["gdrive"]["versioned_dir"]}/{node} '
         f'2>/dev/null | tail -1', timeout=30, shell=True)
     if rc != 0 or not out:
-        log.info(f"{node}: GDrive'da versiyon yok")
+        log.info(f"{node}: ⚠ GDrive'da versiyon yok (pull atlandı — node yedeklenmemiş)")
         return False
     # En son timestamp klasörü
     latest = out.split()[-1]
@@ -1291,7 +1504,25 @@ def gdrive_pull_latest(cfg, node):
 
     # Aç — çakışanları koru
     import tarfile
-    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")  # µs — aynı isim çakışmaz
+    src_machine = detect_machine()
+
+    def _safe_target(root, name):
+        """GPT-5.6 P0: tar member path'i node kökünden kaçamaz."""
+        root_abs = os.path.abspath(root)
+        candidate = os.path.abspath(os.path.join(root_abs, name))
+        if candidate != root_abs and not candidate.startswith(root_abs + os.sep):
+            raise ValueError(f"güvenlik: path kök dışına kaçıyor: {name}")
+        return candidate
+
+    def _write_conflict(dest, src_machine):
+        """Atomik çakışma kopyası — yarım dosya yazılmaz."""
+        conflict = f"{dest}.conflict.{ts}.{src_machine}"
+        tmp = conflict + ".tmp"
+        shutil.copy2(dest, tmp)
+        os.replace(tmp, conflict)
+        return conflict
+
     try:
         with tarfile.open(pkg_file, "r:gz") as tf:
             # SEKANSİYEL iterasyon: gzip akışı tek geçişte açılır.
@@ -1305,13 +1536,12 @@ def gdrive_pull_latest(cfg, node):
                 name = member.name.lstrip("./")
                 if not name:
                     continue
-                dest = os.path.join(target, name)
+                dest = _safe_target(target, name)
                 # Çakışma kontrolü: hedef var + farklı içerik
                 if os.path.exists(dest):
                     # Önce BOYUT: farklıysa içerik okumaya gerek yok (hızlı yol)
                     if os.path.getsize(dest) != member.size:
-                        conflict = f"{dest}.conflict.{ts}"
-                        shutil.copy2(dest, conflict)
+                        conflict = _write_conflict(dest, src_machine)
                         log.warning(f"Çakışma: {name} → {conflict}")
                         continue  # yereli koru, uzak yazılmaz
                     src = tf.extractfile(member)
@@ -1322,8 +1552,7 @@ def gdrive_pull_latest(cfg, node):
                             # İçerik AYNI — yeniden yazmaya gerek yok (hızlı yol)
                             continue
                         # Çakışma — yerel korunur, kopya .conflict.TS ile saklanır
-                        conflict = f"{dest}.conflict.{ts}"
-                        shutil.copy2(dest, conflict)
+                        conflict = _write_conflict(dest, src_machine)
                         log.warning(f"Çakışma: {name} → {conflict}")
                         continue  # yereli koru, uzak yazılmaz
                 # Güvenli yaz
@@ -1384,9 +1613,25 @@ def cmd_pull(cfg):
     local = scan_all(cfg)
     rfiles = remote.get("files", {})
 
+    # GÜVENLİK (26 Ağu, OceanAPI #4): path traversal koruması
+    # Manifest'ten gelen yollar güvenilmez — kök dışına çıkış REDDEDİLİR
+    safe_dirs = set()
+    for node, dc in (cfg.get("dirs") or {}).items():
+        for p in (dc.get("paths") or [dc.get("path")] if dc else []):
+            if p:
+                safe_dirs.add(os.path.realpath(os.path.expanduser(p)))
+
+    def _is_safe_path(relpath):
+        if relpath.startswith(("/", "\\")) or ".." in relpath.split("/"):
+            return False
+        return True
+
     to_pull = []
     conflicts = []
     for path, rinfo in rfiles.items():
+        if not _is_safe_path(path):
+            log.warning(f"GÜVENLİK: tehlikeli yol reddedildi — {path}")
+            continue
         if path not in local:
             to_pull.append(path)
         elif local[path].get("sha") != rinfo.get("sha"):
@@ -1683,6 +1928,957 @@ def cmd_init(cfg):
 # ANA
 # ═══════════════════════════════════════════════════════════════
 
+
+def node_fingerprint(cfg, node):
+    """İçerik parmak izi: (relpath, boyut, mtime) özeti — delta push için."""
+    import hashlib
+    base = cfg["dirs"][node]["path"] if isinstance(cfg["dirs"][node], dict) else cfg["dirs"][node]
+    h = hashlib.sha256()
+    items = []
+    for root, dirs, files in os.walk(base):
+        dirs[:] = [d for d in dirs if d != ".git"]
+        for f in files:
+            if any(sec in f for sec in (".env", ".key", ".pem")):
+                continue
+            p = os.path.join(root, f)
+            try:
+                st = os.stat(p)
+                items.append((os.path.relpath(p, base), st.st_size, int(st.st_mtime)))
+            except OSError:
+                pass
+    items.sort()
+    for it in items:
+        h.update(str(it).encode())
+    return h.hexdigest()
+
+def _state_path(cfg):
+    return os.path.join(cfg["state"]["dir"], "last_push.json")
+
+def load_last_push(cfg):
+    try:
+        return json.load(open(_state_path(cfg), encoding="utf-8", errors="replace"))
+    except Exception:
+        return {}
+
+def save_last_push(cfg, node, fp):
+    d = load_last_push(cfg)
+    d[node] = fp
+    os.makedirs(cfg["state"]["dir"], exist_ok=True)
+    json.dump(d, open(_state_path(cfg), "w", encoding="utf-8"), ensure_ascii=False)
+
+def run_with_retry(fn, *a, retries=1, **kw):
+    """Geçici ağ hatalarında 1 retry — otonom dayanıklılık."""
+    for i in range(retries + 1):
+        try:
+            return fn(*a, **kw)
+        except Exception as e:
+            if i < retries and "Errno" in str(e) or "timeout" in str(e).lower():
+                print(f"    ⏳ geçici hata ({e}) — retry {i+1}/{retries}")
+                time.sleep(5)
+            else:
+                raise
+
+def cmd_agent_status(cfg):
+    """Hermes agent/otonom cron için JSON durum + öneri."""
+    import json as _j
+    conflicts = list_conflicts(cfg)
+    fp_nodes = load_last_push(cfg)
+    status = {
+        "motor": f"sync_motor v{__version__}",
+        "machine": cfg["machine"],
+        "conflicts": len(conflicts),
+        "conflict_files": conflicts[:10],
+        "nodes": list(cfg["dirs"].keys()),
+        "tracked_push": list(fp_nodes.keys()),
+        "son_kosu": last_run_summary(),
+    }
+    # sağlık: çakışma / son push bilgisi / çözüm önerisi
+    rec = []
+    if conflicts:
+        rec.append(f"ÇÖZ: {len(conflicts)} çakışma dosyası — incele + manuel birleştir (.conflict.TS korunur)")
+    if not fp_nodes:
+        rec.append("PUSH: henüz push yok — 'sync_motor.py both' çalıştır (GDrive hub karşılıklı)")
+    else:
+        rec.append("OK: push takibi aktif")
+    lr = status["son_kosu"]
+    if lr and lr.get("rc", 0) != 0:
+        rec.append(f"SON KOŞU HATALI: {lr.get('komut')} rc={lr.get('rc')} @ {lr.get('ts','?')[:19]}")
+    status["recommendation"] = " | ".join(rec) if rec else "OK — eylem gerekmiyor"
+    print(_j.dumps(status, ensure_ascii=False, indent=2))
+
+
+def last_run_summary():
+    """~/.hermes/state/sync_last_run.json'dan son mutating koşu özeti."""
+    try:
+        if not os.path.exists(RUN_STATE):
+            return None
+        hist = json.load(open(RUN_STATE, encoding="utf-8", errors="replace")).get("history", [])
+        if not hist:
+            return None
+        last = hist[-1]
+        return {
+            "ts": last.get("ts"),
+            "komut": last.get("komut"),
+            "rc": last.get("rc"),
+            "node": last.get("node"),
+            "machine": last.get("machine"),
+        }
+    except Exception:
+        return None
+
+
+# ── v1.6.3: GDrive VERSİYON TAKİPLİ YEDEK + LİSTE + GERİ ALMA ──
+
+GDRIVE_VERS = "gdrive:cumulusos-backups/versiyonlu"
+
+def _hub_base(args_hub=None):
+    return args_hub or GDRIVE_VERS
+
+
+# ── v1.6.4: TEK-INSTANCE KİLİT + SON-KOŞU RAPORU ──
+
+MOTOR_LOCK = "/tmp/cumulus_sync.lock"
+RUN_STATE = os.path.expanduser("~/.hermes/state/sync_last_run.json")
+
+# Bu komutlar GDrive/GitHub'a YAZAR → kilit zorunlu. Okuma komutları
+# (status/conflicts/versions/agent-status/nodes/doctor) kilitsiz çalışır.
+MUTATING_CMDS = {"push", "pull", "both", "backup", "rollback",
+                 "init", "add-node", "share", "apply", "memory"}
+
+def acquire_lock():
+    """Aynı anda yalnız bir sync işlemi GDrive/GitHub'a yazsın.
+
+    Linux: fcntl.flock(LOCK_EX|LOCK_NB) — ikinci koşu anında RED.
+    Windows: msvcrt.locking — dosyanın ilk baytını kilitler.
+    Dönüş: fd (kilit sahibi) veya None (başka sync aktif).
+    """
+    try:
+        fd = open(MOTOR_LOCK, "w", encoding="utf-8")
+    except OSError:
+        return None
+    try:
+        if fcntl is not None:
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        elif msvcrt is not None:
+            fd.seek(0)
+            fd.write("\0")
+            fd.flush()
+            msvcrt.locking(fd.fileno(), msvcrt.LK_NBLCK, 1)
+            fd.seek(0)
+        else:
+            # kilit desteği yok — yalnızca pid dosyası (en iyi çaba)
+            if os.path.exists(MOTOR_LOCK) and os.path.getsize(MOTOR_LOCK) > 0:
+                pid = open(MOTOR_LOCK, encoding="utf-8", errors="replace").read().split()[0]
+                if pid.isdigit() and os.path.exists(f"/proc/{pid}"):
+                    return None
+        fd.seek(0, 2)
+        fd.write(f"{os.getpid()} {datetime.now().isoformat()}\n")
+        fd.flush()
+        return fd
+    except OSError:
+        try:
+            fd.close()
+        except Exception:
+            pass
+        return None
+
+def record_run(cfg, komut, rc, node=None, extra=None):
+    """Son koşu kaydı — web paneli/agent-status 'herhangi node üzerinden' okur."""
+    try:
+        hist = []
+        if os.path.exists(RUN_STATE):
+            try:
+                hist = json.load(open(RUN_STATE, encoding="utf-8", errors="replace")).get("history", [])
+            except Exception:
+                hist = []
+        hist.append({
+            "ts": datetime.now().isoformat(),
+            "komut": komut,
+            "rc": rc,
+            "node": node,
+            "machine": cfg.get("machine"),
+            "extra": extra or {},
+        })
+        hist = hist[-50:]  # son 50 koşu
+        os.makedirs(os.path.dirname(RUN_STATE), exist_ok=True)
+        json.dump({"history": hist}, open(RUN_STATE, "w", encoding="utf-8"),
+                  ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"  ⚠ son-koşu raporu yazılamadı: {e}")
+
+def _tar_node(cfg, node, outdir, ts):
+    """Node'u tar.gz yap → (tar_path, sha).
+
+    H1 28 Ağu FIX + H2 29 Ağu Windows birleşik sürümü:
+    - include: virgüllü glob (string) VEYA liste — dosya adı + relpath eşleşir
+    - max_kb: tar öncesi kaba boyut kontrolü (×8 marj, tar sonrası kesin kontrol)
+    - exclude_dirs: dizin adı budaması
+    - sır filtre: .env/.key/.pem/.secret adları atlanır
+    - isdir: Windows Türkçe Unicode yollarda os.path.exists False dönebilir
+      (örn. "Cumulus Patent Dosyaları") — isdir/pathlib güvenilir.
+    """
+    import hashlib, fnmatch
+    src = cfg["dirs"][node]
+    base = src["path"] if isinstance(src, dict) else src
+    include = (src.get("include") if isinstance(src, dict) else None)
+    max_kb = (src.get("max_kb") if isinstance(src, dict) else None)
+    if not os.path.isdir(base):
+        return None, None
+        return None, None
+    include = src.get("include", ["*"]) if isinstance(src, dict) else ["*"]
+    exclude_dirs = set(
+        d.lower().strip("*/") for d in (src.get("exclude_dirs", []) if isinstance(src, dict) else [])
+    )
+    tarp = os.path.join(outdir, f"{node}_{ts}.tar.gz")
+    if include is None:
+        pats = []
+    elif isinstance(include, str):
+        pats = [x.strip() for x in include.split(",") if x.strip()]
+    else:
+        pats = [str(x).strip() for x in include if str(x).strip()]
+    base_parent = os.path.dirname(base.rstrip("/")) or base
+    # 28 Ağu v2: max_kb ÖN KONTROL — tar oluşturmadan boyutu hesapla, aşarsa atla
+    # (önceden tar oluşturulup sonra siliniyordu: pcb 665MB/research 971MB her koşuda israf)
+    if max_kb:
+        _total = 0
+        for _root, _dirs, _files in os.walk(base):
+            _dirs[:] = [d for d in _dirs if d != ".git"]
+            for _f in _files:
+                if any(_sec in _f for _sec in (".env", ".key", ".pem")):
+                    continue
+                _p = os.path.join(_root, _f)
+                _rel = os.path.relpath(_p, base_parent)
+                if pats and not any(fnmatch.fnmatch(_rel, pat) or fnmatch.fnmatch(_f, pat) for pat in pats):
+                    continue
+                try:
+                    _total += os.path.getsize(_p)
+                except OSError:
+                    pass
+        # Ön kontrol = KABA ELEME (sıkıştırılmamış boyut, max_kb×8 marjı):
+        # tar.gz metin/kod için ~10× sıkıştırır; hermes (config+state 2.4MB→631KB tar)
+        # gibi sıkışabilir node'lar yanlış atlanmasın. Kesin kontrol tar sonrası yapılır.
+        if _total // 1024 > int(max_kb) * 8:
+            print(f"    ⚠ {node}: boyut {_total//1024}KB > max_kb {max_kb}KB×8 — atlandı (ön kontrol, tar oluşturulmadı)")
+            return None, None
+    with tarfile.open(tarp, "w:gz") as tar:
+        for root, dirs, files in os.walk(base):
+            dirs[:] = [d for d in dirs if d.lower() not in exclude_dirs and d != ".git"]
+            for f in files:
+                if any(sec in f.lower() for sec in (".env", ".key", ".pem", ".secret")):
+                    continue
+                if not any(fnmatch.fnmatch(f, p) for p in include):
+                    continue
+                p = os.path.join(root, f)
+                rel = os.path.relpath(p, base_parent)
+                if pats:
+                    if not any(fnmatch.fnmatch(rel, pat) or fnmatch.fnmatch(f, pat) for pat in pats):
+                        continue
+                try:
+                    tar.add(p, arcname=rel)
+                except OSError as e:
+                    print(f"    ⚠ atlandı (canlı dosya): {p} ({e})")
+    size_kb = os.path.getsize(tarp) // 1024
+    if max_kb and size_kb > int(max_kb):
+        os.remove(tarp)
+        print(f"    ⚠ {node}: tar {size_kb}KB > max_kb {max_kb}KB — atlandı (küçük node kuralı; hermes-full cron kapsar)")
+        return None, None
+    h = hashlib.sha256()
+    with open(tarp, "rb") as f:
+        for chunk in iter(lambda: f.read(65536), b""):
+            h.update(chunk)
+    return tarp, h.hexdigest()
+
+RESTIC_REPO_URL = os.environ.get("RESTIC_REPO_URL", "rest:http://127.0.0.1:8443/")
+RESTIC_PASS_ENV = "RESTIC_PASSWORD"
+
+def _restic(args, timeout=3600, cwd=None):
+    """restic CLI sarmalayıcı — env'den repo+şifre (.env'den okur)."""
+    env = dict(os.environ)
+    # ~/.hermes/.env'den RESTIC_* değerlerini yükle (cron ortamında .env export edilmeyebilir)
+    try:
+        with open(os.path.expanduser("~/.hermes/.env"), encoding="utf-8", errors="replace") as f:
+            for line in f:
+                line = line.strip()
+                if line.startswith("RESTIC_") and "=" in line:
+                    k, v = line.split("=", 1)
+                    env.setdefault(k.strip(), v.strip())
+    except Exception:
+        pass
+    if not env.get("RESTIC_REPOSITORY"):
+        env["RESTIC_REPOSITORY"] = RESTIC_REPO_URL
+    if not env.get(RESTIC_PASS_ENV):
+        print("    ❌ RESTIC_PASSWORD .env'de yok — restic çalışmaz")
+        return None, "RESTIC_PASSWORD yok"
+    # restic binary yolunu bul (PATH + bilinen konumlar; Windows/Linux/H3)
+    # 29 Ağu 2026 FIX (H2/Windows): expanduser("~/bin/restic") uzantısız döner,
+    # Windows'ta dosya adı restic.exe olduğu için os.path.exists() False veriyordu.
+    # Her adayın .exe varyantı da denenir.
+    rbin = shutil.which("restic") or shutil.which("restic.exe")
+    if not rbin:
+        for cand in ("/usr/local/bin/restic", "/usr/bin/restic",
+                     os.path.expanduser("~/bin/restic"),
+                     os.path.expanduser("~/bin/restic.exe"),
+                     os.path.expanduser("~/AppData/Local/restic/restic.exe"),
+                     os.path.expanduser("~/AppData/Local/Microsoft/WinGet/Links/restic.exe")):
+            if os.path.exists(cand):
+                rbin = cand
+                break
+    if not rbin:
+        print("    ❌ restic binary bulunamadı (PATH'te yok)")
+        return None, "restic binary yok"
+    r = subprocess.run([rbin, *args], capture_output=True, text=True,
+                       encoding="utf-8", errors="replace",
+                       timeout=timeout, env=env, cwd=cwd)
+    return r.returncode, r.stdout + r.stderr
+
+# ─── AKILLI KANAL SEÇİCİ (v2.1, 29 Ağu 2026) ───────────────────────────
+# Üç taşıyıcı: A2A (ajanlar arası görev/cevap, Tailscale HTTP) ·
+# Syncthing (P2P dosya senkron, GDrive'suz) · GDrive (arşiv/versiyonlu).
+# Seçim kuralı: görev/cevap → A2A; dosya değişikliği → Syncthing; arşiv → GDrive.
+TRANSPORT_A2A = "a2a"
+TRANSPORT_SYNCTHING = "syncthing"
+TRANSPORT_GDRIVE = "gdrive"
+
+A2A_NODES = {  # makine → Tailscale IP (a2a_cli hedefi)
+    "H1": "100.92.2.47",
+    "h3": "100.103.44.107",
+    "hermesagent03": "100.103.44.107",
+    "h2": "100.76.82.46",
+    "sistemg16": "100.76.82.46",
+}
+
+def smart_transport(kind: str, target: str = ""):
+    """Kanal seç — kind: task|file|archive."""
+    if kind == "task":
+        return TRANSPORT_A2A
+    if kind == "file":
+        return TRANSPORT_SYNCTHING
+    return TRANSPORT_GDRIVE
+
+def cmd_mesh(cfg, aksiyon, hedef="", gorev="", token="", dry_run=False):
+    """sync_motor.py mesh send|status <hedef> <görev> — A2A üzerinden ajan konuşması."""
+    if not token:
+        # .env'den A2A_TOKEN oku (cron ortamı export etmeyebilir)
+        try:
+            with open(os.path.expanduser("~/.hermes/.env")) as _f:
+                for _line in _f:
+                    if _line.startswith("A2A_TOKEN="):
+                        token = _line.split("=", 1)[1].strip()
+                        break
+        except Exception:
+            pass
+    if aksiyon == "status":
+        for name, ip in A2A_NODES.items():
+            out, rc = run_cmd(["python3", "/root/.hermes/scripts/a2a_cli.py",
+                               "send-status", ip, "--token", token or os.environ.get("A2A_TOKEN", "")],
+                              timeout=60)
+            txt = out if isinstance(out, str) else (json.dumps(out, ensure_ascii=False) if not isinstance(out, (list, tuple)) else "\n".join(str(x) for x in out))
+            try:
+                d = json.loads(txt)
+                r = d.get("result", {}).get("result", {})
+                ozet = f"host={r.get('host','?')} disk={r.get('disk_gb','?')}GB"
+            except Exception:
+                ozet = str(txt).strip().splitlines()[-1] if str(txt).strip() else "erişilemedi"
+            print(f"  {name:14s} ({ip}): {ozet}")
+        return 0
+    if aksiyon == "send":
+        ip = A2A_NODES.get(hedef, hedef)
+        out, rc = run_cmd(["python3", "/root/.hermes/scripts/a2a_cli.py",
+                           "send", ip, gorev, "--token", token or os.environ.get("A2A_TOKEN", "")],
+                          timeout=120)
+        print(out.strip()[-400:] if out.strip() else "(çıktı yok)")
+        return rc
+    print("Kullanım: mesh send|status [hedef] [görev]")
+    return 1
+
+def cmd_restic_backup(cfg, node=None, dry_run=False):
+    """Restic incremental backup (v2.0 — B modülü, 28 Ağu 2026).
+
+    rclone serve restic gdrive:restic-backup --addr 127.0.0.1:8443
+    (systemd servisi olarak çalışır; GDrive = object store, CDC dedup,
+    çoklu makine aynı repo → cross-system dedup).
+
+    Her node: tag:node + exclude .git/.env/.key/.pem.
+    Retention: restic forget --keep-daily 7 --keep-weekly 4 --keep-monthly 6.
+    """
+    nodes = [node] if node else list(cfg["dirs"].keys())
+    print(f"\n  💾 RESTIC INCREMENTAL YEDEK — {RESTIC_REPO_URL}")
+    # hermes node'u restic'ten HARİÇ: /root/.hermes (22GB+) exclude_dirs'la bile
+    # büyük; hermes-full node'u ayrı zstd script ile GDrive'a gidiyor (hermes_full_backup.py).
+    # include filtreleri restic'e yansımıyor — bu yüzden tam dizin yüklenirdi (H2 bulgusu).
+    skip_nodes = {k for k, v in cfg["dirs"].items()
+                  if isinstance(v, dict) and v.get("restic") is False}
+    nodes = [n for n in nodes if n not in skip_nodes]
+    for n in nodes:
+        dst = cfg["dirs"][n]
+        base = dst["path"] if isinstance(dst, dict) else dst
+        if not os.path.exists(base):
+            print(f"    ⚠ {n}: kaynak yok — atlandı"); continue
+        if dry_run:
+            print(f"    [DRY] {n}: restic backup {base} (tag:{n})")
+            continue
+        # Sabit güvenlik/gürültü dışlamaları
+        exc = ["--exclude", ".git", "--exclude", ".env",
+               "--exclude", "*.key", "--exclude", "*.pem",
+               "--exclude", "*.pyc", "--exclude", "node_modules"]
+        # 29 Ağu 2026 FIX (H2): config'teki exclude_dirs/max_size_kb YOKSAYILIYORDU.
+        # Kanıt: hermes node'u = AppData/Local/hermes = 13 GB; config backups(5GB) ve
+        # hermes-agent(3.9GB) dizinlerini dışlıyor ama restic hepsini yüklüyordu
+        # (34 KiB/s GDrive'da ~2-4 gün). Artık config niyeti restic'e aktarılır.
+        if isinstance(dst, dict):
+            seen = {".git", "node_modules"}
+            for d in (dst.get("exclude_dirs") or []):
+                if d and d not in seen:
+                    seen.add(d)
+                    exc += ["--exclude", d]
+            mkb = dst.get("max_size_kb")
+            if mkb:
+                exc += ["--exclude-larger-than", f"{int(mkb)}k"]
+        rc, out = _restic(["backup", base, "--tag", n] + exc)
+        if rc == 0:
+            # özet satırlarını göster
+            for line in out.splitlines():
+                if line.startswith(("Files:", "Added to", "snapshot", "processed")):
+                    print(f"    ✅ {n}: {line.strip()}")
+        else:
+            print(f"    ❌ {n}: {out.strip()[-200:]}")
+    # retention (tüm repo) — SADECE birincil makinede (H2 bulgusu: üç makine
+    # eşzamanlı prune aynı repo'yu kilitler; repo bozulabilir)
+    ret_machine = os.environ.get("SYNC_RETENTION_MACHINE") or cfg.get("retention_machine", "")
+    this_machine = cfg.get("machine", "")
+    if not dry_run and (not ret_machine or this_machine == ret_machine):
+        # forget her koşu (hızlı — snapshot siler); prune SADECE 04:00-05:00 arası
+        # (--prune tüm repo'yu GC'ler, 55 snapshot'ta dakikalar sürer; her koşuda
+        # yapılırsa H1 backup cron'u uzar ve diğer sync'ler kilit yüzünden atlanır)
+        args = ["forget", "--keep-daily", "7", "--keep-weekly", "4",
+                "--keep-monthly", "6", "--retry-lock", "5m"]
+        _h = time.localtime().tm_hour
+        if _h in (4,):
+            args += ["--prune"]
+        rc, out = _restic(args)
+        print(f"    🧹 retention: {'OK' if rc == 0 else out.strip()[-150:]}" + ("" if "--prune" in args else " (prune 04:00'de)"))
+    elif not dry_run:
+        print(f"    🧹 retention: atlandı (bu makine yedekliyor, prune {ret_machine} yapar)")
+
+def cmd_backup(cfg, node=None, hub=None, dry_run=False):
+    """GDrive versiyon takipli yedek (timestamp snapshot; silmez).
+
+    18 Ağu 2026 FIX v2 (disk %100 olayı — syncver_* 175GB birikimi):
+    - Her node tar'ı upload SONRASI hemen silinir (tmp'de birikmesin).
+    - STALE TEMİZLİĞİ FONKSİYON BAŞINA TAŞINDI (v1'de finally'deydi — süreç
+      timeout/kill olunca çalışmıyordu; 18 Ağu 23:05'te 71GB yeni birikim
+      kanıtladı). Artık her koşu başında önceki kalıntılar temizlenir.
+    Kök neden: tar+rclone 30dk aşınca süreç kill oluyor, finally rmtree
+    çalışmıyor → her başarısız koşu ~10GB tar bırakıyor.
+    """
+    hub = _hub_base(hub)
+    print(f"\n  💾 GDRIVE VERSİYON YEDEK — {hub}")
+    nodes = [node] if node else list(cfg["dirs"].keys())
+    # v2 FIX: stale syncver_* dizinleri KOŞU BAŞINDA temizle (finally güvenilmez)
+    # v3 FIX (24 Ağu): EŞZAMANLI koşuların dizinini silme — yalnız 10 dk'dan eski
+    # kalanları temizle (aktif koşunun tmp'si taze olur, dokunulmaz).
+    try:
+        _now = time.time()
+        for stale in glob.glob("/tmp/syncver_*"):
+            if os.path.isdir(stale) and (_now - os.path.getmtime(stale)) > 600:
+                shutil.rmtree(stale, ignore_errors=True)
+                print(f"    🧹 stale temizlendi (koşu başı): {os.path.basename(stale)}")
+    except Exception:
+        pass
+    tmp = tempfile.mkdtemp(prefix="syncver_")
+    try:
+        for n in nodes:
+            tarp, sha = _tar_node(cfg, n, tmp, time.strftime("%Y%m%d_%H%M%S"))
+            if not tarp:
+                print(f"    ⚠ {n}: atlandı (kaynak yok veya max_kb — yukarıya bak)"); continue
+            if dry_run:
+                print(f"    [DRY] {n}: {os.path.basename(tarp)} ({os.path.getsize(tarp)//1024}KB) sha={sha[:12]}")
+                continue
+            r = subprocess.run(["rclone", "copyto", tarp,
+                                f"{hub}/{n}/{os.path.basename(tarp)}",
+                                "--ignore-checksum", "--no-traverse"],
+                               capture_output=True, text=True, errors="replace")
+            if r.returncode == 0:
+                # C modülü (v2.1): upload sonrası SHA doğrulama —
+                # GDrive'daki hash'i çek, yerel sha ile karşılaştır.
+                verified = False
+                rr = subprocess.run(["rclone", "lsjson",
+                                     f"{hub}/{n}", "--hash", "--files-only"],
+                                    capture_output=True, text=True,
+                                    errors="replace", timeout=120)
+                if rr.returncode == 0:
+                    try:
+                        for f in json.loads(rr.stdout or "[]"):
+                            if f.get("Path") == os.path.basename(tarp):
+                                verified = (f.get("Hash", "") == sha)
+                                break
+                    except Exception:
+                        verified = False
+                tag_txt = " ✅ SHA doğrulandı" if verified else " ⚠ SHA doğrulanamadı (lsjson hash kapalı olabilir)"
+                print(f"    ✅ {n}: {os.path.basename(tarp)} sha={sha[:12]}{tag_txt}")
+            else:
+                print(f"    ❌ {n}: {r.stderr.strip()[:120]}")
+            # FIX: upload bitti → tar'ı HEMEN sil (birikme yok)
+            try:
+                os.remove(tarp)
+            except OSError:
+                pass
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+        # FIX: stale syncver_* dizinleri (önceki koşulardan kalan) temizle —
+        # yalnız 10 dk'dan eski (eşzamanlı koşu koruması, v3 24 Ağu)
+        try:
+            _now2 = time.time()
+            for stale in glob.glob("/tmp/syncver_*"):
+                if os.path.isdir(stale) and (_now2 - os.path.getmtime(stale)) > 600:
+                    shutil.rmtree(stale, ignore_errors=True)
+                    print(f"    🧹 stale temizlendi: {os.path.basename(stale)}")
+        except Exception:
+            pass
+
+# ── v2.1 A modülü (29 Ağu 2026): versiyon etiketi regex'i ──
+_TAG_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{0,63}$")
+# Versiyon tar dosya adı — path güvenli (SECURITY — OceanAPI 2026-08-30)
+_VERSION_TAR_RE = re.compile(r"^[A-Za-z0-9._-]+\.tar\.gz$")
+
+
+def _now_iso_utc() -> str:
+    """UTC ISO-8601, Z sonekli (çift offset hatası yok — OceanAPI #12)."""
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _safe_tar_member(name: str) -> bool:
+    """Tar üyesi path güvenli mi? (mutlak yol / .. / sürücü harfi YASAK)."""
+    if not name or name.startswith(("/", "\\")):
+        return False
+    if ":" in name:
+        return False
+    return ".." not in name.split("/") and ".." not in name.split("\\")
+
+def cmd_versions(cfg, node=None, hub=None, tag=None, diff=None):
+    """GDrive'da node'un versiyonlarını listele (+ --tag etiketle / --diff karşılaştır).
+
+    --tag <etiket>: güncel en son versiyonu etiketler (tags/<tag>.txt içinde
+    tam dosya adı + SHA256 + ts). Aynı tag varsa RED (üzerine yazmaz).
+    --diff <v1> <v2>: iki versiyon tar.gz listesini karşılaştırır (içerik
+    indirmeden tar üye listeleri — eklenen/silinen/değişen).
+    """
+    hub = _hub_base(hub)
+    nodes = [node] if node else list(cfg["dirs"].keys())
+    for n in nodes:
+        r = subprocess.run(["rclone", "lsf", f"{hub}/{n}", "--files-only"],
+                           capture_output=True, text=True, errors="replace")
+        if r.returncode != 0:
+            print(f"    ❌ {n}: versiyon listesi okunamadı: {r.stderr.strip()[:120]}")
+            return 1
+        vers = [f for f in r.stdout.splitlines() if f.endswith(".tar.gz")]
+        if tag:
+            rc = _tag_version(cfg, n, tag, vers, hub=hub)
+            if rc != 0:
+                return rc
+            continue
+        if diff:
+            rc = _diff_versions(cfg, n, diff, hub=hub)
+            if rc != 0:
+                return rc
+            continue
+        print(f"\n  📦 {n}: {len(vers)} versiyon")
+        for v in vers[-8:]:
+            print(f"    {v}")
+    return 0
+
+def _tag_version(cfg, node, tag, vers, hub=None):
+    """Versiyon etiketle — non-destructive (aynı tag RED).
+
+    tags/<tag>.txt içeriği: {node, tag, version, sha256, ts}
+    """
+    if not vers:
+        print(f"    ⚠ {node}: versiyon yok — etiketlenemedi")
+        return 1
+    if not _TAG_RE.match(tag):
+        print(f"    ⛔ {node}: geçersiz etiket '{tag}' (^[a-z0-9][a-z0-9._-]{0,63}$)")
+        return 1
+    hub = _hub_base(hub)
+    tags_dir = f"{hub}/{node}/tags"
+    tag_file = f"{tags_dir}/{tag}.txt"
+    # aynı tag var mı? (lsf hatası → RED, fail-open değil — OceanAPI #5)
+    r = subprocess.run(["rclone", "lsf", tags_dir, "--files-only"],
+                       capture_output=True, text=True, errors="replace")
+    if r.returncode != 0:
+        print(f"    ❌ {node}: tag listesi okunamadı: {r.stderr.strip()[:120]}")
+        return 1
+    if f"{tag}.txt" in (r.stdout or "").splitlines():
+        print(f"    ⛔ {node}: tag '{tag}' zaten var (RED — üzerine yazılmaz)")
+        return 1
+    latest = vers[-1]
+    # Uzak hash — GDrive için genelde MD5 olabilir; 'sha256' DEĞİL,
+    # 'remote_hash' olarak etiketlenir (OceanAPI #10).
+    rr = subprocess.run(["rclone", "lsjson", f"{hub}/{node}", "--hash",
+                         "--files-only"],
+                        capture_output=True, text=True, errors="replace")
+    sha = ""
+    if rr.returncode == 0:
+        try:
+            for f in json.loads(rr.stdout or "[]"):
+                if f.get("Path") == latest:
+                    sha = f.get("Hash", "")
+                    break
+        except Exception:
+            sha = ""
+    meta = json.dumps({"node": node, "tag": tag, "version": latest,
+                       "remote_hash": sha,
+                       "ts": _now_iso_utc()},
+                      ensure_ascii=False, indent=1)
+    tmp = tempfile.mkdtemp(prefix="synctag_")
+    try:
+        lp = os.path.join(tmp, f"{tag}.txt")
+        with open(lp, "w") as f:
+            f.write(meta + "\n")
+        r2 = subprocess.run(["rclone", "copyto", lp, tag_file],
+                            capture_output=True, text=True, errors="replace",
+                            timeout=120)
+        if r2.returncode != 0:
+            print(f"    ❌ {node}: tag yazılamadı: {r2.stderr.strip()[:120]}")
+            return 1
+        print(f"    🏷  {node}: '{tag}' → {latest}"
+              + (f" (remote hash {sha[:12]}…)" if sha else " (hash yok)"))
+        return 0
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+def _diff_versions(cfg, node, diff, hub=None):
+    """İki versiyon arası dosya farkı — tar üye listelerini karşılaştır.
+
+    diff formatı: 'v1.tar.gz,v2.tar.gz' (virgülle ayrılmış).
+    İçerik indirilmez; rclone cat ile tar üye listesi okunur (stream).
+    """
+    hub = _hub_base(hub)
+    parts = [p.strip() for p in diff.split(",")]
+    if len(parts) != 2:
+        print(f"    ⚠ {node}: --diff 'v1.tar.gz,v2.tar.gz' formatı beklenir")
+        return 1
+    v1, v2 = parts
+    # shell enjeksiyon + path traversal koruması (OceanAPI #1)
+    if not _VERSION_TAR_RE.match(v1) or not _VERSION_TAR_RE.match(v2):
+        print(f"    ⛔ {node}: geçersiz versiyon adı "
+              f"(yalnız [A-Za-z0-9._-]+.tar.gz kabul edilir)")
+        return 1
+    lists = []
+    for v in (v1, v2):
+        # rclone cat | tar tzf - — shlex.quote ile shell-escape (OceanAPI #1)
+        r = subprocess.run(["bash", "-c",
+                            f"rclone cat {shlex.quote(f'{hub}/{node}/{v}')} | tar tzf - 2>/dev/null"],
+                           capture_output=True, text=True, errors="replace",
+                           timeout=300)
+        if r.returncode != 0:
+            print(f"    ⚠ {node}: {v} okunamadı ({r.stderr.strip()[:100]})")
+            return 1
+        members = set(l for l in r.stdout.splitlines() if l.strip())
+        lists.append(members)
+    only1 = sorted(lists[0] - lists[1])
+    only2 = sorted(lists[1] - lists[0])
+    print(f"\n  🔀 {node}: {v1} ↔ {v2}")
+    print(f"    ➕ sadece {v1}: {len(only1)} dosya")
+    for f in only1[:10]:
+        print(f"      + {f}")
+    if len(only1) > 10:
+        print(f"      … +{len(only1) - 10} daha")
+    print(f"    ➖ sadece {v2}: {len(only2)} dosya")
+    for f in only2[:10]:
+        print(f"      - {f}")
+    if len(only2) > 10:
+        print(f"      … -{len(only2) - 10} daha")
+    return 0
+
+def cmd_rollback(cfg, node, version, hub=None, force=False, dry_run=False):
+    """Belirli versiyonu non-destructive geri al (.conflict korur; --force ez).
+
+    --dry-run: ön-inceleme — hangi dosyalar değişecek, kaç çakışma olacak;
+    HİÇBİR ŞEY yazmaz (v2.1 A modülü).
+    """
+    if not node or not version:
+        print("Kullanım: sync_motor.py rollback <node> --version <dosya.tar.gz> [--force] [--dry-run]")
+        return 1
+    # path traversal koruması (OceanAPI #3)
+    if not _VERSION_TAR_RE.match(version) or os.path.basename(version) != version:
+        print(f"    ⛔ geçersiz version '{version}' "
+              f"(yalnız [A-Za-z0-9._-]+.tar.gz dosya adı kabul edilir)")
+        return 1
+    hub = _hub_base(hub)
+    dst = cfg["dirs"][node]
+    base = dst["path"] if isinstance(dst, dict) else dst
+    tmp = tempfile.mkdtemp(prefix="syncrb_")
+    try:
+        tarp = os.path.join(tmp, version)
+        r = subprocess.run(["rclone", "copyto", f"{hub}/{node}/{version}", tarp],
+                           capture_output=True, text=True, errors="replace")
+        if r.returncode != 0:
+            print(f"    ❌ indirme hatası: {r.stderr.strip()[:120]}")
+            return 1
+        if not os.path.exists(tarp):
+            print(f"    ❌ indirilen dosya bulunamadı (copyto rc=0 ama yok): {tarp}")
+            return 1
+        # önce tar üye listesi + değişecek dosyaları hesapla
+        changed = 0
+        conflicts = 0
+        skipped = 0
+        with tarfile.open(tarp, "r:gz") as tar:
+            members = [m for m in tar.getmembers() if m.isfile()]
+            for m in members:
+                # tar üyesi path güvenliği (OceanAPI #4)
+                if not _safe_tar_member(m.name):
+                    skipped += 1
+                    continue
+                dstp = os.path.join(base, m.name)
+                if os.path.exists(dstp):
+                    srcp = os.path.join(tmp, m.name)
+                    tar.extract(m, path=tmp, filter="data")
+                    if not filecmp.cmp(dstp, srcp, shallow=False):
+                        changed += 1
+                        if not force:
+                            conflicts += 1
+                else:
+                    changed += 1
+        if skipped:
+            print(f"    ⚠ {skipped} güvensiz tar üyesi atlandı")
+        if dry_run:
+            print(f"    🔍 [DRY-RUN] {node} ← {version}: {changed} dosya değişecek, "
+                  f"{conflicts} çakışma korunacak (force={force})")
+            print("    HİÇBİR ŞEY yazılmadı.")
+            return 0
+        with tarfile.open(tarp, "r:gz") as tar:
+            for m in tar.getmembers():
+                if not m.isfile() or not _safe_tar_member(m.name):
+                    continue
+                dstp = os.path.join(base, m.name)
+                if os.path.exists(dstp) and not force:
+                    # farklıysa .conflict koru, değilse atla
+                    srcp = os.path.join(tmp, m.name)
+                    tar.extract(m, path=tmp, filter="data")
+                    if not filecmp.cmp(dstp, srcp, shallow=False):
+                        c = f"{dstp}.conflict.{int(time.time())}"
+                        shutil.copy(srcp, c)
+                        print(f"    ! çakışma korundu: {os.path.basename(c)}")
+                else:
+                    tar.extract(m, path=base, filter="data")
+        print(f"    ✅ {node} ← {version} geri alındı (force={force})")
+        return 0
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+# ═══════════════════════════════════════════════════════════════
+# D MODÜLÜ — ORTAK HAFIZA (v2.1, 29 Ağu 2026)
+# sync_memory.py (v0.1→v1.0 AKTİF): memory DIF JSONL → GDrive hub
+# gdrive:hermes-sync/<user>/shared/memory/ push/pull + import +
+# fact_store (memory_store.db facts) entegrasyonu.
+# Tasarım ilkeleri (GPT-5.6): canlı DB senkronu YOK — mantıksal delta;
+# çakışma preserve (.conflict~node~ts); secret allowlist; HLC saat.
+# ═══════════════════════════════════════════════════════════════
+
+MEMORY_HUB_SUBDIR = "shared/memory"          # cfg['gdrive']['user_root'] altında
+DEFAULT_MEMORY_DIR = os.path.expanduser("~/.hermes/memory")
+
+
+def _memory_hub(cfg):
+    """GDrive hub yolu: gdrive:hermes-sync/<user>/shared/memory"""
+    user_root = cfg.get("gdrive", {}).get("user_root",
+                                          "gdrive:hermes-sync/cumulusnet")
+    return f"{user_root}/{MEMORY_HUB_SUBDIR}"
+
+
+def _memory_node_id(cfg):
+    """Makine kimliği — memory DIF source.node_id."""
+    mid = cfg.get("identity", {}).get("machine_id") or ""
+    return mid or (os.uname().nodename if os.name != "nt"
+                   else os.environ.get("COMPUTERNAME", "unknown"))
+
+
+def memory_export(memory_dir, cfg, dry_run=False):
+    """Yerel memory DIF'lerini JSONL delta'ya export et.
+
+    sync_memory.export_memory_delta: namespace'leri (shared/private/
+    quarantine) tarar, secret allowlist'ten geçirir, deltas/<ts>-<node>-
+    <seq>.jsonl yazar. Secret hit → ValueError (RED, hiçbir şey gitmez).
+    """
+    node_id = _memory_node_id(cfg)
+    agent_id = cfg.get("identity", {}).get("user_id", "cumulusnet")
+    if dry_run:
+        print(f"    [DRY] export memory_delta (node={node_id}, agent={agent_id})")
+        return None
+    try:
+        exp = smem.export_memory_delta(memory_dir, node_id, agent_id, since_seq=0)
+        print(f"    ✅ export: {exp['records']} kayıt → {os.path.basename(exp['delta'])}")
+        return exp["delta"]
+    except ValueError as e:
+        print(f"    ⛔ SECRET RED: {e}")
+        return None
+
+
+def memory_push(cfg, delta_path, dry_run=False):
+    """Delta JSONL'yi hub'a yükle (rclone copy — silmez, non-destructive)."""
+    if not delta_path:
+        return False
+    hub = _memory_hub(cfg)
+    if dry_run:
+        print(f"    [DRY] rclone copy {os.path.basename(delta_path)} → {hub}")
+        return True
+    r = subprocess.run(["rclone", "copy", delta_path, hub],
+                       capture_output=True, text=True, errors="replace",
+                       timeout=120)
+    if r.returncode != 0:
+        print(f"    ❌ push hatası: {r.stderr.strip()[:150]}")
+        return False
+    print(f"    ✅ push: {os.path.basename(delta_path)} → {hub}")
+    return True
+
+
+def memory_pull_import(cfg, memory_dir, dry_run=False):
+    """Hub'daki uzak deltaları çek + import (conflict_policy='preserve').
+
+    Adımlar: 1) rclone lsf hub/*.jsonl → 2) her delta yerel incoming'e
+    rclone copyto → 3) smem.import_memory_delta (aynı revision: eski atla,
+    eşit+aynı hlc: atla, eşit+farklı hlc: .conflict koru, tombstone: kaldır).
+    """
+    hub = _memory_hub(cfg)
+    node_id = _memory_node_id(cfg)
+    incoming = os.path.join(memory_dir, "incoming")
+    os.makedirs(incoming, exist_ok=True)
+    if dry_run:
+        print(f"    [DRY] pull+import deltas from {hub}")
+        return 0
+    r = subprocess.run(["rclone", "lsf", hub, "--files-only"],
+                       capture_output=True, text=True, errors="replace",
+                       timeout=90)
+    if r.returncode != 0:
+        # 29 Ağu FIX (OceanAPI #8): -1 = HARD hata — cmd_memory rc=1 döner,
+        # cron görür; hub geçici kapalıysa retry şansı verir.
+        print(f"    ❌ hub listelenemedi: {r.stderr.strip()[:120]}")
+        return -1
+    deltas = [f for f in (r.stdout or "").splitlines()
+              if f.endswith(".jsonl")]
+    total_applied = total_conflicts = total_tomb = 0
+    for fn in sorted(deltas):
+        dst = os.path.join(incoming, fn)
+        rr = subprocess.run(["rclone", "copyto", f"{hub}/{fn}", dst],
+                            capture_output=True, text=True, errors="replace",
+                            timeout=120)
+        if rr.returncode != 0:
+            print(f"    ⚠ {fn} indirilemedi: {rr.stderr.strip()[:100]}")
+            continue
+        res = smem.import_memory_delta(memory_dir, dst, node_id,
+                                       conflict_policy="preserve")
+        total_applied += res.get("applied", 0)
+        total_conflicts += res.get("conflicts", 0)
+        total_tomb += res.get("tombstones", 0)
+    if deltas:
+        print(f"    ✅ import: {len(deltas)} delta, {total_applied} uygulandı, "
+              f"{total_conflicts} çakışma korundu, {total_tomb} tombstone")
+    else:
+        print("    ℹ hub'da delta yok (ilk koşu olabilir)")
+    return total_applied
+
+
+def memory_to_fact_store(memory_dir, dry_run=False, db_path=None):
+    """Import sonrası DIF kayıtlarını fact_store'a (memory_store.db) yaz.
+
+    facts şeması: (content UNIQUE, category, tags, trust_score, ...).
+    İçerik: subject — predicate — value metni; INSERT OR IGNORE (dedup).
+    Bu, Hermes bellek füzyon hattıyla (memory_fusion.py facts_fts) birleşir.
+    """
+    db_path = db_path or os.path.expanduser("~/.hermes/memory_store.db")
+    if not os.path.exists(db_path):
+        print(f"    ℹ memory_store.db yok ({db_path}) — fact yazılmadı")
+        return 0
+    try:
+        import sqlite3
+    except ImportError:
+        print("    ⚠ sqlite3 yok — fact yazılmadı")
+        return 0
+    added = 0
+    try:
+        conn = sqlite3.connect(db_path)
+    except Exception as e:
+        # 29 Ağu FIX (OceanAPI #8): -1 = HARD hata — cmd_memory rc=1 döner
+        print(f"    ❌ fact_store bağlantı hatası: {e}")
+        return -1
+    try:
+        for ns in smem.MEMORY_NAMESPACES:
+            ns_dir = os.path.join(memory_dir, ns)
+            if not os.path.isdir(ns_dir):
+                continue
+            for fn in sorted(os.listdir(ns_dir)):
+                if not fn.endswith(".json"):
+                    continue
+                try:
+                    with open(os.path.join(ns_dir, fn)) as f:
+                        rec = json.load(f)
+                except Exception:
+                    continue
+                if rec.get("tombstone"):
+                    continue
+                subj = str(rec.get("subject", "")).strip()
+                pred = str(rec.get("predicate", "")).strip()
+                val = rec.get("value")
+                if isinstance(val, (dict, list)):
+                    val = json.dumps(val, ensure_ascii=False)
+                content = " — ".join(x for x in (subj, pred, str(val)) if x)
+                if not content:
+                    continue
+                if dry_run:
+                    added += 1
+                    continue
+                cat = (pred or "sync-memory")[:63]
+                tags = rec.get("namespace", "shared")
+                cur = conn.execute(
+                    "INSERT OR IGNORE INTO facts "
+                    "(content, category, tags, trust_score) VALUES (?,?,?,?)",
+                    (content, cat, tags, 0.5))
+                added += cur.rowcount
+        conn.commit()
+    finally:
+        conn.close()
+    if added:
+        if dry_run:
+            print(f"    [DRY] fact_store: {added} kayıt adayı (yazılmaz)")
+        else:
+            print(f"    ✅ fact_store: +{added} kayıt ({db_path})")
+    return added
+
+
+def cmd_memory(cfg, dry_run=False, memory_dir=None, memory_db=None):
+    """Ortak hafıza D modülü: export → push → pull/import → fact_store.
+
+    Kullanım: sync_motor.py memory [--dry-run] [--memory-dir <dir>]
+    Cron bağlantısı: node_agent.py once içinde 'memory' adımı (v2.1).
+    memory_db: fact_store hedefi (varsayılan ~/.hermes/memory_store.db;
+    testler geçici DB verir — gerçek DB'ye yazılmaz).
+    """
+    memory_dir = memory_dir or DEFAULT_MEMORY_DIR
+    os.makedirs(memory_dir, exist_ok=True)
+    print(f"\n  🧠 ORTAK HAFIZA (D) — {_memory_hub(cfg)}")
+    print(f"    yerel: {memory_dir}")
+
+    if dry_run:
+        # export hiçbir şey üretmez (None); tüm adımlar simüle edilir
+        memory_export(memory_dir, cfg, dry_run=True)
+        memory_push(cfg, None, dry_run=True)
+        memory_pull_import(cfg, memory_dir, dry_run=True)
+        memory_to_fact_store(memory_dir, dry_run=True, db_path=memory_db)
+        return 0
+
+    delta = memory_export(memory_dir, cfg, dry_run=False)
+    if delta is None:
+        return 1  # secret RED veya export hatası
+    if not memory_push(cfg, delta, dry_run=False):
+        return 1
+    pr = memory_pull_import(cfg, memory_dir, dry_run=False)
+    if isinstance(pr, int) and pr < 0:
+        return 1  # hub hard hata (OceanAPI #8) — pull/import başarısız
+    fs = memory_to_fact_store(memory_dir, dry_run=False, db_path=memory_db)
+    if isinstance(fs, int) and fs < 0:
+        return 1  # fact_store hard hata — cron görsün, retry edebilsin
+    return 0
+
 def main(argv=None):
     parser = argparse.ArgumentParser(
         prog="sync_motor",
@@ -1692,7 +2888,8 @@ def main(argv=None):
                         choices=["status", "push", "pull", "both",
                                  "conflicts", "init", "select", "nodes",
                                  "add-node", "share", "doctor", "version",
-                                 "probe", "propose", "apply"])
+                                 "probe", "propose", "apply", "agent-status",
+                                 "backup", "versions", "rollback", "memory", "mesh"])
     parser.add_argument("hedef", nargs="?",
                         help="add-node: node adı | share: node adı")
     parser.add_argument("--config", default=None,
@@ -1719,6 +2916,21 @@ def main(argv=None):
                         help="apply: onay sormadan kur (varsayılan: interaktif onay)")
     parser.add_argument("--no-color", action="store_true",
                         help="renksiz çıktı")
+    parser.add_argument("--skip-unchanged", action="store_true",
+                        help="push/both: içerik değişmediyse node'u atla (delta, v1.6.2)")
+    parser.add_argument("--hub", default=None,
+                        help="backup/versions/rollback: GDrive versiyon dizini (varsayılan gdrive:cumulusos-backups/versiyonlu)")
+    parser.add_argument("--version", default=None,
+                        help="rollback: geri alınacak versiyon dosyası (ör: kernel_20260815_120000.tar.gz)")
+    parser.add_argument("--force", action="store_true",
+                        help="rollback: çakışma dosyası oluşturmadan üzerine yaz")
+    parser.add_argument("--memory-dir", default=None,
+                        help="memory: yerel memory DIF dizini (varsayılan ~/.hermes/memory)")
+    parser.add_argument("--tag", default=None,
+                        help="versions: en son versiyonu etiketle (örn: kernel-v2.3-dgk)")
+    parser.add_argument("--token", dest="token", default="")
+    parser.add_argument("--diff", default=None,
+                        help="versions: iki versiyon arası dosya farkı (v1.tar.gz,v2.tar.gz)")
     args = parser.parse_args(argv)
 
     if args.komut == "version":
@@ -1732,11 +2944,21 @@ def main(argv=None):
 
     cfg = load_config(args.config)
 
+    # ── v1.6.4: TEK-INSTANCE KİLİT — aynı anda iki sync aynı hub'a yazmasın
+    lock_fd = None
+    if args.komut in MUTATING_CMDS and not args.dry_run:
+        lock_fd = acquire_lock()
+        if lock_fd is None:
+            print("⛔ Başka bir sync işlemi çalışıyor — bu koşu ATLANDI "
+                  "(kilit aktif, /tmp/cumulus_sync.lock)", file=sys.stderr)
+            return 0   # cron no_agent: exit 0 = sessiz atla; sorun değil
+
     print(f"\n╔{'═'*58}╗")
     print(f"║  CUMULUS SYNC MOTOR v{__version__} — {cfg['machine']}"
           f"{' '*(34-len(cfg['machine']))}║")
     print(f"╚{'═'*58}╝")
 
+    rc = 0
     if args.komut == "status":
         cmd_status(cfg)
     elif args.komut == "push":
@@ -1748,18 +2970,40 @@ def main(argv=None):
         if not args.dry_run:
             cmd_pull(cfg)
     elif args.komut == "doctor":
-        return cmd_doctor(cfg)
+        rc = cmd_doctor(cfg)
     elif args.komut == "probe":
-        return cmd_probe(cfg)
+        rc = cmd_probe(cfg)
     elif args.komut == "propose":
-        return cmd_propose(cfg)
+        rc = cmd_propose(cfg)
     elif args.komut == "apply":
         if not args.tool:
             print("Kullanım: sync_motor.py apply --tool <ad> [--yes]")
-            return 1
-        return cmd_apply(cfg, args.tool, yes=args.yes)
+            rc = 1
+        else:
+            rc = cmd_apply(cfg, args.tool, yes=args.yes)
     elif args.komut == "conflicts":
         cmd_conflicts(cfg)
+    elif args.komut == "agent-status":
+        cmd_agent_status(cfg)
+    elif args.komut == "mesh":
+        # Kullanım: mesh status | mesh send <host> "<görev>" (--node host, --path görev)
+        rc = cmd_mesh(cfg, args.hedef or "status", args.node or "", args.path or "", args.token)
+    elif args.komut == "backup":
+        # v2.0 (28 Ağu): restic entegre — backup komutu artık incremental restic
+        # yedekler (CDC dedup + snapshot + restore). Eski tar tabanlı davranış
+        # --legacy-tar ile korunur (henüz eklenmedi; eski snapshot'lar duruyor).
+        if os.environ.get("SYNC_BACKUP_ENGINE", "restic") == "restic":
+            rc = cmd_restic_backup(cfg, node=args.node, dry_run=args.dry_run)
+        else:
+            rc = cmd_backup(cfg, node=args.node, hub=args.hub, dry_run=args.dry_run)
+    elif args.komut == "versions":
+        rc = cmd_versions(cfg, node=args.node, hub=args.hub,
+                          tag=args.tag, diff=args.diff)
+    elif args.komut == "rollback":
+        rc = cmd_rollback(cfg, args.node, args.version, hub=args.hub,
+                          force=args.force, dry_run=args.dry_run)
+    elif args.komut == "memory":
+        rc = cmd_memory(cfg, dry_run=args.dry_run, memory_dir=args.memory_dir)
     elif args.komut == "init":
         cmd_init(cfg)
     elif args.komut == "nodes":
@@ -1771,16 +3015,27 @@ def main(argv=None):
         if not node_name or not args.path:
             print("Kullanım: sync_motor.py add-node <ad> --path <dizin> "
                   "[--include '*.md,*.txt'] [--max-kb 1024]")
-            return 1
-        cmd_add_node(cfg, node_name, args.path, args.include, args.max_kb)
+            rc = 1
+        else:
+            cmd_add_node(cfg, node_name, args.path, args.include, args.max_kb)
     elif args.komut == "share":
         node_name = args.hedef or args.node
         if not node_name or not args.to:
             print("Kullanım: sync_motor.py share <node> --to <kullanıcı>")
-            return 1
-        cmd_share(cfg, node_name, args.to)
+            rc = 1
+        else:
+            cmd_share(cfg, node_name, args.to)
 
-    return 0
+    # ── v1.6.4: son-koşu kaydı (mutating koşular + agent-status okuyucuları)
+    if args.komut in MUTATING_CMDS and not args.dry_run:
+        record_run(cfg, args.komut, rc, node=args.node)
+        if lock_fd is not None:
+            try:
+                lock_fd.close()
+            except Exception:
+                pass
+
+    return rc
 
 
 if __name__ == "__main__":
