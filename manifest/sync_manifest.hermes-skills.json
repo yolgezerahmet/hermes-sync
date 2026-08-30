@@ -1,8 +1,8 @@
 {
  "node": "hermes-skills",
- "ts": "2026-08-31T01:50:32",
- "revision": "daac1389da06",
- "file_count": 16004,
+ "ts": "2026-08-31T02:12:27",
+ "revision": "dba3991eafae",
+ "file_count": 16005,
  "files": {
   ".curator_state": {
    "sha": "079c2ea53d6f78ecbb5d78833dce63a2b6463c311e1a7404ccea655311127d42",
@@ -13,13 +13,13 @@
   ".bundled_manifest": {
    "sha": "b1c6fe80b9d718fe9d9868be6eb2f1e0eda0af9dce4fa500dfd351e7b6c10a19",
    "size": 3877,
-   "mtime": 1788129717,
+   "mtime": 1788130678,
    "machine": "H1"
   },
   ".usage.json": {
-   "sha": "7f2b5c7c3475fc4ede6e390dd7b87f3255999b442f0fdb0f31d5594c4c0b1c23",
-   "size": 193263,
-   "mtime": 1788124821,
+   "sha": "6123ef8017383f7b2d7205be08a1149adf38c6253a102dd5b149d9a944bcaf7f",
+   "size": 193652,
+   "mtime": 1788131251,
    "machine": "H1"
   },
   "cumulus-unutma-checklist.md": {
@@ -28382,6 +28382,12 @@
    "sha": "3b236ba91352c44047bcee057c0af4bf6d5aa715db09f1c80c5214bb955486b4",
    "size": 1027,
    "mtime": 1785394262,
+   "machine": "H1"
+  },
+  "hardware/cumulus-donanim-kb/SKILL.md": {
+   "sha": "b8852b882ae88b850abefe84a38aa82ec255d73c400f2355e7e0c0f20b0ea3ff",
+   "size": 3365,
+   "mtime": 1788131251,
    "machine": "H1"
   },
   "hardware/kicad-happy/SKILL.md": {
