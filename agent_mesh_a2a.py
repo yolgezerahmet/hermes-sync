@@ -52,6 +52,28 @@ def identity():
 INBOX_DIR = Path(os.environ.get("A2A_INBOX", "~/.hermes/a2a_inbox")).expanduser()
 TASK_STORE = Path(os.environ.get("A2A_TASK_STORE", "~/.hermes/a2a_tasks.json")).expanduser()
 
+# ─── Rate limiting (endüstri standardı: 429 Too Many Requests) ─────────
+# Bellek içi token bucket — her istemci IP + agent_id için. Dış saldırı/
+# brute-force koruması: kimlik doğrulaması başarısız olsa bile sınırsız
+# deneme yapılamaz. A2A_REQ_LIMIT/RATE env ile ölçeklenir (20 node destekler).
+RATE_LIMIT = int(os.environ.get("A2A_REQ_LIMIT", "120"))    # istek / pencere
+RATE_WINDOW = int(os.environ.get("A2A_RATE_WINDOW", "60"))  # saniye
+_RATE: dict[str, list[float]] = {}
+_RATE_LOCK = __import__("threading").Lock()
+
+
+def _rate_allowed(key: str) -> bool:
+    """Token bucket — pencere içinde limit aşılırsa False (429)."""
+    now = time.time()
+    with _RATE_LOCK:
+        hist = [t for t in _RATE.get(key, []) if now - t < RATE_WINDOW]
+        if len(hist) >= RATE_LIMIT:
+            _RATE[key] = hist
+            return False
+        hist.append(now)
+        _RATE[key] = hist
+        return True
+
 # ─── Kalıcı görev deposu (asenkron: server restart'ında kaybolmaz) ─────
 def _load_tasks() -> dict:
     try:
@@ -245,7 +267,20 @@ def build_app(token: str):
     from fastapi import FastAPI, Request
     from fastapi.responses import JSONResponse
 
-    app = FastAPI(title="Cumulus Agent Mesh (A2A)")
+    app = FastAPI(
+        title="Cumulus Agent Mesh (A2A)",
+        version="2.3.0",
+        description=(
+            "CumulusNET agent mesh — A2A (Agent2Agent) JSON-RPC 2.0 uyumlu.\n\n"
+            "Güvenlik: Ed25519 imza (X-Agent-*) + X25519 ECDH/AES-GCM şifreli gövde "
+            "(X-Agent-Enc) + TOFU peer defteri + replay koruması.\n"
+            "Endüstri: OpenAPI 3.1 /docs (Swagger), A2A AgentCard, task/send-async."
+        ),
+        openapi_tags=[
+            {"name": "keşif", "description": "AgentCard + sağlık + kimlik"},
+            {"name": "rpc", "description": "JSON-RPC 2.0 (task/send, task/get)"},
+        ],
+    )
 
     def check_auth(request: Request):
         if not token:
@@ -258,10 +293,16 @@ def build_app(token: str):
 
     @app.post("/")
     async def rpc(request: Request):
+        req_id = 1  # parse'tan önce varsayılan (erken hata yolları için)
+        # Rate limit — kimlik doğrulamasından ÖNCE (brute-force koruması)
+        client = request.client.host if request.client else "?"
+        rl_key = f"{client}|{request.headers.get('x-agent-id', '')}"
+        if not _rate_allowed(rl_key):
+            return JSONResponse({"jsonrpc": "2.0", "id": req_id, "error": {
+                "code": -32005, "message": "rate_limited"}}, status_code=429)
         if not check_auth(request):
             return JSONResponse({"jsonrpc": "2.0", "error": {"code": -32001, "message": "unauthorized"}}, status_code=401)
         raw = await request.body()
-        req_id = 1  # parse'tan önce varsayılan (erken hata yolları için)
 
         # ── Kimlik katmanı ────────────────────────────────────────────
         # 1) Kendi kimliğimiz klon şüphesindeyse hiç görev almayız (fail-closed):
