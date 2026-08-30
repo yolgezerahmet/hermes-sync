@@ -25,6 +25,7 @@ import argparse
 import copy
 import json
 import os
+import re
 import socket
 import subprocess
 import sys
@@ -40,6 +41,10 @@ TASKS_DIR = "tasks"
 
 VALID_STATUS = ("pending", "running", "done")
 
+# Kullanıcı adı / task_id path güvenliği (SECURITY — OceanAPI denetim 2026-08-30)
+_USER_RE = re.compile(r"^[A-Za-z0-9._-]{1,64}$")
+_TASK_ID_RE = re.compile(r"^[A-Za-z0-9._-]{1,64}$")
+
 
 class CommonKnowledgeError(Exception):
     """Ortak akıl işlem hatası — fail-closed (rclone hata → raise)."""
@@ -53,18 +58,51 @@ def _machine_name() -> str:
 
 
 def _now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat() + "Z"
+    """UTC ISO-8601, Z sonekli (çift offset hatası yok — OceanAPI #12)."""
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _parse_hlc(hlc: Any):
+    """HLC string'ini (ms.counter-node) bileşenlerine ayır; bozuk → (0,0,'')."""
+    try:
+        ms, rest = str(hlc).split(".", 1)
+        cnt, node = rest.split("-", 1)
+        return int(ms), int(cnt), node
+    except Exception:
+        return 0, 0, ""
 
 
 def _hlc_value(hlc: Any) -> str:
-    """HLC string'ini normalize et (sync_memory.HLC.now() biçimi)."""
+    """İlk/bağımsız HLC üret — önceki değer varsa İLERLET (OceanAPI #11).
+
+    HLC: <fiziksel_ms>.<counter>-<node>. Fiziksel saat önceki HLC'den
+    büyükse sayaç sıfırlanır; aksi halde (saat aynı/geri) sayaç artar —
+    monoton artış garantisi, dağıtık sıralama çakışmaları azalır.
+    """
+    now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
+    node = _machine_name()
     if hlc is None:
-        return f"{int(datetime.now(timezone.utc).timestamp() * 1000)}.0000-{_machine_name()}"
-    return str(hlc)
+        return f"{now_ms}.0000-{node}"
+    prev_ms, prev_cnt, prev_node = _parse_hlc(hlc)
+    node = prev_node or node
+    if now_ms > prev_ms:
+        return f"{now_ms}.0000-{node}"
+    return f"{max(prev_ms, now_ms)}.{prev_cnt + 1:04d}-{node}"
+
+
+def _is_not_found(rc: int, err: str) -> bool:
+    """rclone 'dosya yok' durumunu gerçek hatadan ayır (OceanAPI #8/#9)."""
+    if rc == 0:
+        return False
+    e = (err or "").lower()
+    return "not found" in e or "yok" in e or "doesn't exist" in e
 
 
 def _hub_base(user: Optional[str] = None) -> str:
-    return f"{GDRIVE_HUB}/{user or DEFAULT_USER}"
+    u = user or DEFAULT_USER
+    if not _USER_RE.match(u):
+        raise CommonKnowledgeError(f"geçersiz kullanıcı: {u!r} (^[A-Za-z0-9._-]{{1,64}}$)")
+    return f"{GDRIVE_HUB}/{u}"
 
 
 def _run_rclone(args: List[str], timeout: int = 120):
@@ -80,33 +118,46 @@ def _run_rclone(args: List[str], timeout: int = 120):
 
 # ─── Ortak durum (state.json) ─────────────────────────────────
 def read_state(user: Optional[str] = None) -> Dict[str, Any]:
-    """state.json'u oku — yoksa boş sözlük döner."""
+    """state.json'u oku — yoksa boş sözlük, GERÇEK hata → raise (fail-closed)."""
     rc, out, err = _run_rclone(["cat", f"{_hub_base(user)}/{SHARED_DIR}/{STATE_PATH}"])
-    if rc != 0:
+    if rc == 0:
+        try:
+            data = json.loads(out)
+            return data if isinstance(data, dict) else {}
+        except Exception:
+            raise CommonKnowledgeError(f"state.json bozuk JSON: {err.strip()[:150]}")
+    if _is_not_found(rc, err):
         return {}
-    try:
-        data = json.loads(out)
-        return data if isinstance(data, dict) else {}
-    except Exception:
-        return {}
+    raise CommonKnowledgeError(f"state.json okunamadı: {err.strip()[:150]}")
 
 
 def update_state(node: str, updates: Dict[str, Any],
                  user: Optional[str] = None) -> Dict[str, Any]:
     """Kendi durum bloğunu HLC saatli state.json'a yaz (merge).
 
-    Önce oku → blok güncelle → temp yaz → copyto. Çakışma riski düşük
-    (blok başına yazım); HLC + son-okuma azaltır.
+    Yarış azaltma: yazmadan hemen önce yeniden okuyup diğer makinelerin
+    yeni bloklarını korur (OceanAPI #1). Kesin atomiklik yok — rclone
+    üzerinde distributed lock ileride.
     """
     state = read_state(user)
     blocks = state.get("nodes", {})
     block = blocks.get(node, {})
+    prev_hlc = block.get("hlc")
     block.update(updates)
     block["ts"] = _now_iso()
-    block["hlc"] = _hlc_value(block.get("hlc"))
+    block["hlc"] = _hlc_value(prev_hlc)
     blocks[node] = block
     state["nodes"] = blocks
-    state.setdefault("updated_at", _now_iso())
+    state["updated_at"] = _now_iso()
+    # yazmadan önce son-okuma: araya giren blokları koru (diğer makineler)
+    latest = read_state(user)
+    if latest:
+        for n, b in (latest.get("nodes") or {}).items():
+            if n not in state["nodes"]:
+                state["nodes"][n] = b
+        latest_ua = latest.get("updated_at")
+        if latest_ua and latest_ua > state["updated_at"]:
+            state["updated_at"] = latest_ua
     _write_state(state, user)
     return state
 
@@ -128,17 +179,23 @@ def _write_state(state: Dict[str, Any], user: Optional[str] = None):
 
 # ─── Ortak görev kuyruğu ──────────────────────────────────────
 def _task_remote_path(task_id: str, user: Optional[str] = None) -> str:
+    """Görev uzak yolu — task_id path güvenli (SECURITY — OceanAPI #6)."""
+    if not _valid_task_id(task_id):
+        raise CommonKnowledgeError(f"geçersiz task_id: {task_id!r}")
     return f"{_hub_base(user)}/{SHARED_DIR}/{TASKS_DIR}/{task_id}.json"
 
 
-def _read_remote_json(remote_path: str, default=None):
-    rc, out, err = _run_rclone(["cat", remote_path])
-    if rc != 0:
+def _read_remote_json(remote_path: str, default=None, timeout: int = 120):
+    """Uzak JSON oku — 'yok' default döner, GERÇEK hata → raise (fail-closed)."""
+    rc, out, err = _run_rclone(["cat", remote_path], timeout=timeout)
+    if rc == 0:
+        try:
+            return json.loads(out)
+        except Exception:
+            raise CommonKnowledgeError(f"bozuk JSON: {remote_path}")
+    if _is_not_found(rc, err):
         return default
-    try:
-        return json.loads(out)
-    except Exception:
-        return default
+    raise CommonKnowledgeError(f"okunamadı: {err.strip()[:150]}")
 
 
 def _write_remote_json(remote_path: str, data: Dict[str, Any]):
@@ -191,7 +248,7 @@ def claim_task(task_id: str, owner: Optional[str] = None,
     claimed = copy.deepcopy(task)
     claimed["status"] = "running"
     claimed["owner"] = owner
-    claimed["hlc"] = _hlc_value(hlc)
+    claimed["hlc"] = _hlc_value(task.get("hlc"))
     # claim öncesi son okuma (yarış azaltma)
     latest = _read_remote_json(remote_path, None)
     if not isinstance(latest, dict) or latest.get("status") != "pending":
@@ -202,7 +259,7 @@ def claim_task(task_id: str, owner: Optional[str] = None,
 
 def done_task(task_id: str, owner: Optional[str] = None,
               hlc: Any = None, user: Optional[str] = None) -> Dict[str, Any]:
-    """running görevi yalnız sahibi done yapabilir."""
+    """running görevi yalnız sahibi done yapabilir (pending → done YASAK)."""
     owner = owner or _machine_name()
     remote_path = _task_remote_path(task_id, user)
     task = _read_remote_json(remote_path, None)
@@ -212,12 +269,16 @@ def done_task(task_id: str, owner: Optional[str] = None,
     if current_owner and current_owner != owner:
         raise CommonKnowledgeError(
             f"Task başka node tarafından sahiplenilmiş: {current_owner}")
-    if task.get("status") not in ("running", "pending"):
-        return task
+    status = task.get("status")
+    if status == "done":
+        return task  # idempotent
+    if status != "running":
+        raise CommonKnowledgeError(
+            f"Task 'running' değil ({status}) — önce claim gerekir")
     result = copy.deepcopy(task)
     result["status"] = "done"
     result["owner"] = owner
-    result["hlc"] = _hlc_value(hlc)
+    result["hlc"] = _hlc_value(task.get("hlc"))
     result["ts"] = _now_iso()
     _write_remote_json(remote_path, result)
     return result
@@ -231,16 +292,20 @@ def list_tasks(user: Optional[str] = None) -> List[Dict[str, Any]]:
         return []
     result = []
     for fn in (out or "").splitlines():
-        if not fn.endswith(".json"):
+        # basename + task_id doğrulama (SECURITY — OceanAPI #7)
+        if not fn.endswith(".json") or os.path.basename(fn) != fn:
             continue
-        task = _read_remote_json(f"{tasks_dir}/{fn}", None)
+        tid = fn[:-5]
+        if not _valid_task_id(tid):
+            continue
+        task = _read_remote_json(f"{tasks_dir}/{fn}", None, timeout=30)
         if isinstance(task, dict):
             result.append(task)
     return sorted(result, key=lambda t: t.get("ts", ""))
 
 
 def _valid_task_id(task_id: str) -> bool:
-    return all(c.isalnum() or c in "._-" for c in task_id) and len(task_id) <= 64
+    return bool(_TASK_ID_RE.match(task_id)) and len(task_id) <= 64
 
 
 # ─── CLI ──────────────────────────────────────────────────────

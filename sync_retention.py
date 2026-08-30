@@ -46,8 +46,14 @@ def retention_limits(node: str) -> dict:
 
 
 def parse_snapshots(node: str):
-    """rclone lsd ile node altındaki YYYYMMDD_HHMMSS dizinlerini listele."""
-    out = run(f"rclone lsd {GDRIVE_ROOT}/{node} --max-depth 1 2>/dev/null")
+    """rclone lsd ile node altındaki YYYYMMDD_HHMMSS dizinlerini listele.
+
+    Hata → None (çağıran işaretler; sessiz boş dönüş YOK — OceanAPI #9).
+    """
+    rc, out, err = run(["rclone", "lsd", f"{GDRIVE_ROOT}/{node}",
+                        "--max-depth", "1"])
+    if rc != 0:
+        return None
     snaps = []
     for line in out.splitlines():
         m = re.search(r"(\d{8})_(\d{6})", line)
@@ -93,19 +99,36 @@ def retention_decision(snaps, node: str):
 
 
 def run(cmd):
-    r = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=120)
-    return r.stdout
+    """rclone çalıştır — shell=False (komut enjeksiyonu YOK — OceanAPI #2).
+
+    Dönüş: (returncode, stdout, stderr). rc yok sayılmaz.
+    """
+    r = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+    return r.returncode, r.stdout, r.stderr
 
 
 def main():
     dry = "--apply" not in sys.argv
     node = None
     if "--node" in sys.argv:
-        node = sys.argv[sys.argv.index("--node") + 1]
+        idx = sys.argv.index("--node")
+        if idx + 1 >= len(sys.argv):
+            print("Kullanım: --node <ad> (değer eksik)")
+            return 1
+        node = sys.argv[idx + 1]
+        if node not in NODE_PRIORITY:
+            print(f"⛔ bilinmeyen node: {node} (bilinenler: "
+                  f"{', '.join(sorted(NODE_PRIORITY))})")
+            return 1
     nodes = [node] if node else sorted(NODE_PRIORITY.keys())
     total_del = 0
+    had_error = False
     for n in nodes:
         snaps = parse_snapshots(n)
+        if snaps is None:
+            print(f"\n📦 {n}: ⛔ rclone lsd HATASI — retention denetlenemedi")
+            had_error = True
+            continue
         if not snaps:
             continue
         limits = retention_limits(n)
@@ -116,18 +139,28 @@ def main():
         to_delete, keep = retention_decision(snaps, n)
         total_del += len(to_delete)
         print(f"   KORUNAN: {len(keep)} | SİLİNECEK: {len(to_delete)}")
-        for name in to_delete[:10]:
-            if dry:
-                print(f"     [dry-run] sil: {name}")
-            else:
-                print(f"     sil: {name}")
-                run(f"rclone purge {GDRIVE_ROOT}/{n}/{name} 2>/dev/null")
+        # TÜM silinecekler işlenir (ilk 10 sınırı yalnız çıktıda — OceanAPI #7)
+        shown = 0
+        for name in to_delete:
+            if shown < 10:
+                print(f"     [dry-run] sil: {name}" if dry else f"     sil: {name}")
+                shown += 1
+            if not dry:
+                rc, _, err = run(["rclone", "purge",
+                                  f"{GDRIVE_ROOT}/{n}/{name}"])
+                if rc != 0:
+                    print(f"       ⛔ purge hatası: {err.strip()[:100]}")
+                    had_error = True
         if len(to_delete) > 10:
-            print(f"     … +{len(to_delete) - 10} daha")
+            print(f"     … +{len(to_delete) - 10} daha (hepsi işlendi)")
     print(f"\nToplam silinecek: {total_del} | Retention node-bazlı (KRİTİK 12ay / ORTA 8h / BÜYÜK 4h)")
+    if had_error:
+        print("⚠ BAZI NODE'LARDA HATA — çıktıyı inceleyin (retention tamamlanmadı)")
+        return 2
     if total_del and dry:
         print(f"UYGULAMAK İÇİN: {sys.argv[0]} --apply [--node <ad>]")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

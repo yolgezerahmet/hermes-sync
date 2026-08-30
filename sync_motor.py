@@ -41,6 +41,7 @@ Geliştiren: CumulusNET Mühendislik — 2026
 """
 
 import argparse
+import filecmp
 import glob
 try:
     import fcntl
@@ -55,6 +56,7 @@ import json
 import logging
 import os
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -2436,6 +2438,22 @@ def cmd_backup(cfg, node=None, hub=None, dry_run=False):
 
 # ── v2.1 A modülü (29 Ağu 2026): versiyon etiketi regex'i ──
 _TAG_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{0,63}$")
+# Versiyon tar dosya adı — path güvenli (SECURITY — OceanAPI 2026-08-30)
+_VERSION_TAR_RE = re.compile(r"^[A-Za-z0-9._-]+\.tar\.gz$")
+
+
+def _now_iso_utc() -> str:
+    """UTC ISO-8601, Z sonekli (çift offset hatası yok — OceanAPI #12)."""
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _safe_tar_member(name: str) -> bool:
+    """Tar üyesi path güvenli mi? (mutlak yol / .. / sürücü harfi YASAK)."""
+    if not name or name.startswith(("/", "\\")):
+        return False
+    if ":" in name:
+        return False
+    return ".." not in name.split("/") and ".." not in name.split("\\")
 
 def cmd_versions(cfg, node=None, hub=None, tag=None, diff=None):
     """GDrive'da node'un versiyonlarını listele (+ --tag etiketle / --diff karşılaştır).
@@ -2450,6 +2468,9 @@ def cmd_versions(cfg, node=None, hub=None, tag=None, diff=None):
     for n in nodes:
         r = subprocess.run(["rclone", "lsf", f"{hub}/{n}", "--files-only"],
                            capture_output=True, text=True, errors="replace")
+        if r.returncode != 0:
+            print(f"    ❌ {n}: versiyon listesi okunamadı: {r.stderr.strip()[:120]}")
+            return 1
         vers = [f for f in r.stdout.splitlines() if f.endswith(".tar.gz")]
         if tag:
             rc = _tag_version(cfg, n, tag, vers, hub=hub)
@@ -2480,15 +2501,18 @@ def _tag_version(cfg, node, tag, vers, hub=None):
     hub = _hub_base(hub)
     tags_dir = f"{hub}/{node}/tags"
     tag_file = f"{tags_dir}/{tag}.txt"
-    # aynı tag var mı?
+    # aynı tag var mı? (lsf hatası → RED, fail-open değil — OceanAPI #5)
     r = subprocess.run(["rclone", "lsf", tags_dir, "--files-only"],
                        capture_output=True, text=True, errors="replace")
+    if r.returncode != 0:
+        print(f"    ❌ {node}: tag listesi okunamadı: {r.stderr.strip()[:120]}")
+        return 1
     if f"{tag}.txt" in (r.stdout or "").splitlines():
         print(f"    ⛔ {node}: tag '{tag}' zaten var (RED — üzerine yazılmaz)")
         return 1
     latest = vers[-1]
-    # SHA256 — GDrive'dan indirmeden hesaplanamaz; metadata ile alınır:
-    # rclone lsjson hash alanı verir (--hash)
+    # Uzak hash — GDrive için genelde MD5 olabilir; 'sha256' DEĞİL,
+    # 'remote_hash' olarak etiketlenir (OceanAPI #10).
     rr = subprocess.run(["rclone", "lsjson", f"{hub}/{node}", "--hash",
                          "--files-only"],
                         capture_output=True, text=True, errors="replace")
@@ -2502,8 +2526,8 @@ def _tag_version(cfg, node, tag, vers, hub=None):
         except Exception:
             sha = ""
     meta = json.dumps({"node": node, "tag": tag, "version": latest,
-                       "sha256": sha,
-                       "ts": datetime.now(timezone.utc).isoformat() + "Z"},
+                       "remote_hash": sha,
+                       "ts": _now_iso_utc()},
                       ensure_ascii=False, indent=1)
     tmp = tempfile.mkdtemp(prefix="synctag_")
     try:
@@ -2517,7 +2541,7 @@ def _tag_version(cfg, node, tag, vers, hub=None):
             print(f"    ❌ {node}: tag yazılamadı: {r2.stderr.strip()[:120]}")
             return 1
         print(f"    🏷  {node}: '{tag}' → {latest}"
-              + (f" (sha256 {sha[:12]}…)" if sha else " (sha yok)"))
+              + (f" (remote hash {sha[:12]}…)" if sha else " (hash yok)"))
         return 0
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
@@ -2534,11 +2558,16 @@ def _diff_versions(cfg, node, diff, hub=None):
         print(f"    ⚠ {node}: --diff 'v1.tar.gz,v2.tar.gz' formatı beklenir")
         return 1
     v1, v2 = parts
+    # shell enjeksiyon + path traversal koruması (OceanAPI #1)
+    if not _VERSION_TAR_RE.match(v1) or not _VERSION_TAR_RE.match(v2):
+        print(f"    ⛔ {node}: geçersiz versiyon adı "
+              f"(yalnız [A-Za-z0-9._-]+.tar.gz kabul edilir)")
+        return 1
     lists = []
     for v in (v1, v2):
-        # tar üye listesini stream oku: rclone cat | tar tzf -
+        # rclone cat | tar tzf - — shlex.quote ile shell-escape (OceanAPI #1)
         r = subprocess.run(["bash", "-c",
-                            f"rclone cat '{hub}/{node}/{v}' | tar tzf - 2>/dev/null"],
+                            f"rclone cat {shlex.quote(f'{hub}/{node}/{v}')} | tar tzf - 2>/dev/null"],
                            capture_output=True, text=True, errors="replace",
                            timeout=300)
         if r.returncode != 0:
@@ -2570,6 +2599,11 @@ def cmd_rollback(cfg, node, version, hub=None, force=False, dry_run=False):
     if not node or not version:
         print("Kullanım: sync_motor.py rollback <node> --version <dosya.tar.gz> [--force] [--dry-run]")
         return 1
+    # path traversal koruması (OceanAPI #3)
+    if not _VERSION_TAR_RE.match(version) or os.path.basename(version) != version:
+        print(f"    ⛔ geçersiz version '{version}' "
+              f"(yalnız [A-Za-z0-9._-]+.tar.gz dosya adı kabul edilir)")
+        return 1
     hub = _hub_base(hub)
     dst = cfg["dirs"][node]
     base = dst["path"] if isinstance(dst, dict) else dst
@@ -2581,22 +2615,32 @@ def cmd_rollback(cfg, node, version, hub=None, force=False, dry_run=False):
         if r.returncode != 0:
             print(f"    ❌ indirme hatası: {r.stderr.strip()[:120]}")
             return 1
+        if not os.path.exists(tarp):
+            print(f"    ❌ indirilen dosya bulunamadı (copyto rc=0 ama yok): {tarp}")
+            return 1
         # önce tar üye listesi + değişecek dosyaları hesapla
         changed = 0
         conflicts = 0
+        skipped = 0
         with tarfile.open(tarp, "r:gz") as tar:
             members = [m for m in tar.getmembers() if m.isfile()]
             for m in members:
+                # tar üyesi path güvenliği (OceanAPI #4)
+                if not _safe_tar_member(m.name):
+                    skipped += 1
+                    continue
                 dstp = os.path.join(base, m.name)
                 if os.path.exists(dstp):
                     srcp = os.path.join(tmp, m.name)
                     tar.extract(m, path=tmp, filter="data")
-                    if open(dstp, "rb").read() != open(srcp, "rb").read():
+                    if not filecmp.cmp(dstp, srcp, shallow=False):
                         changed += 1
                         if not force:
                             conflicts += 1
                 else:
                     changed += 1
+        if skipped:
+            print(f"    ⚠ {skipped} güvensiz tar üyesi atlandı")
         if dry_run:
             print(f"    🔍 [DRY-RUN] {node} ← {version}: {changed} dosya değişecek, "
                   f"{conflicts} çakışma korunacak (force={force})")
@@ -2604,12 +2648,14 @@ def cmd_rollback(cfg, node, version, hub=None, force=False, dry_run=False):
             return 0
         with tarfile.open(tarp, "r:gz") as tar:
             for m in tar.getmembers():
+                if not m.isfile() or not _safe_tar_member(m.name):
+                    continue
                 dstp = os.path.join(base, m.name)
-                if m.isfile() and os.path.exists(dstp) and not force:
+                if os.path.exists(dstp) and not force:
                     # farklıysa .conflict koru, değilse atla
                     srcp = os.path.join(tmp, m.name)
                     tar.extract(m, path=tmp, filter="data")
-                    if open(dstp, "rb").read() != open(srcp, "rb").read():
+                    if not filecmp.cmp(dstp, srcp, shallow=False):
                         c = f"{dstp}.conflict.{int(time.time())}"
                         shutil.copy(srcp, c)
                         print(f"    ! çakışma korundu: {os.path.basename(c)}")

@@ -126,9 +126,10 @@ def fake_run(cmd, **kw):
         return FakeProc(0)
     if cmd[0] == "rclone" and cmd[1] == "cat":
         # rclone cat <hub>/<node>/<file> | tar tzf - (bash -c ile gelir)
-        # cmd = ["bash", "-c", "rclone cat '...' | tar tzf - 2>/dev/null"]
+        # shlex.quote sonrası tırnaksız olabilir — sağlam parse
         inner = cmd[2]
-        remote = inner.split("'")[1]
+        remote = inner.split("'")[1] if "'" in inner else \
+            inner.split("|")[0].strip().split("rclone cat ", 1)[1]
         parts = remote.replace(GDRIVE_HUB + "/", "").split("/")
         rel = os.path.join(TMP, "hub", *parts)
         if os.path.exists(rel):
@@ -137,9 +138,10 @@ def fake_run(cmd, **kw):
             return FakeProc(0, "\n".join(names) + "\n")
         return FakeProc(0, "")
     if cmd[0] == "bash" and cmd[1] == "-c":
-        # rclone cat '<hub>/<node>/<file>' | tar tzf -
+        # rclone cat '<hub>/<node>/<file>' | tar tzf - (shlex.quote olabilir)
         inner = cmd[2]
-        remote = inner.split("'")[1]
+        remote = inner.split("'")[1] if "'" in inner else \
+            inner.split("|")[0].strip().split("rclone cat ", 1)[1]
         parts = remote.replace(GDRIVE_HUB + "/", "").split("/")
         rel = os.path.join(TMP, "hub", *parts)
         if os.path.exists(rel):
@@ -183,9 +185,9 @@ try:
     meta = json.load(open(tag_path))
     if meta["version"] != "kernel_20260802_100000.tar.gz":
         fail("tag en son versiyonu göstermiyor", str(meta))
-    if not meta["sha256"] or len(meta["sha256"]) != 64:
-        fail("tag sha256 eksik", str(meta.get("sha256")))
-    ok(f"tag: en son versiyon + sha256 {meta['sha256'][:8]}…")
+    if not meta.get("remote_hash"):
+        fail("tag remote_hash eksik", str(meta.get("remote_hash")))
+    ok(f"tag: en son versiyon + remote_hash {str(meta.get('remote_hash'))[:8]}…")
 
     # aynı tag tekrar → RED
     rc2 = motor._tag_version(make_cfg(), "kernel", "kernel-v2.3-dgk", vers,
