@@ -88,10 +88,14 @@ def _push_notify(callback: str, task_id: str, status: str, result: dict):
     body = json.dumps({"jsonrpc": "2.0", "id": 1, "method": "task/notify",
                        "params": {"task_id": task_id, "status": status,
                                   "result": result}}).encode()
+    headers = {"Content-Type": "application/json",
+               **ident.sign_request("task/notify", body)}
+    # Bearer token da gönder (check_auth her istekte zorunlu)
+    tok = os.environ.get("A2A_TOKEN", "")
+    if tok:
+        headers["Authorization"] = f"Bearer {tok}"
     req = urllib.request.Request(
-        f"http://{host}:{port}/", data=body,
-        headers={"Content-Type": "application/json",
-                 **ident.sign_request("task/notify", body)})
+        f"http://{host}:{port}/", data=body, headers=headers)
     try:
         with urllib.request.urlopen(req, timeout=8) as r:
             r.read()
