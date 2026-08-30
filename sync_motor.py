@@ -2417,12 +2417,14 @@ def cmd_task(cfg, aksiyon, task_id="", title="", token="", dry_run=False):
         print(f"  ➕ task: {t['task_id']} ({t['status']})")
         return 0
     if aksiyon == "claim":
-        owner = os.environ.get("SYNC_NODE_NAME") or cfg.get("machine", "H1")
-        t = ck.claim_task(task_id, owner=owner)
-        print(f"  🤝 task {task_id}: {t.get('status')} (owner={owner})")
+        # owner = state.json node adı (küçük harf) — "H1" state'te yok
+        owner = os.environ.get("SYNC_NODE_NAME") or os.uname().nodename.lower()
+        # FAILOVER: allow_stale=True — sahibi düştüyse/yaşlıysa devral
+        t = ck.claim_task(task_id, owner=owner, allow_stale=True)
+        print(f"  🤝 task {task_id}: {t.get('status')} (owner={owner}, attempt={t.get('attempt', 0)})")
         return 0
     if aksiyon == "done":
-        owner = os.environ.get("SYNC_NODE_NAME") or cfg.get("machine", "H1")
+        owner = os.environ.get("SYNC_NODE_NAME") or os.uname().nodename.lower()
         t = ck.done_task(task_id, owner=owner)
         print(f"  ✅ task {task_id}: {t.get('status')} (owner={owner})")
         return 0
