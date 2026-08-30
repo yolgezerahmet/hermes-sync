@@ -15,6 +15,7 @@ Host örnekleri: 100.103.44.107 (H3), 100.92.2.47 (H1), 100.76.82.46 (H2)
 import argparse
 import json
 import sys
+import time
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -41,8 +42,26 @@ def identity():
     return _IDENT
 
 
+def peer_card(host: str, port: int = 8643):
+    """Karşı tarafın AgentCard'ı (önbellekli). Şifreli gönderim için X25519
+    açık anahtarı ve şifreleme desteği buradan alınır."""
+    now = time.time()
+    key = f"{host}:{port}"
+    hit = _CARD_CACHE.get(key)
+    if hit and now - hit[1] < _CARD_TTL:
+        return hit[0]
+    req = urllib.request.Request(f"http://{host}:{port}/.well-known/agent.json")
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            card = json.loads(resp.read().decode())
+        _CARD_CACHE[key] = (card, now)
+        return card
+    except Exception:
+        return hit[0] if hit else {}
+
+
 def rpc(host: str, method: str, params: dict, token: str, port: int = 8643,
-        sign: bool = True, conv_id: str = ""):
+        sign: bool = True, conv_id: str = "", encrypt: bool = True):
     url = f"http://{host}:{port}/"
     body = json.dumps({"jsonrpc": "2.0", "id": 1, "method": method, "params": params}).encode()
     req = urllib.request.Request(url, data=body, headers={"Content-Type": "application/json"})
@@ -52,11 +71,28 @@ def rpc(host: str, method: str, params: dict, token: str, port: int = 8643,
     if ident:
         # Klon şüphesinde kendi kimliğimizle mesaj GÖNDERMEYİZ (fail-closed)
         ident.assert_not_clone()
-        for k, v in ident.sign_request(method, body).items():
-            req.add_header(k, v)
-        req.add_header("X-Agent-Label", ident.meta.get("machine_label", ""))
-        if conv_id:
-            req.add_header("X-Conversation-Id", conv_id)
+        card = peer_card(host, port)
+        peer_enc = (card.get("capabilities") or {}).get("encryptedRequests")
+        peer_x = (card.get("identity") or {}).get("x25519_public", "")
+        if encrypt and peer_enc and peer_x:
+            # ŞİFRELİ gövde: X25519 ECDH + AES-GCM (PFS) + Ed25519 imza
+            peer_aid = (card.get("identity") or {}).get("agent_id", "")
+            env = ident.secure_payload(peer_x, body, to_agent=peer_aid)
+            env["runtime"] = ident.runtime
+            env["machine_label"] = ident.meta.get("machine_label", "")
+            body2 = json.dumps({"enc": env}).encode()
+            req.data = body2
+            req.add_header("X-Agent-Enc", "v1")
+            req.add_header("X-Agent-Label", ident.meta.get("machine_label", ""))
+            if conv_id:
+                req.add_header("X-Conversation-Id", conv_id)
+        else:
+            # İmzalı ama düz gövde (eski sunucu / şifreleme yok)
+            for k, v in ident.sign_request(method, body).items():
+                req.add_header(k, v)
+            req.add_header("X-Agent-Label", ident.meta.get("machine_label", ""))
+            if conv_id:
+                req.add_header("X-Conversation-Id", conv_id)
     with urllib.request.urlopen(req, timeout=120) as resp:
         out = json.loads(resp.read().decode())
     # Giden mesajı yerel sohbet defterine işle (karşı tarafın agent_id'si ile)

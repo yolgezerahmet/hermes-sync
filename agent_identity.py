@@ -56,9 +56,13 @@ try:
     from cryptography.hazmat.primitives.asymmetric.ed25519 import (
         Ed25519PrivateKey, Ed25519PublicKey)
     from cryptography.hazmat.primitives import serialization
+    from cryptography.hazmat.primitives.asymmetric.x25519 import (
+        X25519PrivateKey, X25519PublicKey)
+    from cryptography.hazmat.primitives.ciphers.aead import AESGCM
     CRYPTO_OK = True
 except Exception:  # pragma: no cover - kurulum eksikse açıkça söyle
     Ed25519PrivateKey = Ed25519PublicKey = serialization = None  # type: ignore
+    X25519PrivateKey = X25519PublicKey = AESGCM = None  # type: ignore
     CRYPTO_OK = False
 
 SCHEMA_VERSION = 1
@@ -200,6 +204,13 @@ class AgentIdentity:
         self.meta = meta
         self._priv = priv
         self.dir = d
+        self._xpriv: "X25519PrivateKey | None" = None
+        xk = d / "agent_x25519.key"
+        if xk.exists():
+            try:
+                self._xpriv = X25519PrivateKey.from_private_bytes(xk.read_bytes()[:32])
+            except Exception:
+                self._xpriv = None
 
     # ---- oluşturma / yükleme ----
     @classmethod
@@ -215,6 +226,21 @@ class AgentIdentity:
         if key_f.exists() and meta_f.exists():
             priv = Ed25519PrivateKey.from_private_bytes(key_f.read_bytes()[:32])
             meta = json.loads(meta_f.read_text())
+            # X25519 (şifreleme) anahtarı eksikse oluştur (v1.1 yükseltmesi)
+            xk_f = d / "agent_x25519.key"
+            if not xk_f.exists() or "x25519_public" not in meta:
+                xpriv = X25519PrivateKey.generate()
+                xpub = xpriv.public_key().public_bytes(
+                    encoding=serialization.Encoding.Raw,
+                    format=serialization.PublicFormat.Raw)
+                xk_f.write_bytes(xpriv.private_bytes(
+                    encoding=serialization.Encoding.Raw,
+                    format=serialization.PrivateFormat.Raw,
+                    encryption_algorithm=serialization.NoEncryption()))
+                os.chmod(xk_f, 0o600)
+                meta["x25519_public"] = _b64(xpub)
+                (d / "agent_identity.json").write_text(
+                    json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
             ident = cls(meta, priv, d)
             ident._refresh_clone_state(save=True)
             if strict:
@@ -230,6 +256,10 @@ class AgentIdentity:
         pub_raw = priv.public_key().public_bytes(
             encoding=serialization.Encoding.Raw,
             format=serialization.PublicFormat.Raw)
+        xpriv = X25519PrivateKey.generate()
+        xpub_raw = xpriv.public_key().public_bytes(
+            encoding=serialization.Encoding.Raw,
+            format=serialization.PublicFormat.Raw)
         hw = hw_fingerprint()
         agent_id = cls._derive_id(runtime, pub_raw)
         meta = {
@@ -237,6 +267,7 @@ class AgentIdentity:
             "agent_id": agent_id,
             "runtime": runtime,
             "public_key": _b64(pub_raw),
+            "x25519_public": _b64(xpub_raw),
             "user_id": user_id or os.environ.get("SYNC_USER_ID", "cumulusnet"),
             "machine_label": _hostname(),
             "hw_fingerprint": hw["fingerprint"],
@@ -250,6 +281,12 @@ class AgentIdentity:
         }
         key_f.write_bytes(raw_priv)
         os.chmod(key_f, 0o600)
+        xk_f = d / "agent_x25519.key"
+        xk_f.write_bytes(xpriv.private_bytes(
+            encoding=serialization.Encoding.Raw,
+            format=serialization.PrivateFormat.Raw,
+            encryption_algorithm=serialization.NoEncryption()))
+        os.chmod(xk_f, 0o600)
         meta_f.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
         os.chmod(meta_f, 0o644)
         return cls(meta, priv, d)
@@ -334,13 +371,95 @@ class AgentIdentity:
     def card(self) -> dict:
         """A2A AgentCard'a gömülecek açık kimlik (özel anahtar yok)."""
         return {k: self.meta.get(k) for k in (
-            "agent_id", "runtime", "public_key", "user_id", "machine_label",
-            "hw_fingerprint", "hw_strength", "install_epoch", "clone_state",
-            "boot_count", "schema")}
+            "agent_id", "runtime", "public_key", "x25519_public", "user_id",
+            "machine_label", "hw_fingerprint", "hw_strength", "install_epoch",
+            "clone_state", "boot_count", "schema")}
 
     # ---- imzalama ----
     def sign_blob(self, blob: bytes) -> str:
         return _b64(self._priv.sign(blob))
+
+    # ---- şifreleme (X25519 ECDH + AES-GCM, PFS) ----
+    @property
+    def x25519_public(self) -> str:
+        return self.meta.get("x25519_public", "")
+
+    def encrypt_for(self, peer_x25519_pub: str, plaintext: bytes) -> dict:
+        """Karşı tarafın X25519 anahtarına şifrele (her mesajda ephemeral → PFS).
+
+        Dönen: {"nonce": b64, "eph": b64(ephemeral pub), "ct": b64}
+        Alıcı: kendi xpriv + eph ile ECDH → AES-GCM(nonce, ct)
+        """
+        if not CRYPTO_OK or not self._xpriv:
+            raise RuntimeError("şifreleme için X25519 anahtarı yok")
+        eph = X25519PrivateKey.generate()
+        shared = eph.exchange(X25519PublicKey.from_public_bytes(_unb64(peer_x25519_pub)))
+        nonce = secrets.token_bytes(12)
+        ct = AESGCM(shared).encrypt(nonce, plaintext, b"a2a-v1")
+        eph_pub = eph.public_key().public_bytes(
+            encoding=serialization.Encoding.Raw,
+            format=serialization.PublicFormat.Raw)
+        return {"nonce": _b64(nonce), "eph": _b64(eph_pub), "ct": _b64(ct)}
+
+    def decrypt_from(self, peer_x25519_pub: str, env: dict) -> bytes:
+        """encrypt_for çıktısını çöz. AAD 'a2a-v1' — kurcalama reddedilir."""
+        if not CRYPTO_OK or not self._xpriv:
+            raise RuntimeError("şifreleme için X25519 anahtarı yok")
+        eph = X25519PublicKey.from_public_bytes(_unb64(env["eph"]))
+        shared = self._xpriv.exchange(eph)
+        return AESGCM(shared).decrypt(
+            _unb64(env["nonce"]), _unb64(env["ct"]), b"a2a-v1")
+
+    def secure_payload(self, peer_x25519_pub: str, body: bytes,
+                       to_agent: str = "") -> dict:
+        """Tek paket: imza + şifreleme + replay koruması (ts+nonce).
+
+        to_agent: alıcının agent_id'si (boşsa kendi kimliğimiz yazılır —
+        bu durumda alıcı kontrolü yapılamaz; gerçek kullanımda ALICI verilir).
+        """
+        env = self.encrypt_for(peer_x25519_pub, body)
+        env["ts"] = str(int(time.time()))
+        env["nonce2"] = secrets.token_hex(8)
+        env["to_agent"] = to_agent
+        canon = b"|".join([b"a2a-enc-v1", self.agent_id.encode(),
+                           env["ts"].encode(), env["nonce2"].encode(),
+                           env["to_agent"].encode(),
+                           env["nonce"].encode(), env["eph"].encode(),
+                           env["ct"].encode()])
+        env["sig"] = self.sign_blob(canon)
+        env["agent_id"] = self.agent_id
+        env["public_key"] = self.public_key
+        env["x25519_public"] = self.x25519_public
+        return env
+
+    @staticmethod
+    def open_secure_payload(env: dict, identity: "AgentIdentity",
+                            runtime: str | None = None) -> bytes:
+        """secure_payload çıktısını doğrula + çöz (kimlik sahibi alıcı için)."""
+        if env.get("to_agent") and env.get("to_agent") != identity.agent_id:
+            raise ValueError("bu paket bana değil")
+        try:
+            skew = abs(time.time() - int(env.get("ts", "0")))
+        except ValueError:
+            skew = SIG_MAX_SKEW_S + 1
+        if skew > SIG_MAX_SKEW_S:
+            raise ValueError(f"stale_encrypted_payload({int(skew)}s)")
+        nk = f"enc:{env.get('agent_id')}:{env.get('nonce2')}"
+        now = time.time()
+        for k, seen in list(_NONCE_CACHE.items()):
+            if now - seen > SIG_MAX_SKEW_S * 2:
+                _NONCE_CACHE.pop(k, None)
+        if nk in _NONCE_CACHE:
+            raise ValueError("replay_encrypted_payload")
+        canon = b"|".join([b"a2a-enc-v1", env["agent_id"].encode(),
+                           env["ts"].encode(), env["nonce2"].encode(),
+                           env.get("to_agent", "").encode(),
+                           env["nonce"].encode(), env["eph"].encode(),
+                           env["ct"].encode()])
+        Ed25519PublicKey.from_public_bytes(_unb64(env["public_key"])).verify(
+            _unb64(env["sig"]), canon)
+        _NONCE_CACHE[nk] = now
+        return identity.decrypt_from(env["x25519_public"], env)
 
     def sign_request(self, method: str, body: bytes) -> dict:
         """A2A isteği için imza başlıkları. Kanonik: agent|ts|nonce|method|sha256(body)"""
