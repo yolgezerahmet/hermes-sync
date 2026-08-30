@@ -4,7 +4,8 @@ import json, os, shutil, sys, tempfile, unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-import agent_identity as AI
+sys.path.insert(0, str(Path(__file__).parent.parent))
+import synclave.agent_identity as AI
 
 
 class Base(unittest.TestCase):
