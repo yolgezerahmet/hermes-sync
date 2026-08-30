@@ -1,8 +1,8 @@
 {
  "node": "openclaw",
- "ts": "2026-08-30T13:41:02",
- "revision": "366d2d1efd32",
- "file_count": 7,
+ "ts": "2026-08-30T15:06:47",
+ "revision": "b587ae2c6bf9",
+ "file_count": 8,
  "files": {
   "skills/cumulus-sync-motor/config.openclaw.json": {
    "sha": "609cc904be50fac879d173d138983cf8ed6f4e659da1cb6023eb422c8b57848d",
@@ -11,9 +11,9 @@
    "machine": "H1"
   },
   "skills/cumulus-sync-motor/SKILL.md": {
-   "sha": "e6e459e85b73d47b508f8df2ce936d7c528c9001158dd0c1d9d50de9adfd19e1",
-   "size": 3755,
-   "mtime": 1785762270,
+   "sha": "7f5ce687e3b4bff1af00499ce2d9fac1e5154aa36b2c39b6d23ad2e564adfe8e",
+   "size": 5168,
+   "mtime": 1788090946,
    "machine": "H1"
   },
   "skills/cumulus-sync-motor/config.example.json": {
@@ -22,10 +22,16 @@
    "mtime": 1785762310,
    "machine": "H1"
   },
+  "skills/cumulus-sync-motor/scripts/a2a_cli.py": {
+   "sha": "af5e1335318366fdfefe8717e83aad8bf8cd821fde90e281bbdc914af15fc546",
+   "size": 3428,
+   "mtime": 1788090946,
+   "machine": "H1"
+  },
   "skills/cumulus-sync-motor/scripts/sync_motor.py": {
-   "sha": "8804b3c36fe6f5e331587e85c4e617fa4a3b05036fcec977684707a0797c44cc",
-   "size": 50400,
-   "mtime": 1785776468,
+   "sha": "b2d3b43339cfb14388f92fd385dc5759c8db5c257b7d79af350009d5b91e6f0d",
+   "size": 133008,
+   "mtime": 1788090946,
    "machine": "H1"
   },
   "skills/cumulus-sync-motor/scripts/hermes_full_backup.py": {
