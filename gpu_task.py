@@ -78,15 +78,42 @@ def gpu_task(gorev: str, timeout: int = 600) -> dict:
     http = _http_check()
     if http.get("status") == "ok":
         import urllib.request
-        body = json.dumps({"task": gorev}).encode()
-        req = urllib.request.Request(
-            f"http://{H2_HOST}:{GPU_HTTP_PORT}/analyze", data=body,
-            headers={"Content-Type": "application/json"}, method="POST")
-        try:
-            with urllib.request.urlopen(req, timeout=timeout) as r:
-                sonuc = json.loads(r.read().decode())
-        except Exception as e:
-            return {"error": f"gpu_agent hatası: {e}"}
+        # H2'de farklı gpu_agent sürümleri olabilir: önce standart body şeması
+        # ({"task": ...}), 422 alırsa query şeması (?request=...) dene.
+        sonuc = None
+        denemeler = [
+            ("body", json.dumps({"task": gorev}).encode(),
+             {"Content-Type": "application/json"}),
+            ("query", b"",
+             {"Content-Type": "application/json"}),
+        ]
+        for etiket, data, hdr in denemeler:
+            import urllib.error
+            if etiket == "query":
+                import urllib.parse
+                url = (f"http://{H2_HOST}:{GPU_HTTP_PORT}/analyze?request="
+                       + urllib.parse.quote(gorev))
+            else:
+                url = f"http://{H2_HOST}:{GPU_HTTP_PORT}/analyze"
+            req = urllib.request.Request(url, data=data or None,
+                                         headers=hdr, method="POST")
+            try:
+                with urllib.request.urlopen(req, timeout=timeout) as r:
+                    sonuc = json.loads(r.read().decode())
+                break
+            except urllib.error.HTTPError as e:
+                if e.code in (422, 400, 404) and etiket == "body":
+                    continue  # şema farklı — query'yi dene
+                if etiket == "query":
+                    return {"error": f"gpu_agent hatası: HTTP {e.code}",
+                            "detay": e.read().decode()[:200]}
+                continue
+            except Exception as e:
+                if etiket == "query":
+                    return {"error": f"gpu_agent hatası: {e}"}
+                continue
+        if sonuc is None:
+            return {"error": "gpu_agent yanıt vermedi"}
     else:
         # A2A inbox yolu — H2'de worker/Hermes işler
         sonuc = _run_a2a(["send", H2_HOST, f"gpu:analiz {gorev}",
