@@ -3,6 +3,8 @@ __pycache__/
 *.pyc
 *.pyo
 *.egg-info/
+dist/
+build/
 
 # Yapılandırma (kişisel — asla public'e)
 config.json
