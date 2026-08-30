@@ -1,7 +1,7 @@
 {
  "node": "kernel",
- "ts": "2026-08-30T04:44:17",
- "revision": "773157521a23",
+ "ts": "2026-08-30T05:01:53",
+ "revision": "fba93cf3185c",
  "file_count": 9459,
  "files": {
   "ci_pipeline.py": {
@@ -11629,2971 +11629,2971 @@
   "build/cumulusos.bin": {
    "sha": "334ffcd688ab1bbb1e0ee05852dee810a42fac2d7c072e923a07eb55f4814ed6",
    "size": 42656,
-   "mtime": 1788050927,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/cumulusos.hex": {
    "sha": "2e98da68657606a8b37ae79ee43ce5a6b6f9d2573263cf588e459ea659ebd42e",
    "size": 120030,
-   "mtime": 1788050927,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/cumulusos.elf": {
    "sha": "c513129391c5633056c7367e1014894cac9a076961a068aae3d3efbaa8b3938e",
    "size": 454432,
-   "mtime": 1788050927,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/kernel/fault_handler.o": {
-   "sha": "6339c937bbd389803f30bff2016cfb7669fc1e09669518abf0eab08737badebe",
+   "sha": "779d17a5931e77073d209c4304d5f27bd6c6586e2d429fc1d7d31e3f6f093013",
    "size": 14996,
-   "mtime": 1788050921,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/gateway_mux.o": {
-   "sha": "d72a5895d0db2e3263b0489ca9f77b5324e1d266cf4db6d3adb9096db31d7570",
+   "sha": "8e81fc2f2a097ee6862e04f9313505cdf9746ff20002d284e781bd3eaf3ea41c",
    "size": 16764,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/mesh_routing.o": {
-   "sha": "7f39b33704f97586ed4598117c58af2e35e61e5c96c1b8571d8ea9d4953ce8a7",
+   "sha": "a214394ec9b270672fb778b88fbc2e73fcdc545f17c4665080484ede63e42a73",
    "size": 44364,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/lr_fhss.o": {
-   "sha": "226ce46ab5ce159c9a86c65794c457af965435aabdfb0e498c76ea06935eac2e",
+   "sha": "24e94574546c50cd0744ce02d685976acccebd8f4fb8a835c52f6ae6fec440f8",
    "size": 39368,
-   "mtime": 1788050922,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/swarm_position_engine.o": {
-   "sha": "a190e5a58b1ce19057a7d7ca1044c877eb22ca1de63d7f548c71ba18b6cc3ebf",
+   "sha": "35b71e98fcd6fdeff36f123c701e4755bb70cc65705a83f5884fd8afcf857106",
    "size": 20820,
-   "mtime": 1788050925,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/waterfall.o": {
-   "sha": "81c14a68bb925eb4a73e7b5d901abda1ae5c25f0183e3c28260789592d15430c",
+   "sha": "94abce92dfa3c48378901dd7369c915d09946609ee5c1561b0afd796d2c60696",
    "size": 13660,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/secure_math.o": {
-   "sha": "f74b15654807da6ab31670d8add799d7583a88c037ecdeb541ad579db78cbfd9",
+   "sha": "15db96050177574a68fce36cb384adb69aebe31e76e2e33776f4132604e3ae95",
    "size": 24336,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/mesh_attack_detect.o": {
-   "sha": "1b7a04af517baa6cd021bb3fd4761b81b89721284ebf125b78d13d035a692682",
-   "size": 23720,
-   "mtime": 1788050923,
+   "sha": "ae1517322cd08afb4a15ce4c2deee137a836fb5313c990d82c63709cb45ce20e",
+   "size": 23684,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/lna_bgu8m1.o": {
-   "sha": "695e1528fff3a1741c3afdee9eb8102a76253f70b777492a7e9e4f1c3e3273fe",
+   "sha": "ad627891f5e142518788cc59e41c4238e2be10aea9fea494dff3e97c2f4e597a",
    "size": 4640,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/data_path.o": {
-   "sha": "785bf095fa8cbe642cda638c849f6b2ccf366a8337a4cce5af7a249b3463ed8a",
+   "sha": "0870c63b393665f9e261f97b1e536be006ef7c328cadf04cd3003cc069874ccb",
    "size": 25604,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/math_data_accel.o": {
-   "sha": "000a0fb866a74626befacdf9253ef804e1d6834308c346583c74c407627a6e4a",
+   "sha": "a384917ee626965c1ea6e1259f9aec8847996e3469acdb6eea7927b5efd25a03",
    "size": 21372,
-   "mtime": 1788050922,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/pq_crypto.o": {
-   "sha": "1e0d693e983858f395ff96183f4b83fc4da59cd4f3398be3071c6c86625aba5c",
+   "sha": "f4ceff108a783cac7ad82836607929d867b0a346d2c4ddcfbf8b0f1cfe1b27cd",
    "size": 40336,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/fed_ai_bridge.o": {
-   "sha": "11987038f049121d17da490434f90110a92b1dce1d4270eb0d73f982fa66242a",
+   "sha": "bda33988cae9f2fec267f863b819d8ec9ddee8e97aa743f61e86ac5703eabb87",
    "size": 10052,
-   "mtime": 1788050921,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/graceful_mesh_degradation.o": {
-   "sha": "84cd9c23b003b1e2882c9839f84ebc29698d8c529dbae08f9da1f2ecda067f18",
+   "sha": "1b7133a92d7bd5bc4e45754b9b39a8228e89e124795352f28258690ac889ece3",
    "size": 15024,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/deep_defense.o": {
-   "sha": "fcbd2512361b5ed283c776e60acbb0abc52c694f92589f374623316859774916",
+   "sha": "ac85c87cb5379bea3728afe42b371ddbc6e3c478328c0bfa655488549a2b9662",
    "size": 27120,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/math_accel.o": {
-   "sha": "2237d44b2afca469ddaad2110c9928ad2698630a1f53d3608aacc5081bbbcbde",
+   "sha": "ec9dc7a79c5d507a0252c7f62c12b350ff9a11527d01d06aca0024a059cfd125",
    "size": 25000,
-   "mtime": 1788050922,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/echo_confidence.o": {
-   "sha": "4cd46b7fc73b6d2474e6bd84e8105ed439c30f69cf7c4d806a1544f7a1b60a20",
-   "size": 10972,
-   "mtime": 1788050921,
+   "sha": "829dc21bff2a055e0fc1d147afbc63029dc3df1563107081b28a73d738e1046e",
+   "size": 10952,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/mesh_services.o": {
-   "sha": "98471900bba2cb45a33c0fb0aa242273ad5a6e8679d29b6e3d66bda5d680ea1b",
+   "sha": "69feef49183c33fdbae7b9d84340ca3f3d725aeef86cea9bf148470dc1049465",
    "size": 24224,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/bstb_waterfall_cluster.o": {
-   "sha": "a3eb0c6877186c1ad6b8574d1b897b289bf091781b5562e58fa86800e61289ea",
+   "sha": "a38f9c325233dc1925eee71882206725fc7691f24fcd5ab267f7d292fb2d969c",
    "size": 15068,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/digital_key.o": {
-   "sha": "9b78c36a5439cedf0456eb80e5655e80cb92d7cf1fcb12d438512cd73119bb21",
+   "sha": "a47d13bf5b43ab7f158cccbb2b1b14ce645a23b83f73ae85f73c01838b44c79b",
    "size": 5424,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/edge_ai_core.o": {
-   "sha": "1e3cd8bbda882be07c440e26b6d5842540c29b40ce26e52774fea1bc28da829d",
+   "sha": "35ad35f9dc3ebc77de8b5d14dd7ff01bc9d79c9a50fe82028f13b785e0031fc7",
    "size": 12256,
-   "mtime": 1788050921,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/robust_position_3d.o": {
-   "sha": "271f29be9e13864fa03f57980b80c521843f8646f4f2d591ee5b360cb22aa83e",
+   "sha": "d92677245d83429d0d7f136d2da35f94ea012df714842d86b0a90ffe4fb4b1f3",
    "size": 17876,
-   "mtime": 1788050924,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/halow_aci.o": {
-   "sha": "a9382fee77421105dc99ac8094f760dcc4ac5e074e36c20566cb992b14dc536f",
+   "sha": "86b8e7539f14d5fd841b6b0ac7d13ec88f836ee9906383076ca2d095e09ce859",
    "size": 12132,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/power_policy.o": {
-   "sha": "8d99a04a495392213cc591bf14900b9c9b9cc5ab6edd713c70dfc83e1fa691ae",
+   "sha": "6bb20c36137b7da68fb5df9db3a7a0eb06023bfcc4ce680bcb074ccfeac8e863",
    "size": 11752,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/rlnc_adaptive.o": {
-   "sha": "62418e0e2b8e7184fac7e4dd2cf5f6ad07b3abb5a2d1f1f8dc06d184a2eed2c0",
-   "size": 13984,
-   "mtime": 1788050924,
+   "sha": "f4de3b4926556f7b1aedd8b2c3da23df28ab97f13ac861aa5089b0d9934f4cbe",
+   "size": 13960,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/product_capability.o": {
-   "sha": "0889903d03c21975222d4d7bb91c85de64787f3be7ae73d032f2858bd64d4781",
-   "size": 11088,
-   "mtime": 1788050924,
+   "sha": "ea66cc56ee46723c8c0b554434e60ef66920ace638d217d7232cb29687de0ed3",
+   "size": 11068,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/kernel_health.o": {
-   "sha": "d3ecc339c3ed893fa72d3ba74412e0598291ae65de4ee468378a9293d1dd880c",
+   "sha": "a0c5e46a9077dce5ddbdd9ff19d972b39ed25b01914d3f30b58df6e62abb457c",
    "size": 14076,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/self_heal.o": {
-   "sha": "43920c5db4ad08e81b04b0577336cf09c2213b7da38ee8ba7eaabd8811ab5435",
+   "sha": "2eeb479f047d4e2ce70c0b1ef49a3d6a0a8f7d9dd8daaf76e6fafaf119ca775e",
    "size": 29076,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/verify_engine.o": {
-   "sha": "34a4794b60b7c941403bb4b7206df64563e553558878a75d6fa620f5af108d02",
+   "sha": "5e0b9a1e41c6209095f333f9e487fd75ffaa8ead47ec5e62fc63bbb3409c7152",
    "size": 22584,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/mlkem768_kem.o": {
-   "sha": "264f2b3444cdf763b986172cb4b7525e06b49e3096eab2102c5f4c595972bb56",
+   "sha": "b8a87d425a3e7850f51f0f2b6a3ba7edbc8c1355b305005586621f6e31f48a9e",
    "size": 48828,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/csi_enhanced.o": {
-   "sha": "2094596535e582fa367726b76a032ce27e1d67244fb794f5b2da421c0f65c822",
+   "sha": "b942317b2c2bc1509cb165c16d135a51e6b6e900646dbd2bf3d1238392ebea27",
    "size": 30932,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/rf_gate.o": {
-   "sha": "5f90dc0e1da6840c51931c79783613d8e7c936cd45b264e5ad3cb89783841671",
+   "sha": "72006b7d1de36b56aedcbe77c080382298b2e1df3d7afe68a57172cc37d61fe2",
    "size": 17912,
-   "mtime": 1788050924,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/dempster_shafer.o": {
-   "sha": "26f5556ec8a9298d0daf0163597d16e59c15e7c93a877f4f31c8a02d6601aebd",
+   "sha": "33edd764216280d8778abf7df09c7818079fa31382e1236be8768b466f97d21a",
    "size": 12912,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/q31_fuzzy_math.o": {
-   "sha": "a92491c23d32c3fffc86845a2cad11099ab62b8f330baa3bd7164befc3363ae0",
+   "sha": "f38d9b06029f10fdad0a3713db2301029b5d72a3beabfdb57cdd81c3c1d454a7",
    "size": 19964,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/factory_utils.o": {
-   "sha": "92c2b5d7fbdcc083d7a992c210a2f3be9707004351670df833e9f8db16053b47",
+   "sha": "7ed815074b7a7754388ce6cd7f7c904470a20a117c16fd95772acdf4a099c066",
    "size": 12216,
-   "mtime": 1788050921,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/key_lifecycle.o": {
-   "sha": "71ce2d96692cfc3256a37646fd460018081b5f7f4cbfff8c2d9839857028daf6",
-   "size": 22172,
-   "mtime": 1788050922,
+   "sha": "2cfaf668118cca4c87cb6a1e59961bdf6c6065a8de0f4878f1116c3cf7bbb17e",
+   "size": 22140,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/rlnc.o": {
-   "sha": "7e14961f08e2fe301abcb3219afc2449cb60fdc095d2bedd3796f265260e7b77",
+   "sha": "3271b11496e4d0ee2b261a7e767645e15b3ecbd58ac03e537c4553dd792dd09f",
    "size": 28040,
-   "mtime": 1788050924,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/mesh_dedup.o": {
-   "sha": "2a4ccc0087d8aefd63d3b2e11b45581d8f3e4ccca69f55649b5c000f948a8587",
-   "size": 10940,
-   "mtime": 1788050923,
+   "sha": "304de0c0886f143da9cffaf3496906f213876fb0996a3c31e5c37526def5b48b",
+   "size": 10920,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/proactive_mesh_bridge.o": {
-   "sha": "bbe8fb9d7a55f19d589e9848c9bd193d552ce8275792328056caf34180b5a552",
+   "sha": "da513a7e154a30b7b629b069fcc681d16ac505ace339551df00e9a4a1515c586",
    "size": 12552,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/dsp.o": {
-   "sha": "1ad4c3879acfc2840e301afd1c38cc9443b374f92992ac508b91d5fb19289325",
+   "sha": "c627c3a7901bd866f686f4da488fc18e4101fcedcdb96134374b47b6bdbe5ed5",
    "size": 36420,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/athlete_twin.o": {
-   "sha": "f6232049ddcdc3202c331a7bee1158d6f4a053e38137cf59fd288df1703b10ba",
+   "sha": "ca9e8e511fc0857a2ca5a3c49e0d855b2038d4b2996f4f6eb0d9779c76137808",
    "size": 26484,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/slh_dsa.o": {
-   "sha": "f2817112ebabe95cab3f16e1737c036cc081902cf0bd2e888eee696ae62e685a",
+   "sha": "d91638601bf60d30941aead7fddaa2ea2390eebcbff09eef713f14784dda8f0d",
    "size": 6876,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/modules_pull.o": {
-   "sha": "15d169f106ce68484529c76bacb301666de3b72ff15e9d044aff5e95eb76aace",
+   "sha": "2636c2b65a3f19b2e8265f2328c6b34b24771a90a72fea827d0b8125689303fe",
    "size": 3860,
-   "mtime": 1788050923,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/bat_adc.o": {
-   "sha": "bea3ef4e7d54708b957ec4db750433e82893b128cc141ff1463228fac5049aaf",
+   "sha": "b6d22e19a8df08fd67a5b7b7e1efc70aafe2c432a77660f97eef55aff1b43ba3",
    "size": 8576,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/cli_parser.o": {
-   "sha": "5927c685e81779944afda94d59f84e7f642bcd8e61a9e55a4a57933720b1dd13",
+   "sha": "cfd6187a4ce25d66187b61e5623942a2a060f34e11aa73221189cf63f58c2245",
    "size": 19816,
-   "mtime": 1788050920,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/boot_epoch_journal.o": {
-   "sha": "a9eefa5ba7e34efd8c6e740c15f090fd0405129ebeb73724d10d49cef27b983b",
+   "sha": "830006bfce837f43beccd30d5e76629cffd0e8ca1228b50fa04bb2fa9d71ce57",
    "size": 12892,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/mesh_discovery.o": {
-   "sha": "999a656618bc3405c79a0018b0327000d39c9acbb18114b2fcfdbac4a7ed6026",
+   "sha": "6841f888adb5fb5559f40f80735c4fe093b5dfb8fa1fbfe41d5089f914ee4256",
    "size": 15820,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/micro_ota_map.o": {
-   "sha": "cd196b5299832e17d0981168077b21e8e0566a0c3d390a4b5d2739400dfa694f",
+   "sha": "2195aa4cf0f6d36cc087271685962a86c0c42b506f69de847ec52bb79fd07011",
    "size": 16348,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/fleet_manager.o": {
-   "sha": "619c62b092c583db43dbe52d6cd8ab565b790a24cdb2d842e96a84f8e95588d5",
+   "sha": "6efb5241df99681d9ff3dd6834d1592a0fe218ab6c3814b75784ea9cbc8902b5",
    "size": 33580,
-   "mtime": 1788050921,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/security_audit.o": {
-   "sha": "159f32513fb22a3adce55f904b627516ba50b5bdd98a9ab27f96ceffad68e3ac",
+   "sha": "bb074b977a5f689a5c432f5e02832c20e3cebb10bbe80975aa541b935e2e8c23",
    "size": 13720,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/spectrum_dominance.o": {
-   "sha": "56a7fb8d1030e998aaeb3f4fbc37348946f388192ea8efd3ad8377db2270643a",
+   "sha": "68ecdedeb75ce8fe5f3cbf0898f5155d3f953e23d3fc81a111a7c2530912e4b5",
    "size": 34204,
-   "mtime": 1788050925,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/chaos_fhss.o": {
-   "sha": "02ff509f0c47ef96f99983e087b90173e13a7d98839d8fbd7a6b6eac619f6225",
+   "sha": "6b8f648473b8e55b8a09ac7a035c0147661f941085cc34a3c05cf61ec0b8d3cc",
    "size": 11380,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/aoa_enhanced.o": {
-   "sha": "aa8ec21d6953037d1aa26f93b669dbe45214509b21410267da3069e7748986b8",
+   "sha": "d5e430deafb3b0f45a887740115beedae86ff5694641c04a9bfd3f5994d56673",
    "size": 14032,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/multi_hop.o": {
-   "sha": "89dbaec8768621e591855c2a321ea9f00419e0336e758eee9c9e9cadc5199141",
+   "sha": "d5069f245cc9e1dd0fcf86f111a7158dba78818f756e5ea4f0d351f76dbbb358",
    "size": 8192,
-   "mtime": 1788050923,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/shm_sensors.o": {
-   "sha": "484b4a46fe51d19b0a21a1762f746f6a004fee36eb8afc2741f8b55007cab04e",
+   "sha": "86c276a573b34430defda179152b53a83f468e767533bdde8f6d5d3ad7f0a3e0",
    "size": 42300,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/channel_predictor.o": {
-   "sha": "b11dc5e8c3918092b3510a79cc1637aa11c9388470f9dcb86640b6e5bf9389e1",
+   "sha": "bba722acf745cc72729037c8bc6c40f82054ed7c24cd1db63f17500496cd8433",
    "size": 22680,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/entropy.o": {
-   "sha": "93376b8046beba37bf1129a1846f1b8f730ad52cc8aecb1f66ceacc160320afb",
-   "size": 4076,
-   "mtime": 1788050921,
+   "sha": "0ab85c1b0d25a356fa76adc3c614f55d7fc498b4063a650e1623fc5db63dd6ae",
+   "size": 4060,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/mmc5983ma.o": {
-   "sha": "df540ba4cc09db8dd4741060f424ef9bb05b7a290e93a7f741ef013c1a41168b",
+   "sha": "17fca6f730dab1fc25a1eb8d6c72211bc487ccd100334275df42fd156912b8a4",
    "size": 20376,
-   "mtime": 1788050923,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/dtn_store_forward.o": {
-   "sha": "afd5466bc1286c90c46ac57f4b38e11cfac2dd878afafe29452569985e897377",
+   "sha": "53f9c375aba043a31cdb034a6dfebf6c2f49b4bbf5c4098bfcafba7b13fdc9e0",
    "size": 16796,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/core_services.o": {
-   "sha": "72e87bfb2993bfa335f5ad9dbcbb761672bc378b973d98503d34b8a14a779e62",
-   "size": 29872,
-   "mtime": 1788050920,
+   "sha": "49b3de5116b0f421e3a12ef8166e31e079d746bb4d2f7a29e64bca9eb2e87e7b",
+   "size": 29904,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/hw_dsp.o": {
-   "sha": "3907535481005a7ba1487b2c4f09d2a97177839c13add4809d5854a9dd3b3e89",
+   "sha": "f92cb86b9ed39d80d501ba9cd895e246239cb15de3c97af8082e2ea977525bdf",
    "size": 6740,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/sr250_ocpd.o": {
-   "sha": "458f278e96acd4522dfcbbb00274d13d08438d7f33d38afb30f31f1bb3c543e3",
+   "sha": "e05a3e2014028cea70e0dde6fe93fa88e444f99776d841108536ecd22dbf4d53",
    "size": 11456,
-   "mtime": 1788050925,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/baro_mesh.o": {
-   "sha": "79f7293090003f37db55e6078f357afa186cae304c80644478206247b56c542b",
+   "sha": "6fcc838666718a4c11ab544ff8798714476ab117ff30013603c623ec6535ca60",
    "size": 13608,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/emergency_wire.o": {
-   "sha": "6cebfc0a5ef91f795b86c6d6c22a03a8b8696ba728c6541cadeccf9b5b31f251",
+   "sha": "cd3d40ea502bcfe5e82b66ace3453faa7ac25192ab22a1a443e183f5cdf3ea63",
    "size": 11180,
-   "mtime": 1788050921,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/ota_carrier_bridge.o": {
-   "sha": "98fba19cc6350b3724598069544677bf43754ae26280d361d564a1bb30892376",
-   "size": 6464,
-   "mtime": 1788050924,
+   "sha": "0d89bbfeec1919df51740e0b92c9170d95a606c66380f10a2c9903c7d219547d",
+   "size": 6476,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/echo_beacon.o": {
-   "sha": "b92375f27f381dcc00d14a9640afd4eb8ca9994892e72ab74900b6ae5c04199d",
+   "sha": "79d4aedef27080e41a27625a4762a7b1164d76b25641b2c032a7e977d5bdf71f",
    "size": 15248,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/sar_positioning.o": {
-   "sha": "7d122b635bd7d202b05682ed07cefcd58903a9b9bb8c0646010964221a2a2015",
+   "sha": "e9adc4159515046a1c2db16d9fcb0a49059a1141f66808415914d69bf0107a63",
    "size": 20868,
-   "mtime": 1788050924,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/fed_learn.o": {
-   "sha": "e9855203bf4c4ae6227eafd965ad1d25b0c8efc7f4b2b496f816fdba7edb38ea",
+   "sha": "39cbabfe1c05318bc7e744e3f4373d7e52727444a55a3a03cc92a3cb115061b6",
    "size": 17876,
-   "mtime": 1788050921,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/apnea_detector.o": {
-   "sha": "962e40206a5288f9a58d4e94fb5f913a91d5ab8a68a51946c79e696867175ca7",
+   "sha": "a27451a62661dcf38ea97e58d8190a15af37751c30f3349a503da56ce86af568",
    "size": 24652,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/mesh_key_mgmt.o": {
-   "sha": "8e09cc206c583e34459889afb20dda8a37f0fb29d8a36128ce5e80323af2202d",
+   "sha": "ee91d81f9296fa353c88b92d3bd64955d664ca1beef9bb71c005dbdc89040098",
    "size": 24732,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/sync.o": {
-   "sha": "9d7480ce3a6d1a38c5552a9e17b777e8f90618450e3eb120a0c1676b9a169923",
-   "size": 20316,
-   "mtime": 1788050925,
+   "sha": "2f961ae44e86e96b5cebd2da02cce5a19bc5ca9380bed87f73803481a44558f7",
+   "size": 20348,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/compass_core.o": {
-   "sha": "6b7fa2c67f155ca4f804839d75ec9ff8bab7aa9460bfb02066a5f2169fe13d2e",
+   "sha": "32f8786f3b54bbd28624f6f8ed54452381d042ac0617d6f69a3eb9f755328805",
    "size": 17516,
-   "mtime": 1788050920,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/shm_analyzer.o": {
-   "sha": "1ad17c47d20e1ba1708bf9339feadd2de81a36b8af12aebb76424b3b1656fbe9",
+   "sha": "d5dab6ed59c03da6bcfb17590f7721c31b38c8880f30ee70efea2c9e96d3d4ef",
    "size": 35448,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/sleep_stager.o": {
-   "sha": "de8f8f63a5bb5d85a719ebd46f3e95ea40204eac7b820588a22610705a3eaf4c",
+   "sha": "67681e908ded214de3c4791ee890c235d51315c83ea50711f0552096c9cb3bca",
    "size": 8984,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/mesh_optimizer.o": {
-   "sha": "d798e80f6fbe46ce7eb0f06a79fd4f1bc5137459888d20505b87dde132dd5d4c",
+   "sha": "989b761552fa0479a050f7087ffd1712db2d06f8058d9ed3c67fb0798db93e9f",
    "size": 15132,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/acoustic_verify.o": {
-   "sha": "d374b0f07960e79805a399455056f8738cbe7b4163bd69ca1d7e7b6757fbaf86",
-   "size": 12852,
-   "mtime": 1788050919,
+   "sha": "073b49f80146b11690c7bf3cdc172d646f607e350013906fd5d16d54e3e8d4f0",
+   "size": 12832,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/pqc.o": {
-   "sha": "649df2c53b0926c367b273d791472960e0d6fcffa2454393673db92d16e79521",
+   "sha": "ebcff26f1543e254f9b52ce938d1c00f00c43e412e68312699d6fbc718ddb263",
    "size": 12596,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/adaptive_ttl.o": {
-   "sha": "cac4a27f87df1c0aa2f45829d8576a8698f1f70677fbb036f5e93cda2e9a2efb",
+   "sha": "092dde702b55cb2515049c8b490583d62e688f9dc0141aca4b8f1e0b2ebe8144",
    "size": 8580,
-   "mtime": 1788050919,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/uwb.o": {
-   "sha": "dc63e86722ea7252bffbb9532ba56383b09370d249d921634025e5b9537cf6d2",
+   "sha": "a1733f95b6c4e1b55ed85c64e6e3e9c2b75e13a62a781135b8f54113f3c5623c",
    "size": 8488,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/hal_stubs.o": {
-   "sha": "a39c740374d20e4426e0ca0be09fd76eb5eb915a5aa0673e1efa6bf207f256aa",
-   "size": 19784,
-   "mtime": 1788050922,
+   "sha": "fffc531a2ba2a159dd6479efef032f489bab4ab1e73c275eb324f3e9ceb310e6",
+   "size": 19832,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/animal_vitals.o": {
-   "sha": "26e398707ea064ab89ffa0e64d8cd4393fc66cb365f69a1e6c882e887bb11ae6",
-   "size": 21992,
-   "mtime": 1788050919,
+   "sha": "a81bcdc8ce65d42b5c77b9704e282d8defeb1767185165a6631fa58dc69d2f17",
+   "size": 21960,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/adaptive_mac.o": {
-   "sha": "8c9eab4ce55c9ea867cc6b9d3813c04d0c6657c2096b04a0842b3bb21308afcc",
-   "size": 12308,
-   "mtime": 1788050919,
+   "sha": "cee2775e0f99c1bf0700f2e5484b5add1d0ffe42f8b158b6072368b2653c6125",
+   "size": 12352,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/device_ui.o": {
-   "sha": "bc6c5045fff7d4e3a1098d3acb6419fb78995fab3deed49efb784f1fa31d3221",
+   "sha": "d70f70845aa82a54d645585a58b5e758102871a40191ef7949be7cf6c12fa0f0",
    "size": 17864,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/siem_forward.o": {
-   "sha": "30cc0627a239643393416a22878bc4553fd7f2c6f9876869be90637a7e5c49cd",
+   "sha": "f55a28e611b43d84b11a267cda0cdfa0ae737f3a1a998e382708df77cc609e49",
    "size": 15288,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/rf_sensing.o": {
-   "sha": "0c8b74c8b7e8aa739f4661d892b76e6155bd0f4082faf988286314209762b958",
+   "sha": "2319600e398731711b7de5aed14d178e259f09469d41aea48b0c4b17cb714605",
    "size": 40668,
-   "mtime": 1788050924,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/device_cfg.o": {
-   "sha": "9ba3646465392a77ee32c9d8728c8de76ead91a1ac911f991bd9bf29a3c07d73",
+   "sha": "a56be13cce57472f8358f20e84740a70b2681cfa1e337919d264da0748dcc8bd",
    "size": 11432,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/messaging.o": {
-   "sha": "a50c6787fc3b1260c730b32b4e5b8286e69218bf1f42b103ccc4e0938173ebd8",
+   "sha": "99f25536204895d9a6bc89d737763b7151db78970d4130cb352f78d159a7d033",
    "size": 31168,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/phone_secure_bridge.o": {
-   "sha": "160b32bdc063fe2e76a356010bcff6e8acfb98f1d05874dbe63e6da7588f659d",
+   "sha": "d55cd06d106912cf08e1219b3ff4a97e1940c791d2de485384d46abd3e119c04",
    "size": 19356,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/edhoc.o": {
-   "sha": "5ff90217a02593b4e173dcb8e639e5456eb77c594d3dc80a3549445c85cc4894",
+   "sha": "b4458c49b3acaa3b822744db5b93d0169544bcdf3318924363eaecfc75ab8fd9",
    "size": 48372,
-   "mtime": 1788050921,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/sar_rf_fusion.o": {
-   "sha": "1e000652f701cf07d45c9a8d2aa5f262b11592680815fc3a9f63bd9a3686f539",
-   "size": 31280,
-   "mtime": 1788050924,
+   "sha": "d3225830049267e8483d35c471193fdd1aa209d9e6476b7dfb6c0cc3c4d2cb48",
+   "size": 31320,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/hal_abstraction.o": {
-   "sha": "2e543f31149113630b257c5d13d88c8bf4e03aa477feee12c3a43a6d94e2bb85",
+   "sha": "59d181bb5ae5bea5ccca3b6427cd45a321492cddb9402a08cbcf9d816473089f",
    "size": 19492,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/adxl367.o": {
-   "sha": "07631b1d6b5c320697010c43816a85b143b785ceeed73c3b34f278b9dac48cc4",
+   "sha": "28c9ab102b3888ac80d4d7d080b267ec0930ca81f8ca6b7c6b12e73b783118a7",
    "size": 17684,
-   "mtime": 1788050919,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/elder_guard.o": {
-   "sha": "956eed4ad8314d29e31511a8d7d49a00dad8b29690f3ad46b5d1162b0dfcfeab",
+   "sha": "0acd66c158f3f4f5248de2fec65f19f10bffdccbe5076e095c3ac971aba2bbb3",
    "size": 9036,
-   "mtime": 1788050921,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/mesh_ota.o": {
-   "sha": "dfba19bb1565d70cbe1c419b2980633af9b87439a5f1b9cf6407a9463a466122",
+   "sha": "ba9d03c9375555e19712ff12b9b4a1eb09ccea1b62f5bc8b31e5e9e7665f7844",
    "size": 16576,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/autonomous_mesh.o": {
-   "sha": "479bf21ea93f11b06eb226ae78e9f9bc060f0b754d4c428d87bcf0eebbb60334",
+   "sha": "1389fcb69750e2a890b2d8ebb04089438640b4f0b4109a0f7fb6d4f9573538ee",
    "size": 18724,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/bfi_multispec_npu.o": {
-   "sha": "b50b5f34ec0384875e61e4dcbd5c516d5acd887eeb40837ddda236e4e4a06859",
+   "sha": "ff8cda62a735137c2f0ec098d15e0d704881a57fe445c56ced26b0bd1436c3d2",
    "size": 12136,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/task_queue.o": {
-   "sha": "7a5f595ad5e6bbd45336c4adbb347909b375f2826ebe66fc25c3a5841b761576",
-   "size": 20144,
-   "mtime": 1788050926,
+   "sha": "5e80968834fbab6692afbe9a1bc802fc8e8e2aaa31c1461dde2cfc977a9065c4",
+   "size": 20120,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/acoustic_fhss.o": {
-   "sha": "dfeb16d7dce14a336dedf3f0b9b151c2292505aeda774035a87fe155b9505bbd",
+   "sha": "73cebdda26eebb7c6cd086cc546acfdef862ffc804d42141c4bec9273104e0ec",
    "size": 12528,
-   "mtime": 1788050919,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/ble_mesh_stack.o": {
-   "sha": "9bdb941ead4631e9ee0e532b774497c272a3948b2eade76ac04ed267cd226ed8",
+   "sha": "2a5234b6e0a38070abcf0fcd50d2a557b1353ba8f3ae76f269d07a9ba30e7bb5",
    "size": 9156,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/survivor_evidence.o": {
-   "sha": "fc6abbdf10429febdab6076c2ef57b3a8d62d158d7b87b6a98bfa1975b35a8c0",
+   "sha": "571767d0d277d409fa0e28ba99a79557a819a19b9ec001398e7278b1251f49ca",
    "size": 12624,
-   "mtime": 1788050925,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/secure_nonce.o": {
-   "sha": "ed6790aa6a0345878ad60a185792b45d4829fff46f9def99f85f488a1b8c451d",
+   "sha": "657c21eff6e3ccab3467f32deb545a994f5c0c1f94cd68f7513b8ba1d928916e",
    "size": 8360,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/microtag_apps.o": {
-   "sha": "d43ac3d9521022b8ddfcf5a67d7a639c37c636422f16b85b812c00724107bd5b",
+   "sha": "ddb253e9da0700ea3be37370082594eb654b844b808b5e03d2314881212cfbef",
    "size": 18912,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/security_fit.o": {
-   "sha": "9c9c36cd5e739710d9b8c7c464b13cbc9d37e293dc370bb2d5e79d8c72654e6b",
-   "size": 11992,
-   "mtime": 1788050925,
+   "sha": "c7b96be4424445d5be514b1921dedc43f9365d0974de5b77177477e191afe284",
+   "size": 11972,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/mesh_beacon.o": {
-   "sha": "dee6d435c0398e5b02f815ef4eb64fea6f014375342149127411a42c7208e99d",
-   "size": 6100,
-   "mtime": 1788050923,
+   "sha": "067c465356bb264308f7da3ba7d0621e2d669fe2a95f9685ce6bd64b9f14db5c",
+   "size": 6136,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/device_config.o": {
-   "sha": "8acbb87693252393bd7d3c45ca099f4cff9067bb5e56c4d60254213a02959740",
+   "sha": "25b5c5f769a3774357d7260e95f88bb3217b3e1d63a5d8c59c1d8466854d5bad",
    "size": 17696,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/bfi_sense.o": {
-   "sha": "48b85078430edc1321e3d70acfb64a4fc2f1c49a6b36d8f822929b06f6eb5d74",
+   "sha": "5acac54b2f831f3ce7a6dc865b1638a7e5878a1ecdff5abefe84f5dd118a6cc7",
    "size": 21604,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/fec_doppler.o": {
-   "sha": "34b40a213ab69030bb87e157b1f442d2bcc98a927d731862e9d0642ed6aedcd9",
+   "sha": "3cb5919da688350b1e49b2698c5fee7788296aae29e8b5d34fd2ed775a920257",
    "size": 27416,
-   "mtime": 1788050921,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/channel_adapters.o": {
-   "sha": "edb4f71a400e3dae7a5e47738c07b6bf30e18acd7aaf9dff689d5ea3227e3d7d",
+   "sha": "84ce11903041fc1be46c114530d320ba55bc7b23de63157ed44fa242ff74a19b",
    "size": 19628,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/mesh_heartbeat.o": {
-   "sha": "6bb8d8a5854312b1acd9ab9e08884d5031d0e7478367fb3d83d5499225faf2e8",
-   "size": 6352,
-   "mtime": 1788050923,
+   "sha": "29f5d6de1e08785f14cf647a6ab9f0456f371608fb71b519964cc53707ae8743",
+   "size": 6368,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/telemetry.o": {
-   "sha": "39d7d07130cdbd35840c8b6a517fe59b968989f818739b6f399a138408d2e2e3",
-   "size": 9396,
-   "mtime": 1788050926,
+   "sha": "5e116d6800e3b743d72ff4455ac77c313bd02e8991c3b49b07ed8edd61f7f737",
+   "size": 9376,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/jammer_locate.o": {
-   "sha": "53b9b490051e66e6d28f14b5e60dfaa76ea1c4e405edd7265b3f7fe42a11a9cc",
+   "sha": "181cf1f68a961626ca1b2e424d9dfc7355db73b0f4b439ae94d3605d9c6d130b",
    "size": 10664,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/secure_api_gw.o": {
-   "sha": "1746f7d2c24bc49c0497428748957c04b8e1b22a45b5db2b91b1817064b1bed4",
+   "sha": "902c8f1b6ea9c73a289fdd3befd8e81ed5936859eb221e170571e9c1828e18f3",
    "size": 19576,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/secure_sensors.o": {
-   "sha": "4e1b4ee02bc52a0a9ae8f3a0fa9ec46573386c50e3e58c36b2389cacde18349a",
+   "sha": "df0a43ede49a7f0ec8dc49cb41493c509aa19520957029330ce9a5dc7cafbb4b",
    "size": 25688,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/gossip_swarm_bridge.o": {
-   "sha": "0bd4b1108ea434d55af35ef4ee0567abd53064f163d23b3cbd7f90dafef2af76",
+   "sha": "136aaedb2723a1eea5f1eafc735d91a5cb8a8e17ffd1a37dc3e1eb33011ec091",
    "size": 9484,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/shm_enhanced.o": {
-   "sha": "7113e1e0372b349bc8e1d15319ee00a7189b1b38372da50e0f16a6c7a90d554c",
+   "sha": "4ce0cc6108d21c458d8df332b30909b6e1be85cec98c7ec2cd25054c0839efbc",
    "size": 25128,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/netmon.o": {
-   "sha": "7eea3dbd3c9251f1a9e2168efb9496ffa2566ea522de2ebde1cc1a35027f6687",
-   "size": 16460,
-   "mtime": 1788050924,
+   "sha": "4d48a52c72919df23f30a6dda31e799e2e65b97d9dd27dd7e3834f379455bbd2",
+   "size": 16440,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/se052f_nrf54_twim.o": {
-   "sha": "42934421e013f9fc90653ba250116e0aea7f3ac8bd2e369c5330272857c61de2",
-   "size": 2396,
-   "mtime": 1788050925,
+   "sha": "bd6f4a79e1108f81b1f4ed11b47269a28c582487e0efaf44c423650fbd94741d",
+   "size": 2424,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/worker_safety.o": {
-   "sha": "4dd362f4d6ad52f2ba929fb0298b14106ce76242ca5029a946129f9ed8e2df47",
-   "size": 24600,
-   "mtime": 1788050926,
+   "sha": "e0c2dd4600d9dda15a1abf65bddfc0bf5f8b261268eea56b90848386a54af5a8",
+   "size": 24572,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/max30102.o": {
-   "sha": "32bdad4ba7438a4b6584085c1f00c060097062ecf0ed3930c45cbe1979786b3f",
+   "sha": "843cbf30a7da3ee4cda2f7c331e8fb4cba01fabbc539ed0ed57cb60e036837bb",
    "size": 21744,
-   "mtime": 1788050922,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/bfi_multispec.o": {
-   "sha": "125a946a53652e7e5970a87da3a9e78eb4da580a598a6ad8e74b2780c19113c2",
+   "sha": "c9b2cdb387bc74e96deb73831ac059eab65babb128d140d85991a806e4fd4727",
    "size": 30612,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/sr250_uci.o": {
-   "sha": "106885dbc49d2d9bd7b44eaf24c266bf44cd9e1b2010e23bd9f677e0e29e7591",
+   "sha": "ac2976036464576ef78394a6ea8a45a9accc13546d81e2d634335c171aebab45",
    "size": 21132,
-   "mtime": 1788050925,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/rf_warfare.o": {
-   "sha": "3a9d2f0e4b5b30abef75fe0e595703d1a6ecf2eccf21fff7a5e6b06c973d6af4",
+   "sha": "ea736d48b24a39c15b71d78bd4e9af8beeaea66b0de4d9cbe78ce54e80f28029",
    "size": 25892,
-   "mtime": 1788050924,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/w25q128.o": {
-   "sha": "38a78cdec28b84bb44bb7297b06e22c6271dd16068ce6e4ec2d43639eeac7efa",
+   "sha": "c86071ed9d2410d5f290afa3961f950421068707198dd5c163bbbc52ba375c93",
    "size": 8120,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/bloom_dedup.o": {
-   "sha": "183fa572c241ac3205fad0c7564a78cb2f515547dae3d75cc66b1a7b5295627a",
+   "sha": "abd236b37290cebf0f845497240df68660d2238af4d60d97ec9f2b36a88d9e14",
    "size": 13984,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/echo_life_guard.o": {
-   "sha": "d3d838af331f421f6fc2de3414724fc3966409ba954dce9f4efe5e201f5d193f",
+   "sha": "624a89f6d047748cf7b9318154e30d8abcc3d4d1ab4886262b05446673e76df3",
    "size": 10812,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/dual_use.o": {
-   "sha": "c47bb744c451763c285cf26eeb96d116c178954de6ad58a8863568e67dc9f57c",
+   "sha": "56517d622b3cc8ee3f6c0c41cc1884234d8b88a408bc59c2ac0c185afd951e1d",
    "size": 15424,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/authority_scope.o": {
-   "sha": "de4f9b44c7acd754369d00904f1da20b01cff5ffaf3657854226fbe6414a30d8",
+   "sha": "5a97e8e4896070bfc89c9dff97fc2d50a94213b189f747eabf3db3380f073f30",
    "size": 12396,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/banister.o": {
-   "sha": "45a495862cac395bcd4fe80766a7a68d9123bc42f2ffd22658339c6e4789e7f7",
+   "sha": "365a7d069f30e09d70bd55a89d063c8ef80a8ba70471f672f6887362b7af6505",
    "size": 11316,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/thermal_event.o": {
-   "sha": "22ea705d290c357b488590abdf841036a8329c9595954fc5bda3eeb7c746b495",
+   "sha": "f105873c80303858f460bb691ee5bd0a18f5c2908e1ea78c1c57585d4b215d14",
    "size": 10192,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/satcom_beacon.o": {
-   "sha": "5b48f6139418798df9a94ac96fecfe505c1507e1d8e50e710f83f9ddf75ed066",
+   "sha": "5b9f0457e6193f38a3018844a08f9193ad654f65320d53b7730c5ac69c9cba93",
    "size": 5588,
-   "mtime": 1788050924,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/thermal_zone.o": {
-   "sha": "4206802996b816dffefabaf08a532f43e3073cac5919a69c3ebe95fb8e2c867a",
+   "sha": "e3b10f89452a13aa6c76c627c6429a6a57a141c4bb8d5b57fba29dcf9f28afb5",
    "size": 9616,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/settings_store.o": {
-   "sha": "2fc7e0bf484e2d992b14d513209701c9a1cb635e9ab84fd184188459566b6687",
+   "sha": "fbc143b99f0a91fcb08670f85b4db0ca5bb29ceaffccb608b70890d576dfbddf",
    "size": 17520,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/rlnc_deep_test.o": {
-   "sha": "d22f1ca1ce716c0a0d808d4417f25d02903e2ee9fa14039dd7d08a91ef4447af",
+   "sha": "6f0fba0a49b18e6962002f7d8a6980efbc7b577102812d4c24db154d7324f155",
    "size": 21284,
-   "mtime": 1788050924,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/lr_fhss_ranging.o": {
-   "sha": "56cee51a28fc21f835faec66bae131453a3b6e8c03b39881490ec8eb3a20cc25",
+   "sha": "7283959af22b319c4911d8f3f4486c4ae34701eb1bd63ee18007d5662f52a594",
    "size": 15752,
-   "mtime": 1788050922,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/thermal_budget.o": {
-   "sha": "cf70402e25693550f6270bc14d7972634b70e664874b9395a370a0b282d1dd2d",
+   "sha": "b60bcb9550e7306edb6551688e0997f5d2a320784a752fbf3ad4a00ad688dfa4",
    "size": 12504,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/ucb1_bandit.o": {
-   "sha": "a9aae8e3b7f85c1e667f2d96e931598bb511eae80b569112177400adf78cc018",
+   "sha": "e48a0b53908d0a881c8664ba8705294eb394aea03f0a20a8f47181a016af75f8",
    "size": 16120,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/ca_mesh_bridge.o": {
-   "sha": "ff9964f7192a937b560df7bb66682fcc27ba9a52a11744e3d34cb1ee5f2b1171",
+   "sha": "21e81f1fc421e500e299bf6262988ed0d980d077ce0f89bd133d4ff272c13349",
    "size": 8296,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/sht40_driver.o": {
-   "sha": "f304185b2b5584d4f7674960b93e1343bc54830196adf6207c0bf3f945e8900a",
+   "sha": "14908970575c0f9fd4efa44fa7c63ba88d8b26d0fde582e0a9ce963663b0e1d7",
    "size": 15128,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/cmls_ble6_advanced.o": {
-   "sha": "05850a9369e7d9125eade67449de2aa944c602b9011e7f70378dc6c1b47b2e33",
+   "sha": "19f4e70beca7d29e31fdac46843c6a65d24f01167498ea9bbe237c83e61dbcb7",
    "size": 22196,
-   "mtime": 1788050920,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/rf_spectrum_analyzer.o": {
-   "sha": "609811f212d5b332357829e8a950b167b31c7bad3ef24c3ab47fe1ad3d6df8a1",
+   "sha": "d8f66ad9ea9d717feff10b187abb64744965ff7b0cefe7bc25773ad4fd19333d",
    "size": 15776,
-   "mtime": 1788050924,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/flex_compress.o": {
-   "sha": "fe4219c16cc9abf5317d98f2a1a7fa9bd04bb33c3cdaadf7d9bf2d5aef87bd4c",
-   "size": 26300,
-   "mtime": 1788050921,
+   "sha": "6eb8a5e2fd1cdb651936d782bc2ae06caa9c62612d844519ffd3b0454405d4ff",
+   "size": 26328,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/sensor_mesh_bridge.o": {
-   "sha": "b2ee3c2feceaafc89f98af29ffc71f53ad2615b0507b18604afcac0006c74ae2",
+   "sha": "768bfcc4bff30f1fa5a8786c8e4b37e6605888b888c03b7070df1a24240a0e5a",
    "size": 15212,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/halow_mcs.o": {
-   "sha": "e3898206ede3083a2291927bacc0ba166a960ba35ee94cbc916db3206589b867",
+   "sha": "5809500f77e60505193ac3e9fc6245c183e91ae6d15f4e19845bddf56be422bd",
    "size": 19412,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/context_priority.o": {
-   "sha": "d7481f7271871a6e89fa65dc8b7b77a56e63d8fa52c94402581533b3ae249e66",
+   "sha": "5985bbaeb806393a7c34c86a7925eb1f963bd70a90d444acfc5a1b27fb68f8c4",
    "size": 21508,
-   "mtime": 1788050920,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/usb_hs.o": {
-   "sha": "0c7406a350b6fcfe118beee833615700d4254a64caa8e7d9c7b1cfa029864c21",
+   "sha": "34ca57d221543730a7a6fa879810d6837cb1c5948d750a16094abdb12be58173",
    "size": 6952,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/mesh_monitor.o": {
-   "sha": "a091ff0f82b901af5fe5e32c5a7b1bb4902cdd5653cc0952fd5c0e8e89ca61ab",
-   "size": 8460,
-   "mtime": 1788050923,
+   "sha": "1c77902347587fab4e7412a05152094547f405c5cc9f4e4c29760540ce182845",
+   "size": 8480,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/device_gateway.o": {
-   "sha": "294cb66048ded0676883cfc69d6efe6bcce0d0ab29c4d8913eb6933847d98eeb",
-   "size": 12828,
-   "mtime": 1788050921,
+   "sha": "ebb2d84f1048a300b9f7fbef6cfd0c4ed8c961b6b3faa4aebd3703f540e3e56d",
+   "size": 12848,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/bearer_abstract.o": {
-   "sha": "1c50b8474f64c6c88e19dea2039269e9b1513861693fe6563ef0c17b903aa008",
+   "sha": "c38c3dd41b9538b84212f76fe0e75f7b2221863289e82388775993e1a0c4ff31",
    "size": 10112,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/echo_vital_net.o": {
-   "sha": "1215b83f70bb1b044a59678c5c6947fa930a9c4e8cce359454475ff13e3fe051",
+   "sha": "d64fa88f6f2e8d5451060781eacd3ffc6dbb1c222adc23953875e9a69502d578",
    "size": 14360,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/adaptive_modulation.o": {
-   "sha": "0d8eb2ad4d7cf5adcdadf6ac773e3d9e21af190e05e7ded47a878b6a7a09af69",
+   "sha": "83e9eb8514f21be1c8580c3bef2f4c53605623d92558bf3dbbdd17ec80442dcf",
    "size": 25104,
-   "mtime": 1788050919,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/cs_kalman_fusion.o": {
-   "sha": "dda0e25fbb5b02923496c4c07d2899b37ad7e07cc2803270eacf206cfca5f799",
+   "sha": "2bc9fa38f1ef34efffc3a8b08da9c01209ef94dedac535ef929eed0c967b8f6b",
    "size": 18380,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/security_compliance.o": {
-   "sha": "36636616b664956367d00f1e46f9b89b4c0a21b08db7058082dce25fe616f179",
+   "sha": "2f02bfd414f1e71644fb7128ee435f3b3df729d11a43d7687b2747fa99a33b51",
    "size": 14508,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/micro_ota_wasm.o": {
-   "sha": "4f3780cfdcdf1ae88ad74ff505c798170efad624666f6e6bae55db2bd5a42fbc",
+   "sha": "6c32117efc1f8d4570ecb215e01404d13919774fea655affb77ab9f5047f1c83",
    "size": 20460,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/lpbam_dma.o": {
-   "sha": "7217be1059fc36a033f0f08e21120e6884bbd000571a07b9167e1aeda98ef6b3",
+   "sha": "f6d2a75758c9216c1c77dabe8b7f50a6c326671bb17f86d2c752c67d0de50583",
    "size": 11872,
-   "mtime": 1788050922,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/meshtastic_aes.o": {
-   "sha": "fff535add3664c1831bf3e2871d6af04c5eaabd97776e940848d86c861865606",
+   "sha": "b655c69a39c7230685ab1c92b7d684e0a4129984f039da3c9ba21aceb731d48a",
    "size": 17592,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/thermal_throttle.o": {
-   "sha": "052bace71bde0ab64afe8658a9df9ba27da982069226696d2fddde329c0541c2",
+   "sha": "56a08b1c02ffb73d6785f4649057f795aaa859d1e24b77fd88f0b5abc8713c5d",
    "size": 14112,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/nato_interop.o": {
-   "sha": "112d8696f7b8b5e2a42f3dbef1fa2c0adb2376253a85258bd9746632f545b53e",
+   "sha": "3aa7376b869a35abc67b71271a05cd6fa98a05d5d5efeff04514f2aa197355f0",
    "size": 21728,
-   "mtime": 1788050923,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/ota_crypto.o": {
-   "sha": "765a81be903c7871f3ff210a6a651918ba7ae7461a8e8b07be6b7a3d14f4bdad",
+   "sha": "b6393a061f0269a75366b523d4a56f07cb2ebdd34137268ea57cbfc9523a33ea",
    "size": 13104,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/time_crystal.o": {
-   "sha": "74fa8356cf0979c2768f9ed405b9c14fad3b34221ff561c116ebcad4363a10fa",
+   "sha": "9e64500555c20d5dd4dc4693e23754006a092b98fa5817300db987ec63d7000f",
    "size": 27632,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/policy_engine.o": {
-   "sha": "314617e2241065cb56b98ae0aff279e625af5e96756126b735b80c2e697565fe",
+   "sha": "46782b7eaa4f4c36fc3c815a727f847e9c9148e6272f1836c3431eb92696b8fe",
    "size": 25032,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/goodput_v2.o": {
-   "sha": "b3e2b5e2c4ea117d98d60f8c8d5fde156b7cfcb24a1e1474384c1725472bf875",
+   "sha": "1e0c8eebb1b5852a9afea79e815c6cfdf0bdd3d80b7dcd5b725ae3cd3701b717",
    "size": 39908,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/sensor_aging.o": {
-   "sha": "ab55ec89a4a154f2796b9c6f018f04c1e8ebf25b426c15a772efaa0e10272cb6",
+   "sha": "91fdb90f46a857bfb4e1d688b3cb0247a92fd173d3701260aec19037db99a421",
    "size": 13056,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/trustzone.o": {
-   "sha": "d457864ad17883ffd66c388d5554279e8effcff4f030154618681160797a7a0c",
+   "sha": "d039edd6024aa666a46248cf41e7d9f33c771b54e88ba2bf3e6b7b6462dcd302",
    "size": 19760,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/hybrid_kex.o": {
-   "sha": "66ebd11c85bf74d8cebdf32f50b95f1bf6e12a240379b0fc194a3588663d450b",
-   "size": 5676,
-   "mtime": 1788050922,
+   "sha": "c175acba52b3ff4309545112bc72e79a7c1f48e528f58bc05e9ab43860beb29d",
+   "size": 5692,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/pkt_agg.o": {
-   "sha": "6191af413afa9b35bde574204775342bd2a0d56201d949f2fe869c8a9e4534b3",
+   "sha": "ed12d22f5b505524451f5fa594de871ae26315919aabf791229d5543c47c2240",
    "size": 12580,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/bearer_selector.o": {
-   "sha": "903af77cc7610f310987d048d12be40109d045d69c4ef212928e2f3deb48f890",
+   "sha": "aeb6890e823c98066610a535cc2085bdc9546aeadc155be1f2917ab6d5efb58e",
    "size": 22404,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/cumulus_loop.o": {
-   "sha": "dd67f3c30737f4b2074a821173f3d15302e3f6a2a7b1900560d54b828aa77f31",
+   "sha": "0ee65870787ca16d0f28ae62bec8688f7f308d01b930b8ee4a9ea0bc3eccb1cc",
    "size": 15792,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/se052f_provision.o": {
-   "sha": "a50ef96a6f9c0aea5e0188f9e80fa3823d7824951a64ceb336384c2e039b9762",
+   "sha": "cc5b48bf5ba359027046b5567863efbe274e26b14129550a416d425ce1f87e81",
    "size": 14024,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/route_cache.o": {
-   "sha": "2489a9052acce67c09433227217e99d819b9ff01524d40cd9badbf0be8f38f23",
+   "sha": "34a398aebe05d76c72c7106bd13175e33f1d6b315e38fca540391f65b6540092",
    "size": 10520,
-   "mtime": 1788050924,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/mesh_core.o": {
-   "sha": "4154ce4b147a220a0bf93e8c3d347c05bd4d29ad6e9d529b61d1b1601ca7f846",
+   "sha": "9dd44f23b2e8a06de0c3201ecb5028f8768d7604a2768991ef4a0d6a35845284",
    "size": 71888,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/phy_keygen.o": {
-   "sha": "fa19703c7cccf1d7b3b7638528759bba54b73ff3ad826554c0761d82cb99a83b",
+   "sha": "5a21c4cef7ba372f2aecff07072e1a2ec57fc89ac69cf339a97e92557a1de168",
    "size": 10560,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/compass_calibration.o": {
-   "sha": "b6bca7ee7973b6ea889c36710ba03fc3760083a2225df50cd1a12ba65640916c",
+   "sha": "23e8a318a7294aeb578fa762c08e7bd751200d160d3b035a6360a2e3efc0e9bd",
    "size": 39788,
-   "mtime": 1788050920,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/se2435l.o": {
-   "sha": "c3d12f61e83d1658a689868bc96fe8d74241ccf235025f2bd44cc2978a4668fd",
+   "sha": "309dbb48ca00cc44e3a2e473cd50aeb6b51aa245831da141376f02942c94df10",
    "size": 8972,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/shm_fusion.o": {
-   "sha": "eb136049e4b746680506666c7d2712bbd7287ebb0a91f9d0c58a94e16901f538",
+   "sha": "960bfbd9f58caf37d7cf9c0f9a75182e2ca7b0a3068e3689a0205d567d99a15c",
    "size": 28964,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/multi_profile_msg.o": {
-   "sha": "7bb1bb17e650eb1b0a751de41afdff780784fdadbbc8c6fa868c1da590e282d8",
+   "sha": "4b6afe9eb55b0730c38ea94210c918324e5277e664cc606356e20d12d931a382",
    "size": 18260,
-   "mtime": 1788050923,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/aoa_verify.o": {
-   "sha": "42e45dfb418b9cf8c8fba2d90aea0151eee0eab08d95f51f22ff8d1b0b79161b",
+   "sha": "42cf938596bdf438c248264f1cee052c37e4207d173192ab59a323f0aa283f07",
    "size": 5424,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/lora_rssi_ranging.o": {
-   "sha": "715a6f218e56dd0ee841672871080877e7d012c914b96db0ee3d95e8bb424643",
+   "sha": "cf8bd2e6a19c71510ce08a50232afb5c22bdf5c8dcf0435f4136c750581492c4",
    "size": 13660,
-   "mtime": 1788050922,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/secure_cloud.o": {
-   "sha": "f0bfb063c401cbf65d642655b3f800fe3fd8fb2a5502b6bb796f2afb9aeb2242",
+   "sha": "9ac59fc6511e1ca45a6ecd7752560e279ba7a86221e6793283480e01ebc4798c",
    "size": 29096,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/aco_routing.o": {
-   "sha": "d562786e6bd51e8fb93971c2920afcf05d43faef670480a9c6e2d051b2952ba7",
+   "sha": "5fe4d7fd40b7e8209ae40da4083e32c0b27da3800f5f01becefa5ed256df36d2",
    "size": 31936,
-   "mtime": 1788050919,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/sar_classifier.o": {
-   "sha": "e8b15a77ce0c0cb93fc0b15edf4971909e49c6910f2dcf0d898b2263518341e4",
+   "sha": "7160f2c1c4b479fc3783a4e0692fdc1f9355a82d3f35a3c6a662a6d05699df52",
    "size": 15452,
-   "mtime": 1788050924,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/physio_readiness_score.o": {
-   "sha": "1e33ed8ba42a61bd21c60ef8fdc8245d7528a90afc6e1190d34d49c38b3bd034",
+   "sha": "2e4dc41984feffc14bafabbd965ef7add16c63b1ac0b834e0e293780537341cd",
    "size": 7148,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/lmi_p24.o": {
-   "sha": "e57af32e3778811750bd7819f37867b5b9df35d57b4a4b2cf121323585994d7e",
+   "sha": "51685ee381b75724b8d917b4088fe230b5de9ac82818be3128250bde920ef7e4",
    "size": 8336,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/elderly_care.o": {
-   "sha": "32f950f19a2c1a1f58c464956627b4431790a72e995cf91ff28572bebdf9bfa9",
+   "sha": "4ccac4aaf3271b01d952aa9a6448d17bd1724171dcb72110548d6d31738d5d5f",
    "size": 19736,
-   "mtime": 1788050921,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/homomorphic.o": {
-   "sha": "e2815986b44420b8a1ae9c237ec3054fb0bc0fe0958cb0f50c1f98f3d9a0bf1d",
+   "sha": "4498d86c42bd49aeb7c3195e459f70d502ec98a4e4f7234864531712f6077ff0",
    "size": 32020,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/edge_ai.o": {
-   "sha": "98167d907a92d26b46606ae1fee1414a31cd43fd5312bbfb96d1078695d07ae7",
-   "size": 34008,
-   "mtime": 1788050921,
+   "sha": "3ed8d44fa6f9a90f936bf6f20b230fe3a7e7aab37adeeb3e140898f910bd20b4",
+   "size": 34048,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/phone_bridge.o": {
-   "sha": "6557d3892ec16dead7838ba5dcabf24b1fa3f97199ac0275720185bf975f5bf9",
+   "sha": "904518b3a2dd10d42a6226411af5fbc61e5bc5b8576bcfd17257584210adc723",
    "size": 26200,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/superadmin.o": {
-   "sha": "59f5cb4d241b21b8800cc341bf354443b06fcd9e746067daa6ec08a6b7e8048a",
-   "size": 14388,
-   "mtime": 1788050925,
+   "sha": "d36c39a28bb2cba72d7c9b74704aa3c8ac69054ad81a0f8b1469b8780a3d3b25",
+   "size": 14408,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/datalink_stats.o": {
-   "sha": "e71aa529a202cdac0745935209e935872ed6b5321ca8f5bf29c81c9414bc6060",
+   "sha": "2f8a10855bf8b4d054c3ed27e014eb87a13611741d47913c0406376c228ceb6e",
    "size": 13092,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/mahony_ahrs.o": {
-   "sha": "5f31f36d7836cabc1cbfff263be2309b8f6e84c4d073ed7ade5eb449502236d9",
+   "sha": "3a69937dd992fd740305fa641c85fafbaa0f80e2beef39786f8d589eef8b1b4c",
    "size": 17888,
-   "mtime": 1788050922,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/voice_delivery.o": {
-   "sha": "822c94943c6d81d88b7d8a0e1dac325b88bf1d7622b3de39f9e657efe4c0958a",
+   "sha": "1d8f4a11101638e91b78de1869df7e7639684acd9ac9870aef4c6132a416d1cc",
    "size": 21824,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/cumulus_shield.o": {
-   "sha": "965324c44cb40ee94d59c71b777ee45058782e317b285158ddadc2ad3f438e0c",
+   "sha": "2aa1526475b3969fb34f8434c07c23242e5586c4cefdbcc2d9101e4630e61e3c",
    "size": 19524,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/snmp_trap.o": {
-   "sha": "bf13fc7d607c646a4f478fc448802fbb8e5399b68bb259d816c76250a973cce2",
+   "sha": "9876125dde4bea3ced2f7cebf33b44109420e4ed66c80528d2c83bf25a5e6507",
    "size": 15180,
-   "mtime": 1788050925,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/microtag_ux.o": {
-   "sha": "f86df8b36b3c9d75a38063c42b09eb9cf93b28ae8bcf736a4a37ba676bc8c438",
+   "sha": "09c7513a3f5eb465dd7c825ee1b0cacbea7fad27e4597a6c1a760bf075235872",
    "size": 22168,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/ai_guard.o": {
-   "sha": "b77041dda3bdc936ba6ce9a172afab4206d4b2b6a3e06a78ebdc2c6ae9736a81",
+   "sha": "c1a4d270148d29f1bb3c4420696049fe71270e2b6ae0f6e3a6c7f99b628a24c0",
    "size": 24548,
-   "mtime": 1788050919,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/pdr_predictor.o": {
-   "sha": "9a9bca6c8c0f92554fc2dd235e46260b94b51838886720065db15a6bb99d9ac4",
+   "sha": "21c6fb8ff449131e11365ddacfd20951c74c712626e5748553ff6a980491a379",
    "size": 9348,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/boot_session.o": {
-   "sha": "8900024587f180696be6611efc32cba4759ce6b0e323669ca5713fe7a76b37d2",
+   "sha": "a2731caeda6b92d34241de0c98015c892b7f644e905292889920b06b825c5681",
    "size": 12336,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/coop_tdoa.o": {
-   "sha": "f09fe59edd8d0df2e95ff2b9b01305f91b5f3ffacec8ae3349601f1f2a2dc726",
+   "sha": "48ae655630106680b0a3d93912f13553bb4a51efb3dc86e42ec5aefb7995c30d",
    "size": 15140,
-   "mtime": 1788050920,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/fl_npu_bridge.o": {
-   "sha": "ee0bde74744de00936b6c1360f8665d84d97310418f49a91bf875e2fb38af3d6",
+   "sha": "d2e333bb94e90360c0ec7c42bb413d60121e27f5d4ab59ec19c2d8b1c5a8b498",
    "size": 10116,
-   "mtime": 1788050921,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/flood_relay.o": {
-   "sha": "7554a7789ab36c2ca6c3278b2b5c4eeddd41e43fb5f441833e4c94d7c706b446",
+   "sha": "05b2781dbe03ad521aa09b8c6fc7266c3f32d19542745ff0efc0314d27570141",
    "size": 8200,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/vital_signs.o": {
-   "sha": "22d36189415c4ec35b9b07196cbb33630071ff5b0ef63c6ee35bb81b031e2d3a",
+   "sha": "9ebb9ede41116de1eb4310d79829fadd6f8a6ada36adcbacc8e6bcf63a33a527",
    "size": 13436,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/sportvital.o": {
-   "sha": "b2675408a9e0148331c823f7a66c03fe9a04947e9bf2502f314001c1d09cacb2",
+   "sha": "edc40cd0da392c3ae7b2920aff8c114b88d0b8d547ae7e2b5dc7b82841ffb6c3",
    "size": 18784,
-   "mtime": 1788050925,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/squad_manager.o": {
-   "sha": "3a2e7a80fdbed4613093a6ed06256f57ecc3123bd21aa2d60daa05c3b832efc6",
+   "sha": "66884891812e53fa6882d2a59649e4d44168ebad1d216ac33417fcb6bbdac5ea",
    "size": 23544,
-   "mtime": 1788050925,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/npu_dsp_shim.o": {
-   "sha": "cc4d7cff69152c744adc5fdd78c1f2cebe0b020e5bfec5cb9d2ede643fed1478",
+   "sha": "ba15d018f820217bd716168641a761943ef42faa7cf65cb3274d8c27e95d08f4",
    "size": 119284,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/lr_fhss_wifi_mpu.o": {
-   "sha": "8cd19c1f8f6eafa9c27ab5f5a4507607233e3c4764641e1a1e6253340bfa06bb",
+   "sha": "7f28758f3d15c423a2f42c25e8e6eb089d7d1fa131d9675be52fbc388c97dd82",
    "size": 14120,
-   "mtime": 1788050922,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/neighbor_consensus.o": {
-   "sha": "ff677ace5ad5abaf5f8c61f4a352aa6329dec0a8563278902001aa90183a7da3",
-   "size": 36524,
-   "mtime": 1788050923,
+   "sha": "0da1272a67059b045c513931d525a813200cad56c0cd63dee9c18c23e2c18185",
+   "size": 36556,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/cumulus_protect.o": {
-   "sha": "8adb12b5cb573c888d0cb44108f0b243e1d8f4034acc893540bfdaca90387f6b",
+   "sha": "3680a0eda9769838ed6d73bc69a4319442901eac9cb690680b538d3141b00403",
    "size": 17092,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/rf_anomaly.o": {
-   "sha": "ff621d61e93faf0e0288aec180aff03c60b4b10774b4a8f00bbe42c59cab01b5",
+   "sha": "955b5a26ef9e7d58d529711dbc7f1eeae260b5729956f776ccfd4b163cfd42e5",
    "size": 25896,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/scenario_profiles.o": {
-   "sha": "58143b2b98ebd8fb6b0f41983439fad0cea5e09f39d624fbf0104b116965179a",
+   "sha": "fd3b368c7b36bd82745dbb2581e2fdd5849b67f67cb7b5ac4443fcfaa0ea5236",
    "size": 14440,
-   "mtime": 1788050924,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/sf_adapter.o": {
-   "sha": "fcc32bf2ff631bffefd5fe09aa6306e6cb5198c3b2785859249f53ca3efcace7",
+   "sha": "05cbebe7b1addc01f4a494d3c8c9ef100cc41b4a545bf927ece7fddfa3b820c3",
    "size": 18840,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/cyber_defense.o": {
-   "sha": "31266795ecbd71d18b98d33c19296a8f22010296cc083d67ca3f246809cfcce5",
+   "sha": "9aa8df34662d7e6b2cd1079aedd93c1cd55463cf7e06a62f6225f0b4fe715157",
    "size": 30764,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/cumulus_auth.o": {
-   "sha": "5e8a8de10500dacedf47f92be545a28b815381f97e186a899f7795030950fe3e",
+   "sha": "27ea723637d2684e431332ba717ef59fe2c5901a36d22343ad2b2120885dc347",
    "size": 29232,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/console_ota.o": {
-   "sha": "9f2c7f604bddb710fe960a79eec2e8c82f2516e490fe09941ecd77878bbdb5bd",
+   "sha": "3cb5aa79e0193f62c920f9fb78932a9fe2c1d6317cdb184cb527d12f206f3861",
    "size": 8364,
-   "mtime": 1788050920,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/multi_carrier_sensing.o": {
-   "sha": "c18c1b1671407300d3d4c1fbb4d12c148e646024e4ebf902f8c3fa2742759831",
+   "sha": "c81a003875565d1a38395e890113efd576e172a344e08a4533eb73fe0ce4fe5f",
    "size": 34148,
-   "mtime": 1788050923,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/echo_active_policy.o": {
-   "sha": "de4ccfd7d6d3f8a1835b0319ddafdff86a9a0bfe07d8c0c5fb56bb85f308b14b",
+   "sha": "342c7f30963942f113fca49ce869c6133d1ae27848fb2342de362ed43a706b7d",
    "size": 8764,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/frag_guard.o": {
-   "sha": "8efc63e5e8f1267dec17be12c29da47127b2f7aa73b7ac6ebbdc4d1819c06fe4",
+   "sha": "09c0fe9e5ea3825c0b7b548e953eb5fe9c8cf8c6fa856fcae1a7d86bc9edf53a",
    "size": 14624,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/digital_twin.o": {
-   "sha": "16337cfaa120c49902cc90fa912c7917675844c7ecd579cd352107eb364cc512",
+   "sha": "4b75ca98c4c714272f8d175c455dc58d760bb8577619a3c203c0f2538e91012c",
    "size": 31324,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/aes128.o": {
-   "sha": "e94b0e53a57c5862a43ac5b6f1364dea36970c2b4b1594ab5df1f8742e0e0a8d",
+   "sha": "bebfaf16d46cdbfcdc34e2ce5876252645b0ebffaeb1967c99853a043055ad71",
    "size": 17704,
-   "mtime": 1788050919,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/pet_guard.o": {
-   "sha": "ddc51d3f68e951735224ae4e5bbb22e30111e4b05be8f6cbb5eff17c8f6ce4bb",
+   "sha": "c7eeef138622c97b36d6607f79abaf785261af18e1b9dea31593307b5eecaaf3",
    "size": 12048,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/vitanav_npu.o": {
-   "sha": "c3b3695ab8f6a16da4beea87064efc7e7307cfb82a55d36f47e82dcfb9803797",
+   "sha": "912991bf1a42e1dd1710e8d497c476129d3fe886786b539c74832a9d1bef20a0",
    "size": 9188,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/ai_battery.o": {
-   "sha": "ef74dc8dd5284b450e2a8261bd415fa6e4f284e46c869a8a683b992f543cc6a4",
+   "sha": "f2472b6de15af000794d67f8aaf828f24a1e952ae9e23d2339a8253d83e895e0",
    "size": 8236,
-   "mtime": 1788050919,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/sky13575.o": {
-   "sha": "5cc5669c71ee541afb9af935713b7b3d9356252c0ec773fdaf499fe4641144eb",
+   "sha": "a3060281ff01fb8d4f9288749e69696717ab2fc0990b92f68e8af1400e9c0098",
    "size": 7532,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/bfi_enhanced.o": {
-   "sha": "9e65055476f1db7847255af297d7b11d143c6d30990e41e466e3631c2c02a880",
+   "sha": "3e6a7d4c2422b9d80f283bf02d651945de10a0692340f29fed72a4cd6ea2f2ee",
    "size": 17012,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/nav_unified.o": {
-   "sha": "bebb2e3dc3281b387f454c4b55c0c1c28579eeb85caf8dde7fed1f8c3693fe4b",
-   "size": 15348,
-   "mtime": 1788050923,
+   "sha": "1bd7b77cb771578d39a01c1ae3f77c862aca4f5b2b8a2b4a29e91148f6da9607",
+   "size": 15372,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/ml_power.o": {
-   "sha": "066702c12c7bef27ae91268755b8cdaadcb7d9b95184dec26c006267516193c2",
+   "sha": "598d1039c1b65ed9cd0c4cd28f8e7e639c181c07e23b9a7ef3b4df2c446a9bfe",
    "size": 27684,
-   "mtime": 1788050923,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/coop_position.o": {
-   "sha": "4441adfc12a760ae930a5fb7295e1750d9fab5ac91cdbb185dbbde1ed9e7d422",
+   "sha": "dee5904e6c4309007c8a6c575a33ab991978635ab259b79a21e2947f29a07461",
    "size": 23496,
-   "mtime": 1788050920,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/energy_harvest.o": {
-   "sha": "1f49c1f91863da2b8fb3a57f81e86d6c95d29058fe9f33a1723261500bd50178",
+   "sha": "307baadd688dd789d7f4b9ed088f5e853ba82095d3d0695537fd6740467d9e0e",
    "size": 11052,
-   "mtime": 1788050921,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/lpee_pipeline.o": {
-   "sha": "9896d40c74c6e35a8f1289e2f1a0e398f93f7965113206d5b9250b1a983c10d4",
+   "sha": "172a6b9b59cd1a5bd393ff21a2f0fe759c56a67e19967d2d0d0c44f08d67e534",
    "size": 23128,
-   "mtime": 1788050922,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/sysmon.o": {
-   "sha": "12bdf8033f4390eb096cd5c23152577404c675f36a23a992d9cc2f7f87ecf9d2",
+   "sha": "7d32a5dce78dd301ad8196c11e3afd82371f6fff27ad62c76a8683b90c60632f",
    "size": 17932,
-   "mtime": 1788050925,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/rohc.o": {
-   "sha": "c4729f9cd79b757c860ef3600dccd93abf1adf7accf088dd196b898abec8cf65",
+   "sha": "debe2f3bdb1b3db52a8b0677cd5f5d15932ceb0f1745c6497c83c0e0d43217e5",
    "size": 7480,
-   "mtime": 1788050924,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/tdm_dual_block.o": {
-   "sha": "a7801711df80bd7c5b5d1439bcb43a6bf271dda827929d461278ffd4d11bbb04",
+   "sha": "bf7c36ae4e5ecd5cd4ee3aaa18b08b37afb15c3005e921756b3bc3302d850947",
    "size": 15624,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/halow_twt.o": {
-   "sha": "436146dfc6dc3bce4c1d2ac2407c1da5497155c2cc829dd1dc92cbc5a4fadcf8",
+   "sha": "1c97b51e159fc5548678c2b2c79b873e26ccbe9f2878d454323eabb0a92fdf42",
    "size": 12412,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/pqc_fragment.o": {
-   "sha": "72770c1576b1f700d7a942f581a848cc250edf0cdb8c1103c58e6e52ceaf2892",
+   "sha": "65493d33856ad6b156c0eca682c0fcd9c0f93486da846c6020db5e0ccd5bfeb4",
    "size": 18720,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/mesh_send_stubs.o": {
-   "sha": "fbde798e8b8902203346eee7e09326bd8480c230a0842eac319c325bd153f291",
+   "sha": "97de60ae8825caf683cb874434cfa57678f710119d5df8a32b893af7b3ac77ed",
    "size": 37328,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/lorawan_relay.o": {
-   "sha": "44938a8394ab30d63ea36cd9377885a5afbf3c639be192cb39836f5fb1fb39b2",
+   "sha": "5114ee7170e349228482b1a7ffe1aac28bda5bb0933a62b15b4abec1751fa412",
    "size": 22100,
-   "mtime": 1788050922,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/kernel_stress.o": {
-   "sha": "8c8b4a3db9feff8aba0c0ac307aa1a34ef47880f96bc6af572f3d8db00682ca5",
+   "sha": "d293854c3f2623f9368c70b623f1b08a8bab543ac692a7a533247671f79afd7d",
    "size": 18204,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/goodput.o": {
-   "sha": "08c471c088f00eeab45929232cab415dee002d4392596785b51ccf9cd91ae1ed",
+   "sha": "e046b3dd414a3eeec128613b9f3b355e2fa8e01cc08ce6041ca8dd602ee5553b",
    "size": 28296,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/rekey.o": {
-   "sha": "6cbcab4b1fdc84877fb108a103667fca83966b585c94220fcc4a195648158c02",
-   "size": 5744,
-   "mtime": 1788050924,
+   "sha": "22afdfcdff39030b9c7da81275dc5983c03b53f24a897976c58817386ab0e47b",
+   "size": 5728,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/fuzzy_handoff.o": {
-   "sha": "5c8e77c4f37bd1879ee97b8456cd02283be2e4374bb286123715404504eafc1e",
+   "sha": "8d503f6ed84f56a2308ea2be4e87a181a5c6ec551f5dfe82af623ac149c503e0",
    "size": 16068,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/msg_radio_bridge.o": {
-   "sha": "0be1b1bd4d000df20e1137869d825154f0af7f3283b4c0d0b32d62738beb0500",
+   "sha": "37e345b24bc0dd0cc9f289c5ba54c21b92ef303ce2bb8c1ae064d80ea7e185b0",
    "size": 21812,
-   "mtime": 1788050923,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/hrv.o": {
-   "sha": "5ff3ba3bb6e85de3852e6607c862c016f49fb131647945ad04235d22522fe4a6",
+   "sha": "d1e9a432695a0c34c664bc3b2b6b5d13646f29fa625693a46359b1b068bb4f67",
    "size": 11744,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/main.o": {
-   "sha": "007da7d79c2ca4ebbc47a6635ac48d2e6d2fc5c7816462768353d1d561b4e176",
+   "sha": "0380d67fc8ac7282e09d64f5e2e5f787a76c5c3b21378af63b33c4c4bcc7269d",
    "size": 9848,
-   "mtime": 1788050922,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/mesh_swarm.o": {
-   "sha": "7941b0280506760fcb91ff244f3381ee31bb04448cff8706ee8f131472c683fa",
+   "sha": "02f0885d65ade21c14e7f5e4f66c2e86c1cb9e37831b95e6c6ef62fb28414ce5",
    "size": 43116,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/power_manager.o": {
-   "sha": "a3c2f78b2c6dacee166d9c37899f564fa9b82544830ad517a108281a0147031d",
+   "sha": "ad73356b1334f53e13465bd435835e0cc30b6f0d8fe25919123c62939008c093",
    "size": 8964,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/mesh_governance.o": {
-   "sha": "45bd69f32d52183beb82a703da0e0de8e5a238b30c4a267d77a3bf5199d55daf",
+   "sha": "c6d2a0c13bbcad9b070a0c9f89b40e4129f9e8dc645ecea447e027534bb12aa9",
    "size": 7796,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/sar_profile.o": {
-   "sha": "df5454768d99e8f0de2e5fa807457cdeca2978b41994aee313c61db700ca737d",
+   "sha": "b7a16b7e4b4a94ce01addfaa1428167f264f82906292bd030b7779b7ace147b3",
    "size": 16224,
-   "mtime": 1788050924,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/schema_delta.o": {
-   "sha": "ad8f94b23d784a0921210f00f0460ec5b1b932342e954e6cfd278db9e73fef22",
+   "sha": "f62c994d142d7d3c73f48e5fbf9f57964d192ff3cec0e284a55a26f0c202c05a",
    "size": 15644,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/hybrid_position.o": {
-   "sha": "ac78e1a689a7c525c5b043e438d16728df50079aba6c761d1a54ba0ca89f27ce",
+   "sha": "cd9606ae4f4ccb1943d595aa5d433ac3f20f6d70338f830a3ea3de6c0052364e",
    "size": 54444,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/topology_manager.o": {
-   "sha": "a2093520e79555a4a578217648cb8f53a1935f622ffe60a8ea9df7e622e64a94",
+   "sha": "f5c00fd296fd1c9691a36a9af8c4df8b3403d7e9d7bdfc1692315c250d836248",
    "size": 12612,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/platform_layers.o": {
-   "sha": "070a71b1ddd18c00dacfac0075bf9c6bff9fa8b922de3905327f2dfb04faac9b",
+   "sha": "e463961ab9b197942e9c53f47153bc60e100c4423d487fa6e508e69491481ce8",
    "size": 31848,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/se052f.o": {
-   "sha": "0c6e4923540fafb2d9a48be9cb73f8e9a0748ef761d99490e55eb6d2ff859839",
+   "sha": "7a6c965c6405ef2455a83554166bcfb3ccbd3e8a272bb47c8e9489e356125b82",
    "size": 33116,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/kalman3d.o": {
-   "sha": "0bf1b73cfe187eb4ea2f3ca503451c4256379aca6dffc299e264e534c38a83f4",
+   "sha": "06619f562f3a0c878723c63d9655d2c6c931c2aa3cb7e392551298ef59f67195",
    "size": 27604,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/reality_referee.o": {
-   "sha": "c4611b22e74c20617f410a64e80e0d9c9fd90dca6d33912a449e84d198a12792",
+   "sha": "5a77e42dc93c4b15511b2222d35d87d69600367e2551db495d32da9a7e1e60c2",
    "size": 35040,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/diag_master.o": {
-   "sha": "4835762a674dfffe41bbcc122c58767a739e0ffb364eb7588430e9d5f40bff1c",
+   "sha": "8c9e2913ea2d9f5743078a2c21bd8761a1862bf0f72e269ad3ebe3f322d7e816",
    "size": 27000,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/hw_accelerator.o": {
-   "sha": "c40cb6591cb895d80d6dfb63cbf89252332441cf0013072d2f4857fe4e453b28",
+   "sha": "b13359caaa4062af31f1059c5b2ad3f5eb030bd13feb14fd4160651d9e4d4002",
    "size": 21040,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/secure_enclave.o": {
-   "sha": "afedd887a2dc67ae9af7ef74e35556ad10945c87b9c80bdc6e25ea36dc2eed38",
+   "sha": "49c9f770c327ca0cdd7a463f3a14e5d04b2b64892ac5e71d907705085a4a4de1",
    "size": 6584,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/lmi_state42.o": {
-   "sha": "74c2363161ead46a72d4b1125fdfe92ea11244a1bd5448d0607fddfede166608",
+   "sha": "d6712b1f26294868922b05d49dcccbb2370992bc8b7f5be14eed5d4b7b3cbb92",
    "size": 7388,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/mesh_vital_proof.o": {
-   "sha": "252400a6024c1f9237015c9e7b0cce8df76b7ce364d014ec86bba0a5ee8c9c78",
+   "sha": "6988e9a123a629bd06f029f14c17944c50f894f876860478cfd3b2be276a60ee",
    "size": 17724,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/pred_spec.o": {
-   "sha": "74907a3fe0cb2a2aaf992837b05ec9e4b12010743995fad0eb5ee1958805495d",
+   "sha": "b3705da66ec9324fdf4aece1da79ad7ebbd3596d658cba9a27fb62ffaa445208",
    "size": 25908,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/mesh_adaptive.o": {
-   "sha": "3747cbc6d614f7259bcdac95570c01645000aa5158e74fa4f6d14c901c75416a",
+   "sha": "c76f2f56979b7ffbd15242ea3a8c06309b5a7c8af6e07fbd8aa14b41bfa83e6a",
    "size": 20804,
-   "mtime": 1788050922,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/route_metrics.o": {
-   "sha": "a69292b0385f58c47a850246689187d46c04cb91b054bb75c851d45ed1877399",
+   "sha": "52b35902599ca6453d7417efed58392456379a62143a4da7a3025ecbcaac1189",
    "size": 18804,
-   "mtime": 1788050924,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/lmi_cert.o": {
-   "sha": "a93f4625dfc7f6d415db5b24e55c7213bd073c39e2cf68e1576fff92cc8d788b",
-   "size": 4012,
-   "mtime": 1788050922,
+   "sha": "4b477e5a0b7e47727c4de1c109f29dd970c6efd5a097e8e79c59dc42d0ae3e7a",
+   "size": 3996,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/qos_engine.o": {
-   "sha": "d664bbe2daf56dc4f5c8c60f54e14b33de14ab0d637fd488e6acf08df54018f0",
+   "sha": "77d5ed628b3a0411e7e5c2c740dbe08595859abd8c5623c28f8c672555e41447",
    "size": 33980,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/echo_scene_pose.o": {
-   "sha": "0cf6bf1f2e5fe7844203e36a431d7849655ab3d48957a1cf62da0f20b9aed741",
+   "sha": "a02264e641ec3012e51cf74a818b2b0de5394a56cb0cad6f3064f91c3eb1a0bb",
    "size": 9568,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/cmls_scheduler.o": {
-   "sha": "079c608c02124880315b1e45746318ac497ae6bc9d733f54723d88e7ecd4bd5d",
+   "sha": "01ae4972baba35f7d341ab5055eaa5a1caa8a3f409b844f88b2f0252560784f4",
    "size": 27084,
-   "mtime": 1788050920,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/shm_vital_bridge.o": {
-   "sha": "ba33771a445b3b6e746ec824e0cf18ee91f9fefad6c45f1e2e65dfe4f677a3af",
-   "size": 21708,
-   "mtime": 1788050925,
+   "sha": "9cd61de765d3179bb64ce29af740f730074025d61c8f4f084cd2f8e880e479cc",
+   "size": 21736,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/neighbor_sigchain.o": {
-   "sha": "bc81006625cb437b2001653c08ac2b8b2b5dfb306f3b400a73de72d50556ca4e",
-   "size": 29808,
-   "mtime": 1788050923,
+   "sha": "8801c46929ebf73a03a7c61769e4fe0ba40336f15dd855ebb6306394df8d11b1",
+   "size": 29884,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/swarm_channel.o": {
-   "sha": "d523f41ca925293920197f6d209f9ca398bedd1eba572d04f5c14d6293a4bffd",
+   "sha": "6d577edfec1e99d11aaa5a8f87aa9e4b64c206eda289bc979ed584322b186991",
    "size": 20272,
-   "mtime": 1788050925,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/shm_npu.o": {
-   "sha": "31635cb1bd78b1f91a4ec075b69572c8d2fabc1641f98c1b10dd76b3bc88a767",
+   "sha": "03c1ac7e9b2c5fd670f657b02a39d6e04ed6b70ac215e46efa0d0c509ae3993c",
    "size": 12868,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/acoustic_bridge.o": {
-   "sha": "e50f2b168f80ca07b9ff1121c2acd75b4c51de0c688c0cb890155082d5db6d9e",
+   "sha": "25619d03e967754fecf373bed9ab7be4fe37067311024613e97d9c65217fe569",
    "size": 16468,
-   "mtime": 1788050919,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/hw_crypto.o": {
-   "sha": "92882e5749b673c132815b33253c79dbb1bf87c32f006155cc37762bc9eb7f01",
+   "sha": "092439deb3797fd039f929ec8474aa02a8fb7b53959710a6d3400b7f706e7bd5",
    "size": 35712,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/calibration.o": {
-   "sha": "aed3de82da1d9ea3c4aa35da469ed9308a32a56a9e191493c762d5170a9b32d0",
-   "size": 26996,
-   "mtime": 1788050920,
+   "sha": "8a0bb68f55fd1e3bbe366202075e6581d7da172d3cad841fcec986c7e9a96e56",
+   "size": 27028,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/fire_gas_detect.o": {
-   "sha": "40d304b22a706929681c01a1a3cb652c1b5744210aa541a3aeb4e41447983030",
+   "sha": "59ce1a840586ae140755f52e4433fa7d3c55baf20037e1c5a95cce20bc5a49cd",
    "size": 11584,
-   "mtime": 1788050921,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/bfi_q31_ds.o": {
-   "sha": "3121f98fdde11042f3226acce5d813587d1b4830f8ed08e99461d4c0c173273a",
+   "sha": "6e37d54f89af66956912871f1308726969b47ebaa16c88095712e5c1b13c77ce",
    "size": 13924,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/ble_gnss.o": {
-   "sha": "dcb6a0ea46a443f809c58b2189e41ef2933028aa7dd1de7131436bb3aef1b60b",
+   "sha": "7c8beb1448d69dcbbfcb8ff2cec38c0ba77f0d9f62cf1df232d397354c92b48d",
    "size": 18988,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/geofence_predict.o": {
-   "sha": "61275b89ee3be55b02005ca3f5cb5cf1dadb9408ab9c310b1c5d4f9cd508adb6",
+   "sha": "471467489c1adaab9d83a778f44ba5aedc63b6fdadd4be718834250e7175d569",
    "size": 4972,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/radar_multipurpose.o": {
-   "sha": "f16c6bb01f112f0a35b2abe7ae68fff6ce2ae2288ca3c1616894234036f4e5d1",
-   "size": 24948,
-   "mtime": 1788050924,
+   "sha": "acd6d6b32170f3b6b81181840e3b5399e8957e87ff1fe09ea5045b77cdd0ae91",
+   "size": 25000,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/compass_mmc5983.o": {
-   "sha": "147638446390c335f83888b9acb179199c6831bf7642a775e06bfa8a1c6ea32e",
+   "sha": "ee920af5c3b96d7ce8ea883bac2596ca4eb3b8ccc4faf10638883eae2aef569b",
    "size": 16204,
-   "mtime": 1788050920,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/patent_coverage.o": {
-   "sha": "efc2903854a7ec775181f71b9e2345e7fbc7465b194066c839281b70958bd2ce",
+   "sha": "65c630490a6a37cee415c383d7fbb521dc9a39e6e333eb7b774a97edc2709995",
    "size": 25256,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/dynamic_carrier.o": {
-   "sha": "118743f9b5f16468aa014d22f04dbd21cda87f22482ce5f101112ccb75bcdffe",
+   "sha": "e8f55c130d8227ada60ee2f25201fc47277998aa701c4bd51ba8d8a851268d09",
    "size": 11380,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/carrier_registry.o": {
-   "sha": "7f88b8d7971c63ff493f0ac60d606a863dd0b5c3281b891e47da7d99bf074c07",
+   "sha": "34dafb3c7616b2c491c1c736827cb5ce5a615704b9469b37266177920d1ac7fb",
    "size": 15972,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/lora_phy_opt.o": {
-   "sha": "be23ddc95b2e6a0d9e867503f4db33b2d8700cef8450ea05db1892f32d388677",
-   "size": 16212,
-   "mtime": 1788050922,
+   "sha": "4c02fd297c1d405c1a350879ebeb33e5c637a9ce2d457b264c6c4e813c65c6e0",
+   "size": 16232,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/multi_carrier_frag.o": {
-   "sha": "a99db9c25794fe7c6413d4fcdb97789e1583244293c0a7f7c6232f04037f5a34",
+   "sha": "f6de0e8811b564d8c78e72d633ea618f19aa83aa5bd82d122c27437981e2897f",
    "size": 21460,
-   "mtime": 1788050923,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/predictive_mesh_oracle.o": {
-   "sha": "e43d39cffb6d69b737a97e71eab4c198223cf4b2ed1232cb01cb8f83f188f9d6",
+   "sha": "24490767feed667627effe3144d0ffbcbb47344bb63f61dcff58b9318df30436",
    "size": 20040,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/dbct.o": {
-   "sha": "849ff76915359b46991abd0f8fb7465d6449bc5b3808374f176505bc8c134ef2",
+   "sha": "0f00020f7ae4b830ce3525a3058d21c3a6195e0f2be75910c87d908441c77587",
    "size": 11872,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/beacon_sched.o": {
-   "sha": "e22faf565c5ebd2f3cff5bb3db9fb15ca6590d4093980736ca6da06bbc179b6f",
+   "sha": "45a019362d0c870915dbc6d8ba69896cba7a6ce8b03efe888ff247e595aa0d5c",
    "size": 11804,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/resq.o": {
-   "sha": "962e97c8cdf3138078753af2c7a968069cca4b7e46e7b176d9594180e7ac6c82",
+   "sha": "dd6c5cb581bf2d673be001abc3af70e85797e1e9b68067114153cc88c5b32824",
    "size": 21116,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/sar_mesh_emergency.o": {
-   "sha": "1d8a873a674b815c512790cc71fdaffb84215b637cc8c0aba15e2acdcb918f36",
+   "sha": "e0eb4eae23953e506eab22e6d79e657bcde1d1dfc06b498213927b95df6fdea1",
    "size": 21352,
-   "mtime": 1788050924,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/cmls_sos_nexus.o": {
-   "sha": "cce26038f8b4804939b289fd669a418e54a2d679d95e25899124f12eee3f516c",
+   "sha": "975877f3f424b4bed7adb60ba51d2f1d0d38072595fb338ba860cf1ed267ba98",
    "size": 24880,
-   "mtime": 1788050920,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/spectrum_aware.o": {
-   "sha": "4cc4eaf06bd88df8b075f1f46bb3ee0feece9a4d981081f41cdbf1fcfb05ded3",
-   "size": 15904,
-   "mtime": 1788050925,
+   "sha": "8d3264892f93e20f717e83986e70171e450c09ef4946ef042e6b230258434391",
+   "size": 15928,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/feature_registry.o": {
-   "sha": "5fea441d6f12dba8c7907b21418b817e07ea70bf38c8ef2f92d0938a106d2a60",
+   "sha": "052163bcde6202fb8c55436c4a64d8a5db4ea926572f164b07ef18f32f29732e",
    "size": 19216,
-   "mtime": 1788050921,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/session_key.o": {
-   "sha": "6c56fdd5cdddc37bf08b20b5ced9c2bc1753817571775deb903f75342efad941",
+   "sha": "aeed972d8eecb5ac498761aeda7b30c04768c045eb12cb8bf734e4a2f2f729eb",
    "size": 21428,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/shm_supervisor.o": {
-   "sha": "4036f6a624b9b06f5c72005f6b20508f46aad0b131c524d912292372af92a1d9",
+   "sha": "0f795e256d672a5758c2c112e2f1ea9f4b613e0b6e3030b2652ba0ee87d786a3",
    "size": 27208,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/os_api.o": {
-   "sha": "f58f5f4e18393050f55a48edd5bef72bf754a6e046daf8ff5264562c8fa50fe4",
+   "sha": "458cb5de5cb581c9c30de05d6cdad24d64154e399c7e760fb2e5da612a449936",
    "size": 20972,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/ulp_rendezvous.o": {
-   "sha": "6af4ddb3f56de86d57a03dbece6796f07eb95d0eae8edb09aa66fce7da9abb9e",
+   "sha": "b1d5cb238eddf0ddfd5b92b52904078d3a3e0a7eb146f8bb6dd6f742e870247c",
    "size": 13884,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/nac.o": {
-   "sha": "a5db74bda87bdb40ee36a9963667c5d9a20ca3e4792920e15522b2271f32f39b",
+   "sha": "56b8adaf5d7de4271e1cfc6643af99fbbb53325faa5949f5767652fc6b3b9d4a",
    "size": 14196,
-   "mtime": 1788050923,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/module_registry.o": {
-   "sha": "a37a3dfa99fe06b3c5393bd0315eefb8a7af9f21605bf9767fb1cad98abf365f",
+   "sha": "0ad2e4df48b7a6f9bdb65e899bb2bf24dfc4952f47202d7473c7088634815104",
    "size": 11800,
-   "mtime": 1788050923,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/rf_coex_arbiter.o": {
-   "sha": "a749852a70aaa39401558f5a444aafbe317523cd3c81e31e475ca496965a1cf6",
+   "sha": "ec392524075a42cbe8def2ad44df27f1539f30267e9178b81ef3789697dae9cd",
    "size": 14184,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/phy_optimizer.o": {
-   "sha": "97066711e0176abc39660956b462143e4854ea95f4c52822dba73272287e3a1f",
+   "sha": "14fa2c9977e6c20db5bbe835065e99dcf952d203d2e99634fd8b1e486592a6ec",
    "size": 16436,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/spatial_reuse.o": {
-   "sha": "d1d9eb56304b43a488bad5f6bcdf50f9ca7f881eea508c9a995b6a46e909bd8a",
+   "sha": "d9c26624e4a4944e0f7063a338aeeba7fe9524d462c8c5e91cdabcb881e8801b",
    "size": 22100,
-   "mtime": 1788050925,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/bmm350.o": {
-   "sha": "89807125a4474ab5bc2341e42772060a20e97209edd12aad5b741f7c895f8308",
+   "sha": "2f12655402ebdd371e3762a8b1dbea55e9672abf219ac6d0154272c830f4dc57",
    "size": 9476,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/schc_hdr.o": {
-   "sha": "2408a167ff2fef1280097fbd8ddfc7900193381049ed1811f55768b9a8a0367a",
+   "sha": "e9f3e255036cd5644e9864df15d61cdd5b438590e25523a677f91ba56933de84",
    "size": 20112,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/sports_health.o": {
-   "sha": "443f32fe79f7408e576199325a8f2813f28734760987f0fd000c94a6ef868ad5",
+   "sha": "3c892ec140386a816f93f0480eeeec81b359fdf7ee1f485e6940e98346e3634f",
    "size": 22552,
-   "mtime": 1788050925,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/esp32c6_spi.o": {
-   "sha": "812c2adeab9554a6031738b26f9293a9200e2c05baa158a319ed3ea8f7276f8b",
+   "sha": "cbd844560a11dfa3ad3c7a7f77c80757e7e3ca29e13b56b276d4385b6a6a17b7",
    "size": 27120,
-   "mtime": 1788050921,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/kyber_ntt_real.o": {
-   "sha": "008fd7f3e7bdb2e43e52038e0fa8e6352caeb608d1a903cdb6b3e44cfe9e0a96",
+   "sha": "a901397f401078ae2a9d4da7419e12896a40b046cb9a0928e5613dd69626ffae",
    "size": 17088,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/device_identity.o": {
-   "sha": "c79a7e923ae639d34151b49d9226f1aacd29d6cfe1999aa8d9d80549b71caf02",
+   "sha": "0194b5885d1a1d227b8ff658435a83521e84d9ae9b22dbd0565b14eeea3a506a",
    "size": 23180,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/scheduler.o": {
-   "sha": "54563f7d8a1c4e028a243da4bcc8578ba1db24c9214f3d27e9987a5251a82a9c",
+   "sha": "9b6ba5662f426f99e34fa9f55772a69a12b995d02dbe3a3d6e102a8d14ac172e",
    "size": 6576,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/cmls_microtag_profile.o": {
-   "sha": "dd2aa87440115b85bc0464a47dac643ea0fccc88d9e5fa6ee9085133f1b966fa",
+   "sha": "7d4199f1561929436ed184200a5f6e202f67b977f3ad6543a558e85e0e9a97ae",
    "size": 10612,
-   "mtime": 1788050920,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/tdma_mac.o": {
-   "sha": "83f5bf4c32a7e4bdafc9b0f518f0ab2a09e86c56d23a7fcf14b60951444303f1",
-   "size": 28640,
-   "mtime": 1788050926,
+   "sha": "7bd98fad3fd1f0fca2f60b1d1f111ccda8216f35a585916bbe45952c1a5306ac",
+   "size": 28604,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/ct_ops.o": {
-   "sha": "90848b8b741b9984e16a8d0e9ff66777ac6ec6646900e184279012d307b8ea23",
+   "sha": "59733132b767b2bd1bc44a53f42decb63a3401a7e71108ab1d183522ebdf49db",
    "size": 5080,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/shm_insight.o": {
-   "sha": "8cd5d6c5668f2f19b0a879cfa3feaf1976586e4af074a9940b29e3033daa70ba",
+   "sha": "c05181d660c9efc33643d5c17e47e904305c8a7b1cc434bcc6780830eb154a32",
    "size": 32864,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/bfi_vital_fusion.o": {
-   "sha": "371d52cdfb2dc798601dc4e55e1dc6911311a5dc1eddde196e1a88a8c6b53a58",
-   "size": 26740,
-   "mtime": 1788050920,
+   "sha": "270c7fd56d19c384c40d1c204f957a43d3d39aeb0c17600c214dab7974c19d01",
+   "size": 26712,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/last_gasp.o": {
-   "sha": "7eb0565628f5f81d166f892607ae8ea03f52cb43d12e1dd0c82ef88039368812",
+   "sha": "79be00eca05175e23df4398b20de7ed3e67163cf20f3212f7d359cd68f6cdce4",
    "size": 17892,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/thermal_manager.o": {
-   "sha": "b8c9a927cac60790e8ce44557b1040ebc8b667bb75c43a1316ca2a6009ba8a36",
+   "sha": "8b0ffe1949f0ffe9bd7f4f69303da88300b9c1b1e731dd9b70289874726f6245",
    "size": 34492,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/spectrum.o": {
-   "sha": "39ec6160a7f846ba7f47b8db430ce3f944e2699a8a4a1e09eaea3530d8e88c3a",
+   "sha": "c06721f8e77f9eca8107ffd85f9b7dcf82b57a38ae6b52f7039dc5b874cbfab7",
    "size": 21956,
-   "mtime": 1788050925,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/mesh_advanced.o": {
-   "sha": "0c67d78fbb38048fdbb435f5fd1d57b7a08bf6df7e41bdeacad1519126b9168d",
+   "sha": "dd1406c5649f89ef6d2536a551fe846dbaf41c3108be7fb27812b99230683d59",
    "size": 27828,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/echo_feature_hub.o": {
-   "sha": "7f28af35ba7549559c6b4e62785ab50f3fd01901c5a8b7e80ecb7aefe38135e3",
+   "sha": "cdc35601e8064ace779e7ce592f79c6d44be4b2f8dbb5e148cc7acfa05a7d7f1",
    "size": 16264,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/mesh_messaging.o": {
-   "sha": "1791d4d3d43a46750a6599390eeb54a60b2f797a7b0a5495567c767b08b72d86",
+   "sha": "272a9cf8e4c56df889cd9ac6cdb29f4a603bc2f9153d8339e9e0b1e3e19dbe6b",
    "size": 38732,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/wear_aware_ota.o": {
-   "sha": "e57674e75baf2067b628bed3d7cba8469f0cce97b223f9456853657439b4b9e3",
+   "sha": "5ce1758d718a4387e21b5740b4faeea0dc16cedf5ec10b23f356c5d9516a0497",
    "size": 11248,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/csi_through_wall.o": {
-   "sha": "b7dd861790e83aecc3ec06914c619330ff16c509665213137fef4464c25606e1",
+   "sha": "9e8136dbaad6a2ccc9fb010760b1409db1ca5e2abdebfeffda3bf06d75c339e1",
    "size": 25268,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/coex_pta.o": {
-   "sha": "533fb6c509d9753beb5418d0531c58892020124ba41e87ad62e56292dcce3a27",
+   "sha": "6afd253044b2e3ee42fd9e5bca8126aaf24549a63274a475b4ffcaac951e06c1",
    "size": 13984,
-   "mtime": 1788050920,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/trans_sec.o": {
-   "sha": "027dcc3fc59a859fe3844562d6ac8fcad51346d6a06355e9a07d84c4bcf10b91",
+   "sha": "3734e464e67a07146ac2c8e43b213603d6687559ddb4af1e25bd53dfe782374c",
    "size": 16336,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/subnet_v2.o": {
-   "sha": "c6b515bcea7abd91c6aa93d3f2925549599cccf6c16dcfdf601457c4506ddc0a",
+   "sha": "84a6479821a680790765c3d51da424ab692825a5aedef3f2da79e3d1f6f5dc68",
    "size": 23028,
-   "mtime": 1788050925,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/bfi_clinical.o": {
-   "sha": "f35aab8347c884ebda145ea7dd7ee84c18e2e5fef00610b6149e821d9c0ab322",
+   "sha": "8d116457e8a87b13699ac7398ba0c6e21796ef8ed3357b8581e7515f2820da2f",
    "size": 17120,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/cli_log.o": {
-   "sha": "767bb9129d3d0bbfaca3c30453762634c7cebff3c493713f446cef919cf01e78",
+   "sha": "9e261b69ac9108bd4185f202617f76af45d5404b7e04962ba19550a9a16b56b0",
    "size": 8456,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/lmi_p3.o": {
-   "sha": "2ecd4236e7867f5c6afbed9582acd713a6220dcf6170d52db67d43e7cf959238",
-   "size": 6140,
-   "mtime": 1788050922,
+   "sha": "122c3b25bda79bec57297ddd395f98b61ccb09f42d13d141d633424bd8c2a2dd",
+   "size": 6156,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/data_infra.o": {
-   "sha": "23dce86f58f362d0190e4afda6c24eead6dc09fb68ec17042690ec8c25b6c31c",
+   "sha": "4e7a2a6afe16644aa6fddc11f673718d6a24a37ca99c5b697eb8e47286727ee7",
    "size": 24080,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/radar_phase.o": {
-   "sha": "bb9a329d049561fa0cf3fe78e17fb54892d7b0c59e35de28e449a331654f8733",
+   "sha": "4ae99fdec992a1d2b80a52fe24fa3b4f35e0ff608364945ea6334ffb1bb71e45",
    "size": 17752,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/spectrum_guard.o": {
-   "sha": "9ed4feb616330ee45bcc4173ef26e786ec33f2aea69f97fbb9f8234d2abbc535",
+   "sha": "c63851a94f7e7b3790fc4858bcb99690795cb81eb1cb44b0ed3e162e0f40d5c9",
    "size": 13092,
-   "mtime": 1788050925,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/gossip_mesh.o": {
-   "sha": "c190f95d3970d0061a1c0fde2beeb341376a3b796c796c1a5e6e58dc10f54448",
+   "sha": "db0738b3706a7f9def61e6d91ed883d997b2c2cd2bc313a9c1589a3e583fbc0f",
    "size": 24556,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/power_profile.o": {
-   "sha": "5d5bd139c4817be5e2de225ac1dbed389c0f75663bd27116f859252c37814eae",
+   "sha": "dcedfcee11d97fdf4d6d6e6702be95837f7f82c24f44921a93723381db551888",
    "size": 15720,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/cognitive_tx.o": {
-   "sha": "cc64ab2415d7e85226c933ceec7eecef4ec5ac8f7cba0141c4f3d51ac076cf9f",
+   "sha": "323a762ff888cc0eceb6f9670e95fbd0c5d24dca99e6cfff743d859c52216a4f",
    "size": 13640,
-   "mtime": 1788050920,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/ota_container.o": {
-   "sha": "08c6213cc57f02b36a076de8793ae6fd243cedb5b9fe2af71b660073a0e9c801",
-   "size": 32008,
-   "mtime": 1788050924,
+   "sha": "98dc0d258373ca0844aadb82fa1bed94628afe38d1b21b0306a7e6836de11037",
+   "size": 31964,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/kernel_shield.o": {
-   "sha": "ce407f44d24be753f22a437bb07057bb17b0d84b621d4402256db5061af14b9f",
-   "size": 19356,
-   "mtime": 1788050922,
+   "sha": "0b21afedf658cda03948394146cb81a85a6d3bfc420cd22b4d8e33e3c2f53a19",
+   "size": 19332,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/system_handlers.o": {
-   "sha": "ce684cbf1715277a4505a64689d5c2e5174066c0737700a0b6bdfc18c2fdc003",
+   "sha": "5e822c9de31aa05a43ed7defdb431d2d0d2c8955e46c2cf0bea6f4f70502cc80",
    "size": 4572,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/csi_vital_pro.o": {
-   "sha": "f7a0101e9f78efc479f4f67ca789c951e60402f4ff94dfb6821c27def25968c2",
+   "sha": "276092fa5938cc09179b2a93f3eda4dbfaa2976aa7dbdb722ffee0a24dc8e237",
    "size": 16976,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/dot154.o": {
-   "sha": "10c1e22bf20e51a7e11ade656da43412df5153b185e7319cbf6abf2e6b9114eb",
-   "size": 16236,
-   "mtime": 1788050921,
+   "sha": "9704f9b754a9a67c6cbb98d3932e48703c5af3f665ca9470ed76cd454c580595",
+   "size": 16256,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/adaptive_reputation.o": {
-   "sha": "57278beb0036095d79fe3c5afd650729dc52ccb8f8b80975fea1eaddf5cb4094",
-   "size": 17476,
-   "mtime": 1788050919,
+   "sha": "488ea9dbef055a1414fe627403e4e763234a1d4355b3df98ebbf8788c65a9f94",
+   "size": 17504,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/syscalls.o": {
-   "sha": "396e8598b8ff386083f84da87d0c0197dae1cc3289f71bb09072ef031b698c81",
+   "sha": "0645c7e8f69daad9107b509e7bcc22e952bf1509d0f887dcb25933819c69e780",
    "size": 9528,
-   "mtime": 1788050925,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/carrier_compress.o": {
-   "sha": "84acbdcc9e0845481835e0b6bdc3d96df762ef41f9f5981014b9839de7ca4718",
-   "size": 15720,
-   "mtime": 1788050920,
+   "sha": "cd91329d7be7b7b6dd307c60ce6c52acfe32b87adf53db005fc3cd4941429555",
+   "size": 15736,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/kernel_hardening.o": {
-   "sha": "89fb6e15aafed6e6a4c1ace54954d6d92ceb67bb81b03aade2f00bae9423f07c",
+   "sha": "b2e4a54546037f61ad79564ad424760c49acfe22031eb03c967f95177520a197",
    "size": 16564,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/mesh_admission.o": {
-   "sha": "1c88138c724414496dec6ca95952975369f4fd055e279391117c6431e60f9d55",
+   "sha": "6039ed3d9057ecf5f83c1627cec730812cf8345464e278eda1c6c6df44761b8a",
    "size": 18532,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/trust_chain.o": {
-   "sha": "af6c38229810cd62a816de6e50282659b91ac06d46eeeef419f93892bbd82deb",
+   "sha": "88778eb17b978a1753a8aab8e2afba2b5e46dc260cd1a2cd9650c14542c3e257",
    "size": 19484,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/secure_comms.o": {
-   "sha": "276302254a7b287f9a6042f5bb893afaee5f0b9bfe030ccdde9021b6a59bffb6",
+   "sha": "b63d31997a514dc6b270f41718c15b2c07443ee85105fdf41ce3897ee9ceed5f",
    "size": 27904,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/cmls_module_contract.o": {
-   "sha": "a7cf54a44cde710aaf48e29ede69164ecf184b6dd75b64352307dedf343a4dd8",
+   "sha": "03db28def147a6e9b692fce3d7105ccc2b3952856894664f08294a9486612238",
    "size": 8488,
-   "mtime": 1788050920,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/ml_energy_aware.o": {
-   "sha": "c5b1d781841feb229aed54106d02ef59b4939c8a0b26bc2d91c71ca901399704",
+   "sha": "029c1a92bacc3a80ae7fbf5a7b275b0401cbd6b8bcbd880f8bc86aba8b5afa5f",
    "size": 16880,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/sys_mgmt.o": {
-   "sha": "1acd0a3a4bbfa0d301a6c222eca008a44c6571ec7d35b96647c07cd307b253f1",
+   "sha": "cd00a6732a7fd1b9721d9d6ea9e94e088decb66c1431cbc2f56037bc6b7c25ed",
    "size": 17748,
-   "mtime": 1788050925,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/lr1120_spectral_scan.o": {
-   "sha": "1f19ac5eab5fdd713b938ea5a09381433dcacfc7caf9a9351b00de1ebf7985f0",
+   "sha": "a096b933f16ea656a853597f3d37567708f89cbd8d93ae512e1f37040876155c",
    "size": 11476,
-   "mtime": 1788050922,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/nfc_ble_pairing.o": {
-   "sha": "1b8c3c842599b2eb1239ee2279cf39d93786bcfde0c71033d22291823479e97b",
+   "sha": "1fb0a1971629864f218d3dc3e3b9b5d9e689a3a5168249d18d4f5cf86ee087d6",
    "size": 27120,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/neighbor_attest.o": {
-   "sha": "f4da868b2edbd3385ef6d4084a28c6dd0d401503fce91faee67924e68de9d214",
+   "sha": "823efebb33cacc64a8852e301a521782e77cbeaf6ba884788dd5421c05fd6298",
    "size": 21436,
-   "mtime": 1788050923,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/mesh_subnet.o": {
-   "sha": "38571e7f7d165367ca5a2b219895e1dfc3a08338f7c345eaeb526008a8a54e52",
+   "sha": "442cb29484b24da9eeaaf623f9d3a1288c50ee34ba79adf762ec5dfdfc457e23",
    "size": 26224,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/ram_optimize.o": {
-   "sha": "29132d61f13f06b8ee21d0682710a659658fbd1daf71ecefb3627b591f4aaaef",
+   "sha": "357f4824f89406a5dfc770fee152971fa3a11202900435a1cafed9139e57efcc",
    "size": 10044,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/shm.o": {
-   "sha": "0f4e3ee0cbca0ca11802729184625c796248330b8814f6bae4351f22788f32cb",
+   "sha": "2dc4aee165cbab27b700f9e72e237b3225491b0fcde3fe0301d22edb70ea922b",
    "size": 51512,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/mesh_cluster.o": {
-   "sha": "a80d3ff3e81b370f006dc7a2fd128477a63008d8639549e0e3805ca7e4647544",
-   "size": 16132,
-   "mtime": 1788050923,
+   "sha": "6ef33d471fc90de93ae340c5963d4f7aac7bd09e1c5f727e8a4f2d563d6bd4a0",
+   "size": 16088,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/security.o": {
-   "sha": "d54025a83222c8da07a8c58498386ffce3e81606358a03f45c2598afa7f7931c",
+   "sha": "1950fc8c989ba0b775f6aad024533c0987266bccc252dea30f5bc6f5c2247d72",
    "size": 7780,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/kernel_self_test.o": {
-   "sha": "75ab0218e149d8561f60909c893cf8cb37a27491e617004eaa2f2bd8b4191ddd",
+   "sha": "47ebf154d56db952fe0c678f89d885f2dadca840b15d75790f0b999a6c9c84b8",
    "size": 16032,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/smart_data_engine.o": {
-   "sha": "5c0334b73872f21ae64529597401852582762d3914556ecd05cea21792b4d6cb",
+   "sha": "1133422c32e36ebac66f988977ab48c458283c1b98e2a708cd3eea3d99874914",
    "size": 14772,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/math.o": {
-   "sha": "26883eba0e1b7c415d9d9f3024772a6f49efd753b650cb9e82fb4de3a9a664a0",
+   "sha": "73a10bb4f8fc5902f48e67f62720eb0e6968b4cd47959584f32380ffb3cee702",
    "size": 37888,
-   "mtime": 1788050922,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/command_authority.o": {
-   "sha": "c62e1ed52a26a9f2c0c9fec87dacfb3cd9c544cd82ccf5d8a4165c04656cadef",
+   "sha": "eca281c18439e2954ce449accbde3d268840e5abf5d113339b31fd32f033fd00",
    "size": 19048,
-   "mtime": 1788050920,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/bft_routing.o": {
-   "sha": "623bdcd481853e564d9b236cc3a9717e79a694ec16378c29f60d1ab280c47ab5",
+   "sha": "9a0ef7a9d97c9714427196a56419dea48627e069726d570e66794966d5760981",
    "size": 23688,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/se052f_driver.o": {
-   "sha": "15a92dab8b51d3dedc17b2677925175785636ddbd8ec594c69354df39800db5d",
+   "sha": "c1532875fd5ef44c0437b566453b5319086b958018158dfa93574d61aff8d719",
    "size": 30772,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/auracast_broadcast.o": {
-   "sha": "8a0254a444d272cd347c61124ae86cf97e3a9b2d414bd894f0f818f3d7b359ce",
+   "sha": "334c63c246994f7d28e977c1b1e1d8c45b55d348be0c3adff032c6b2cd8c4aaf",
    "size": 13940,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/nack_recovery.o": {
-   "sha": "a162e3d483d101b3fe7601e5dc81b76a90348f065fd7c512d70a8a044c22e496",
+   "sha": "64f3e85e26698d93d2d9d2121a771d1100e6b67833e7b7020898bcc515e325c6",
    "size": 14732,
-   "mtime": 1788050923,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/coop_time.o": {
-   "sha": "c6df2b46cbf25ef89b105c36baa11baec00c2ab4c4588eef3c9c6a68dde188e6",
+   "sha": "dd2b3cf090170f51f12bd573617e7177a6a16fab8364c52c940f6d4db15fa170",
    "size": 12536,
-   "mtime": 1788050920,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/ulp_bfi_sense.o": {
-   "sha": "475744b1ccd45f8f323bc770c7b78d8c9149e950c28dd170ab6fb1a1442697c6",
+   "sha": "d759995d9f8c92f541a7455396b9b23228271c85649dc8537572c479df700d47",
    "size": 13556,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/mesh_topology.o": {
-   "sha": "b3f856ab8dc115cb74a60b94cd66791bdb54d3428bf1166ef1eeb73aec3a67b0",
-   "size": 15088,
-   "mtime": 1788050923,
+   "sha": "624f1505ab17bd73aa501096373319889cdf9c2b6fc4cacb2e646f00eb3b6f92",
+   "size": 15068,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/flash_wear.o": {
-   "sha": "83f2304a3cd9a4a7dbfe12621c867bb135530435bc9569582cf19205097bd9ea",
+   "sha": "74832c7ef3a0fb66f0832b08242314c6dbbdd0c6cfb1a246a6fec7c6cab79f86",
    "size": 12732,
-   "mtime": 1788050921,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/fadrm.o": {
-   "sha": "44b0d39d4ae776478315094e1b9ced49f4c91beac57390f1da22d116d3685862",
-   "size": 30800,
-   "mtime": 1788050921,
+   "sha": "5409217eb594e526da448f33f2b3370f0ea84554df0e3a9ca50c944e2c8bdfd5",
+   "size": 30768,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/rtos_ext.o": {
-   "sha": "e5c70cdd80ee7c2f09e1f3887bf71d2d74db4a935c9c12cc7c0e9557d1e3d0ab",
-   "size": 19196,
-   "mtime": 1788050924,
+   "sha": "0201aa035cf0c3695031c1dad52b021ba186ef7bdfbc1e066413897b5417b0d6",
+   "size": 19168,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/mathf.o": {
-   "sha": "4df5f5219fd6abbab3746ccc78557f3188e5687a254044529d5715593f553118",
+   "sha": "653ec53b15da495f9926b99fe0871a3bb2eebdcf61d3ed3f3a4a22a0ef3378ed",
    "size": 12496,
-   "mtime": 1788050922,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/grtc_clock.o": {
-   "sha": "c4fdd08313b03f2bda1a1f035aec7901b3fc1b39b32222ccc95d5104b664f208",
+   "sha": "0265ea37c1bde8cc81764245e8a721d7202edad83b0cef64d18c6f814722e8d4",
    "size": 10456,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/rlnc_rx.o": {
-   "sha": "98ba744de5b9bfa453ff6d72355857de1c1e853ebf60a993170c0dbbbb1f640b",
+   "sha": "97fe8d60ce827f161c97b71103c7a920cb6fc804e383d4389cc69dc93ef857d1",
    "size": 21276,
-   "mtime": 1788050924,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/os_hardening.o": {
-   "sha": "197fdf70458d4e2734c51318a96204454b18aff3d655a20e311cf4853b625d78",
+   "sha": "822b6e0d1ca2ec95a1a256c96f3793963c9c8c652fcb68d02c0c9ad12e554111",
    "size": 13952,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/trustzone_config.o": {
-   "sha": "eedac9e42e83567a25647d7cb0c77bed4f1f753e2aecc39b0191970567d0a485",
-   "size": 15564,
-   "mtime": 1788050926,
+   "sha": "b19e3b0bdfcc671fc8f0f537e115d6091ab64ca92b195f56ca49a98a9a551016",
+   "size": 15596,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/ota_carrier.o": {
-   "sha": "d520022ac5464dd17d09d8a3fe5a3003cc5021b725e8120afee9674c06cecc1a",
-   "size": 8884,
-   "mtime": 1788050924,
+   "sha": "78ea705b9984710ecefb849b8c0e3f28910d88613de91e16ecd3d9c8a50b0217",
+   "size": 8864,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/mesh_ratelimit.o": {
-   "sha": "16498bbfcb3f888fd0fc68c78e35d66944bee6b78f5c0a225c8c71ab98a84eb1",
+   "sha": "dd264562eabeebfd80f04d119f2d2ce77640ed60c28a96dfde0bc71ea1acde75",
    "size": 11724,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/sys_status.o": {
-   "sha": "41f6e4cddd986f704a77e6432782bc941ccc2871d3da5ef72ff799a39f5a8268",
+   "sha": "bfe934ebebb885fc69ba64b60a8b8be8ff27ffd69334298b9e19b0ac4f1dd754",
    "size": 16608,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/channel_runtime.o": {
-   "sha": "4885d60adc3d62add7a0a8245c529d48f5c113d3b7d3e8904d7f4ea980e7f082",
+   "sha": "ebada8dcdb19070a3c100d7fcb56be467607789f91210db8f77303905d0648f0",
    "size": 17716,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/dogbeam.o": {
-   "sha": "265c9ddcec33c3c7ee626cc0f0e05229e3316202a8c6c15ffed5f09d43b8bfde",
+   "sha": "36e51281ca94e0e04369a4eba799f23a21d42de8aeb8a265e54a122b920dbf1c",
    "size": 5844,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/mmc5603nj.o": {
-   "sha": "1ab229196f46fec7966afaa98869a1fc8627019042afe8d84e67c2d234b3b766",
+   "sha": "81b1f333ba7d59df05c27e64033ae259466ff4f86a4227da0bb9690005d85c90",
    "size": 9640,
-   "mtime": 1788050923,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/bme680.o": {
-   "sha": "ab9584053d6968318f00e03c4859f285dd09a5f8f47eeafc41c47383e8ed815b",
+   "sha": "f26be4bd31a3fc236479005a2bdf488e34ad7ff5174907768d620b0158f6c372",
    "size": 7744,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/health_monitor.o": {
-   "sha": "7fe0a5528c1a8fb8c152a380263fa3039eea57aca97e4e7855176502dbea86eb",
+   "sha": "26ff4f3dccd3cc6faa9d32feaa5be9e054babc613f78ca9e779693d6e8a9847e",
    "size": 27748,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/predictive_health_geofence.o": {
-   "sha": "f8878dde463d933e1f326e09ffbce29cf92008ed0f06ba93d7be1c4a222bba2f",
+   "sha": "0f53a5c13e82ae3c279d2ed152478e9eaaee312d5455a46db3a3b5660fe55052",
    "size": 20252,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/emergency_envelope.o": {
-   "sha": "be8d76064a9e48bb22ce4cb6e7416cded91f57e610347fa3262e1b5853b2bc7b",
+   "sha": "528cdeac4000e89173969878699d8f500263bf05a5c230807ebfd5b236a09841",
    "size": 14924,
-   "mtime": 1788050921,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/mobile_bridge.o": {
-   "sha": "e59e8a1ba4de9a49667913824c387c2fe55014d0135b6cb2c0b267d62af8493d",
+   "sha": "85b4bc8abe4715a452ba63a87cb8bdff48ff0f2f8293f38ea3db624716f3f707",
    "size": 20488,
-   "mtime": 1788050923,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/contactless_vitals.o": {
-   "sha": "ec0c7599ba650db7ce25afa7f8403e1dc112511eae223667742ea8557ac92726",
+   "sha": "9a9a6b04c17c0b86eeabfaef5e35c7075043df449ce32c2c0ef7dba3e2b1bc67",
    "size": 24600,
-   "mtime": 1788050920,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/lora_tx_pipeline.o": {
-   "sha": "56d8ba5c7033c578177067eb7e8d79f8081ef82b96e90a1e2619c074e11370a9",
+   "sha": "7317365f394c13db6e2f11b23017fd802b5cd2becbd91b7b6378576c76dbdc85",
    "size": 36472,
-   "mtime": 1788050922,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/thermal_drivers.o": {
-   "sha": "7805e18ace3b1e935e4b822c5b3176926f15b53ab2907c07af6db04a4b666621",
+   "sha": "055b04dc9714ebc258b0651fa99857b827f3db3cdf5316aa3721f100d733a410",
    "size": 2420,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/lr1120_combined_scan.o": {
-   "sha": "7099e2da87aed6434a64187afbe37fb77209d92dda37b53ef0b225006bfd47d2",
+   "sha": "135558c7224a2f1dbd969a80e62af024759a2983a9d054a54abb2d294b848881",
    "size": 12460,
-   "mtime": 1788050922,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/tdm_rf_arbiter.o": {
-   "sha": "a746e357f6d91662f98bcaf0d65c06266689279531114e91e3c7d1f5edf57631",
+   "sha": "f8eef03b0d20561f7afaf6c9e502cf80273fdf10ed7112e3a4eb98e4500df15c",
    "size": 22236,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/kernel.o": {
-   "sha": "84f9c11a179be510f61839c41eeb0de840e57466dc07c1a9fc5c16a5b39a524b",
+   "sha": "be5e81c9ea0c51410b9ed2b7bd4727a508f65a5220037be5a87058f4f45434d2",
    "size": 23212,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/robust_position.o": {
-   "sha": "65ddf2e959d05e7b7cc7f3471d41b5ef56fed9924b89d88d183f6388353c7f07",
+   "sha": "14787baaef74c212ffec4f2814c080097c19d3b08d7e6725c37a1f49531626e2",
    "size": 14672,
-   "mtime": 1788050924,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/zstd_compress.o": {
-   "sha": "dd39d2bd5fc656752ff4e733fe20a3f3b6c24e39f945ff7d5c2784cfa9d45a41",
+   "sha": "01ed4e44472ad376860bd4ccb35813da546353b9b38d09f9a54f844346242ee7",
    "size": 25916,
-   "mtime": 1788050926,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/kernel/multi_bearer.o": {
-   "sha": "be973beada1153b735e1a472e3ab777555b994fc0050ece063bd2815703b30c4",
-   "size": 16936,
-   "mtime": 1788050923,
+   "sha": "e71275b2638eccc7e7ec4a62e45c2c7380650c7aade64198f2dddc0686a48f88",
+   "size": 16956,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/acoustic_eye.o": {
-   "sha": "099e81127d3a421fb23a2ba57fbea3ab3b392f9d8897e4650a385819cb0146e2",
+   "sha": "a1fd4ee3594d0c08b9a6252676803aece08359575d318cd49d58af4327b9fe8d",
    "size": 24760,
-   "mtime": 1788050919,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/mesh_subnet_gateway.o": {
-   "sha": "b0dc51c2f63f27c8fc97a3d505c0bbea1be0e316275bdd1ab9118bd4beaecf1f",
+   "sha": "5ba0bc684bc077ca39fa6daac49e943ab4b58b948bc5742e9679f9c9d39405d8",
    "size": 23244,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/auth_goodput.o": {
-   "sha": "3f826c9eb4aa2c44954e51b5b024a99e027d568f190a1213ffd5abe369158bda",
+   "sha": "28717f47c43e298b64e70ec5f517060af671053b13d46f8ae346dbb5096e11e9",
    "size": 14348,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/adaptive_repair.o": {
-   "sha": "b76bd464917a82e0f4d58cf14e33c4d4d5d1ac622956af2d802420b968d16ea0",
+   "sha": "586ea44d442d933a1b1f6fcf4bcd268e9068e109ea643b0263f0dbcf6872cde9",
    "size": 6760,
-   "mtime": 1788050919,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/xai.o": {
-   "sha": "22df110249dc131b4540e145832f9bfb5a70d0dfce2d846ca194599c78a58b50",
-   "size": 23708,
-   "mtime": 1788050926,
+   "sha": "965b0b9dbc1f835e0440ae0015b18b40d674fe7cf2fa2ab3263de488b9ebbe49",
+   "size": 23680,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/kernel/data_transport.o": {
-   "sha": "155d37cb652fb0065b4a4a13432bc8012571c08b74d74b36d3b531987f4c196f",
+   "sha": "897f4c8faa7f652cbb145411be4de1782f73c37d0a04722fad36a13d3f3a93f6",
    "size": 18548,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/coop_gnss.o": {
-   "sha": "9234f3a82f3eef33e055ee9f1e7976f12a4c110342e28abd20a046ff0e2453c6",
+   "sha": "2cd738aaa40a4a130e39c750c83b71ef94c5e602c2d573b3b023812d42f789bc",
    "size": 8400,
-   "mtime": 1788050920,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/vitanav.o": {
-   "sha": "4ba2b71806b146497c066686ffcc8bbcfd72a23421381ab69fe62fd28dda6c4e",
+   "sha": "315813b26e3829089d8e377efc87083a1453d51b08d44f1a21b1eef0e955078e",
    "size": 28808,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/sensor_fusion.o": {
-   "sha": "4e82022610a9a4c5bcd33b73b7f9a3f4a9d5d45e4be0f3a2e4f2514957529122",
+   "sha": "5e19b8b2576f7f71116916fa559862db6e7e88453b0afb30ce87ff5d9afae186",
    "size": 15312,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/modules_init.o": {
-   "sha": "e7f7443635749525a3db4bfc24e6892f776b432c93beb082386c820411f410c6",
+   "sha": "1afc7b313e7666d1e5164a2f079785c3274302fc92952abc66227562e2fe61a4",
    "size": 48840,
-   "mtime": 1788050923,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/arch_contract.o": {
-   "sha": "b3870c7708ff6d1c6e2c1b1252bb58c5b24b2fe0aad8d618d29723f68bd0431d",
+   "sha": "8b720389e0a0ce9ac710f3d3e795f97d42d3117cb0ec55abf56ffddc7629f1ca",
    "size": 18796,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/dgk_gate.o": {
-   "sha": "16508a33a274dd5e93026fd4d9ede7e726db0fca8335b4b7edd551d0a9fd1903",
+   "sha": "37d74cb4afbc8e4b2bfdbcbcab7eb84f2c1e1e30d5cfb8bbf35366e0255c55c1",
    "size": 22444,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/scp03.o": {
-   "sha": "faa4497380b5bd03050864cd3499dbe07b9da4aa97e6e70aa31050db11626397",
+   "sha": "561ca357666bbeaedf05d1fa8978f8b9390064bc54137adf17fe93f03d961439",
    "size": 12400,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/compat.o": {
-   "sha": "d6cf9f14465173ecf799f8a6a29f925da2c2da3256ef2e327a24f5f150320a15",
+   "sha": "d5f16854709625523aab3fe02bd3c1ac6bcb26180761d6395ba88d8f301850df",
    "size": 16960,
-   "mtime": 1788050920,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/cognitive_radio.o": {
-   "sha": "c63f0c72bd8feeb18f6ae757a0a2215ba0c4ccfc745140c5f88694d86801fdd9",
+   "sha": "b35b2aa4a8a0e3581ad067a4c840df186cdb77b8f7c17d9a985666307f8615c3",
    "size": 29816,
-   "mtime": 1788050920,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/meshtastic_proto.o": {
-   "sha": "975b85c74d75a54ee06911f54878e257724e5aa5a1625fd23a57d053c39a6aa5",
+   "sha": "ad92f54d460f1f8a921d0741cdcbdb1f87ce0fa574adbfc79de3b5145467d2e3",
    "size": 45260,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/uwb_digital_key.o": {
-   "sha": "37b724e24391e989ae33eca302273d7d81cca830148f883ee2ad4d4dfbcc766a",
+   "sha": "edcc8be5a1a53d1c94ee090506a92f9c288f27135f921e7164ade00521f171cb",
    "size": 11468,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/unity.o": {
-   "sha": "8b1469e48f06eecae4c499bd2ab76d6f4e6f3c6b9a5c25fdda4f45c7535a1b90",
+   "sha": "2fb38170e062af5c84bd0074876c9fe186e0ca81124937fd68d2403fdd8dd608",
    "size": 80312,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/coop_time_multi.o": {
-   "sha": "3216a7695c62ca397c8d8a0ac10ca9663632e507988dbc477184ad79e404f240",
+   "sha": "68d0aaa797a12fb5f6adedd76354dfc8fc01279ad6cd1517615d5d64a867c249",
    "size": 21632,
-   "mtime": 1788050920,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/math_opt_v12.o": {
-   "sha": "d78ca12866f5bebd117d0708332b3fa1687806d67005309d55b0d0a0ecf2e97b",
+   "sha": "c78b750ea1a7a4ce0166603c933653985c4675fbfd748f613d00bcf288e6e6d8",
    "size": 12688,
-   "mtime": 1788050922,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/data_delivery.o": {
-   "sha": "db763d126da5f52285f79149f45d1f9a786df86a94cc0177a3f773c3519d262f",
+   "sha": "64fe287945cb1cb3282863eed02914074082998b33a9724ab9572be859c21809",
    "size": 25232,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/ota_update.o": {
-   "sha": "eeb4337342c68ae11a694fb8986806153be8281644dc3ff876db06499908583f",
+   "sha": "a9bec687f8661e493a0d3538f791cb42e3c23c9f6066ec0268f4988f9fd463eb",
    "size": 13852,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/ca_dual_use_bridge.o": {
-   "sha": "7fefc2c145baaa555cbac56cc9a7fde3442c9166091b09801998537638a89b0e",
+   "sha": "f88de90505fcd854f194c0f064a47de4838961046053f84e11be3ddf76e31063",
    "size": 8836,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/axon_mesh_ai.o": {
-   "sha": "a9d4db3f2959dad2bbfc26a9b1ea5875b88f8edb48a2f2ffcd163fefc1a50d07",
-   "size": 33720,
-   "mtime": 1788050920,
+   "sha": "f1f56aac420f9aec2b8f582f882ffb3b668f51df0a016532a07e628666446e6a",
+   "size": 33756,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/custody_chain.o": {
-   "sha": "6adf26993ff8ecf12e857937572fff585c2a590a27c852550154901d5af3d372",
+   "sha": "321400bd40d1eba901f542d48d6993dcf4cfb400a094650dffa2448e8fb8052c",
    "size": 12292,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/carrier_profiles.o": {
-   "sha": "e4bae215bc5d91cf5ef819220b80ca32b95f912950a6e14af6e5e895d8ca0ccb",
+   "sha": "00ba4c4157081df610ee7abfdd4a885b8cb35000ae4a5c958feb92eebe9614c9",
    "size": 23836,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/subnet_secure.o": {
-   "sha": "84f51f6685553c455ed826ba07c4944e81a897997e4d51f3dba68ed4bc78880f",
+   "sha": "5cbcf2e46c120d93dcd81ad0518e348e1c4a78470b4bd24bc52b955f830b9fd0",
    "size": 23912,
-   "mtime": 1788050925,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/milsec_compliance.o": {
-   "sha": "04f3d7896d7a2313343309742ee4b6185cf8a2e08d0f2249e8217f7a6bea52f5",
+   "sha": "e0ef907e3ac68c23126839766571c82856589dffe6118cc4a58dff48988f54ee",
    "size": 23056,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/esp_now.o": {
-   "sha": "773f28ff141f8b2e16296fc439afe959661b4436c57590052383f23482fc3b58",
+   "sha": "9bb3ad6aa320983d0fa608b14a9b7a4e9d97eb89ac6a02cf58e37a4419a7afcb",
    "size": 21452,
-   "mtime": 1788050921,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/virtual_fence.o": {
-   "sha": "3d6b81161eba0c3317865fbb99eebedf5038a38b7bbf2d69166291e43258b666",
+   "sha": "26da7c6632365eea1fc2dd2392117ec11201d9fc9a07b9f54897c4ca7e979947",
    "size": 28816,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/secure_mesh_keys.o": {
-   "sha": "7c34d854074d75e1b3a0492c35712d315c640d9632da7b07bd58fd6c249ccbae",
+   "sha": "48862829e7f0fbd5f9a690ab16549e30f85ba37c1dad95ddff10103a90008b4e",
    "size": 12368,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/esp32c6_secure.o": {
-   "sha": "8dd5aee503fe773fff2ee465a24557c31cd7cc54a65df4b9b98f22d9c3b87547",
+   "sha": "3e1f928ed9ec97baede09546fb1afa0be4624d4c4d95c4bdc228a8ddadec7098",
    "size": 13624,
-   "mtime": 1788050921,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/lora_compress.o": {
-   "sha": "d5482243b389566c3193ef290dd83eae942c38e3b8f1d1149bb8870be7c4bd8e",
+   "sha": "b9038b7c0a9ceee344fe1ccc7c9bc029332f0cb1a58bb3581893140d204cb013",
    "size": 36252,
-   "mtime": 1788050922,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/unused_capabilities.o": {
-   "sha": "cebe9130dda73c18236e91e76e12c648c04bc8d8dd722ea33b82c370954273b1",
+   "sha": "4a9a72742421df9f202afce0de0019780f312e0497c34877deab165cfabf1478",
    "size": 17628,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/tdma.o": {
-   "sha": "a2db083cc25e506c29ba96f503c9f1c875135f9ddb16ed7390d44606f58f6cbf",
+   "sha": "bac679b5a5903c1c514a3b79a66601c7c58f275f430e179ef393883ad1471821",
    "size": 18272,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/vital_radar_bridge.o": {
-   "sha": "8977505b4ff406ad3fbc3c51c91adc640421c1f83e1f3c398cf827c1d29d4d6e",
+   "sha": "1cb879cec35f1d924705a5251fc672de82f7a0941d76f77f900ce5a4c5818058",
    "size": 10580,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/acoustic_alert.o": {
-   "sha": "7aa4857992057d13ed349cebf5a5144e7fcc0a28cedf5aa5074f7d9045408444",
+   "sha": "dce5329b8bd6e55ddecbdc3617a4908e08a9d84089712523ad15502ac8eaed3e",
    "size": 26120,
-   "mtime": 1788050919,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/mesh_tx_rlnc.o": {
-   "sha": "a52dfd4c50a320fec8607890bdbe189db045070347f603f2c9e758515979aec6",
-   "size": 19764,
-   "mtime": 1788050923,
+   "sha": "071eaaa0f0b15dd0016c2bc25d7386998752c02d252ff56ad3d16c486ac815aa",
+   "size": 19740,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/dtn_lite.o": {
-   "sha": "a216c2cb331d44de056a9c7d49bff0648f4cb7327a748a4513204435384c4cd3",
+   "sha": "1acc4b3521b7312b590fdaaa16367f28062380b78551d9280d2810acfdc594fc",
    "size": 13108,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/mesh_compress.o": {
-   "sha": "a4f353e06eaa48d38b6647a430db065f1570f08a25f6b54a4ea2e1930d5740fc",
+   "sha": "759e25e0d869a09f98618d13b263aaac12db772ba55820240a64952247da97b3",
    "size": 13172,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/tesla_auth.o": {
-   "sha": "1f2c66fa47ad3c397799ad13e04fca8b3f79c3b7ab4d01f146fbbb999842e3a0",
+   "sha": "1d2a89f99c0a992e09f93254ad787fd9780045ee779daec0b458bd15453db09e",
    "size": 15416,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/bhi385_ai.o": {
-   "sha": "2982d8f9483328636fd07b3b1e08cfc65fcaecc986279296de173900c6181ab9",
+   "sha": "a4cb190e6671d8cdb18a7c92d43d24d2f2ec8e63bdd9f46939f455f6161ba027",
    "size": 19052,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/kernel_checkpoint.o": {
-   "sha": "c69af473f6b7c8bf0f6e3667fe3d34974c2c3d20dfe5c2e0efe23e1ed3e6f809",
+   "sha": "46a396964759d11a9ba9c806dbc793bface02de3eb993ed5b8a2b17b0aa2c8d8",
    "size": 18128,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/tactical_mesh.o": {
-   "sha": "5ff3a0a53659db8887aab56baaab1c45c0127d578bb78a24da599b002097ae87",
+   "sha": "de60d06b92d4b404325e41a01de22137106f51620bb120fef96ea9f372f87b98",
    "size": 22760,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/innovations.o": {
-   "sha": "3a5c1d88f86a3540b3e79ed34ff49696d9d31433b0f6b1060e60ca07811d90fb",
+   "sha": "8b9dc26999bafa04e72199179ac82ce209b2a87b4dbaf13dfbed6f8874cae2ab",
    "size": 27448,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/man_down.o": {
-   "sha": "e15db0820227b66128679d86935046a7f8ba97e5cb25308f771e9330b508ad37",
+   "sha": "984639bc7ba55ffe7c19234ecbddaafc3bdcd0eb3039bd7153df69184f5e75a1",
    "size": 5908,
-   "mtime": 1788050922,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/sar_acoustic.o": {
-   "sha": "6fd23a7d02db059081f96fa9c75f8e22aaa56dbe76d7e858807663cbfcc08048",
+   "sha": "11501432ae134cac7134a1d01a4efa38827bdd6beafc875cb57105d36ded5104",
    "size": 13468,
-   "mtime": 1788050924,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/group_key.o": {
-   "sha": "17e329d2d1f92ec2fb729e89ded7c51775bc126213e33404c7dbbf63de889c1d",
+   "sha": "fdb8d81e0ccf59b6087d06331aa31cdd37a9997519c7a192f8f323f512ae7856",
    "size": 18812,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/cose_sign1.o": {
-   "sha": "2ee5199aba8c051659de2dd64023ca8202c6c5ca00d6cf99692d5bbeeb1290d0",
+   "sha": "94fea80800463604d02ea22c3101117949f7061224104557815f0c72a595b8f0",
    "size": 22040,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/outdoor_analytics.o": {
-   "sha": "9701fb565936e5fa6aefbd16d4659cecb0129f39080a27d4a5025d4b6acb82f6",
+   "sha": "a2a10ba51794bc4a4d213b6367287348a59ff646b24ef880cc5e8d57570f8665",
    "size": 31432,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/tx_burst.o": {
-   "sha": "8895583584e382a3122f39eb4c97e506d8c29d9849f33fee1fb9955ee3808d13",
+   "sha": "9c28e930f155ff63b8ce7dc14d831476590feb6c2ed474e192214496b26960a1",
    "size": 12932,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/lr1120_crypto_bridge.o": {
-   "sha": "124463131543d0ca38cd565ed0b9a3f5253556505b8469f341c5f8cddfdfb515",
+   "sha": "6227a4b3afae4d9460617f618360deca755abeb155311a7fe6c1603effb43059",
    "size": 18508,
-   "mtime": 1788050922,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/mlkem768_ntt.o": {
-   "sha": "c8616a1651aa63e8d03a31094339dbc21f551d739e61e59a0a2886dbaaf447ef",
+   "sha": "e7c475685721ccf09654dca876a432c366f3185aef4057dfa5d644322dc32877",
    "size": 28276,
-   "mtime": 1788050923,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/anti_jam_resilience.o": {
-   "sha": "a2c8b3d8a1555b26dcc3334d7b5646ab8f79b2fe8320dbf4a5245c44aa792764",
+   "sha": "67ec00761d09e34eeb4a3156c630772b12883ad1826425ee7412346249ab1fbf",
    "size": 13724,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/mesh_delegate.o": {
-   "sha": "1cb52dae1eb8f3ad797b4dea432fae187ca19afd588daac31cdc34b0b0c998b5",
+   "sha": "d0a1b7f03bfce911a6d8b5482476eca71b7868bbb6872518972c851e32d6ddc1",
    "size": 27696,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/voice_tts_stt.o": {
-   "sha": "463c80ba68833d930b6e1f4a63e32d3cedd3608dfb086d16cbbb2d2bcfb264ea",
+   "sha": "db52014e783f41b75e3a36f1dbd06714a37c84b8884484fec249bf6f316f36de",
    "size": 40580,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/cli_session.o": {
-   "sha": "75ec5efbb7425975dd63b825561bbb9282b398ce0197eb0b10c30111474db9a2",
+   "sha": "484e0db086333978366238f0d43c1c1f672ba7bbb533c06552a57368ff169ff6",
    "size": 14416,
-   "mtime": 1788050920,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/mesh_crypto.o": {
-   "sha": "d3c44c1ba41cb66309db637eff6005c70a38ac3761aecfee7f4048d6ece85d11",
-   "size": 35424,
-   "mtime": 1788050923,
+   "sha": "507d33c50e06a14483fc1aaf4ba5ab8bae508aaa433f6a69edc5b94ccc56fbcc",
+   "size": 35456,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/solar_harvest.o": {
-   "sha": "76bbfb5d45c8acebe14ac8ce14d7f88067e407d733b8872c0584a351b36cce54",
+   "sha": "c511b0bdb6258448f7c0045821dbdf691dc88a43f9f3034b8f02d57e2f1089cc",
    "size": 14136,
-   "mtime": 1788050925,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/echo_beam.o": {
-   "sha": "100cffbf96d79455bf5ed34add01d6250b839468dd65521149f538ef941e9233",
+   "sha": "bbbec68e9f02b7fafc0023309f8ade28c770e72dacdc9b0fd6ac6420777b5ecb",
    "size": 40096,
-   "mtime": 1788050921,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/lab_test.o": {
-   "sha": "3bc205efe435dc62c2618067b1feece6aa5888f72f8cbe36a6fd3b13beb923aa",
+   "sha": "a8a61ad045844f5b328648ccf83ff96288a7c8e9ae28400485fbcf0ca6c64fc8",
    "size": 24696,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/ulp_power.o": {
-   "sha": "f2661cf300f26d99d9599b43d2879e4a04ff40359be77f042bbbc075b26321c7",
+   "sha": "a30673d52e45305eb7c266966e251123eb42f7ada945cddea8954fa1efb2dda5",
    "size": 17420,
-   "mtime": 1788050926,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/codec2_voice.o": {
-   "sha": "24ab4f37d1618f88fe1697eec9bb735c1c6c713683a56271e664f46be2432aa7",
+   "sha": "023f567064606ac4b44f2430725a896893c0b4e21a2ac7c2cbbbd84d17e74736",
    "size": 11920,
-   "mtime": 1788050920,
+   "mtime": 1788054330,
    "machine": "H3"
   },
   "build/kernel/secure_ota.o": {
-   "sha": "3201578babd02dfba423b51eabd6901410294c554fb7809f2aceac170976b1bc",
+   "sha": "c05ff97a6c4abbd293c2a3fb440f822271294d36b05b385252dea0b04c957aa6",
    "size": 15812,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/channel_sounding.o": {
-   "sha": "6354e2182c9770e01bc5664219bd18da4aeb8ffbe37088a4a032867c4a91dc08",
+   "sha": "f8d928e981c4f1506ba4c9df593ef2d74620f8f419b08614a9c8cfba43298dc6",
    "size": 8228,
-   "mtime": 1788050920,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   "build/kernel/mhps.o": {
-   "sha": "56948325362e82cf9b1207622fb4f96f274143cfe4fafe27cb983e217011253b",
+   "sha": "871a4246e9d9b63b5a8c1bf42c442927c852a3c58dd572bc344925a7f7e67885",
    "size": 7664,
-   "mtime": 1788050923,
+   "mtime": 1788054332,
    "machine": "H3"
   },
   "build/kernel/pred_goodput.o": {
-   "sha": "8c0d2920d81ef4721b400f7b1d6eca26292915cbc42411b0069b36ec528a7cec",
+   "sha": "f3b4753c7bc02dc8faf959208189597599dd65f08e35cd9c1ba44e12d5e82a0e",
    "size": 18900,
-   "mtime": 1788050924,
+   "mtime": 1788054333,
    "machine": "H3"
   },
   "build/kernel/industrack.o": {
-   "sha": "117b3ec321c2f330a4ad3b81d8550373d42e8004bab857c8bbd5d7dcd24f821e",
+   "sha": "0cbda047f8af0d881a797a316b19683b821a9aa849952aef2d136dffbcd60460",
    "size": 19952,
-   "mtime": 1788050922,
+   "mtime": 1788054331,
    "machine": "H3"
   },
   "build/kernel/semantic_codec.o": {
-   "sha": "e0f57ba114b9a66d6487d3aacb2051aa5a5cd96adf3a609cefea2f26c67b9bac",
+   "sha": "21e0df46831ab79cda2794287e393af819fe1dc4416332027a2f3461d503b03f",
    "size": 12464,
-   "mtime": 1788050925,
+   "mtime": 1788054334,
    "machine": "H3"
   },
   "build/kernel/snn.o": {
-   "sha": "51520a1fb5fafa187340c788f7ddcd9b1a562200fb741bfa266176dad2d1734b",
+   "sha": "0f300f7e7aaf7120b20686651a9fbee69594ef8fc65f0249354b26c894b5d04e",
    "size": 18372,
-   "mtime": 1788050925,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/kernel/sys_health.o": {
-   "sha": "3ba4e28a7b39a9b96f6e098cef8c096c4a3f48ffac6f296386979b87a9685260",
+   "sha": "506ffa8f98b730466846e52ca1050392d2469671e3b8936b4bf5c08a9626ae6f",
    "size": 32724,
-   "mtime": 1788050925,
+   "mtime": 1788054335,
    "machine": "H3"
   },
   "build/drivers/iwrl6432_hal.o": {
-   "sha": "4f0f3944ca1c25d283dbc19cc7ec12bcab4b45def890ce2e218eba265524a4c2",
+   "sha": "fe0c577aa378aa7e6fa9aeb1a4fc9bbef8f6c15ae2dc91bf6c050ff67720b3a8",
    "size": 16576,
-   "mtime": 1788050926,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/drivers/bhi385.o": {
-   "sha": "2cd3990cda245094b13e27385265d9ac8ce40f440df7d5466920ed20830670c7",
+   "sha": "4930e558877a7e2bf77e0378532a0a6ac29df52e09642870a1bf4f40f0798b57",
    "size": 42412,
-   "mtime": 1788050926,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/drivers/ch201_freestanding.o": {
-   "sha": "c0d40ef108777a7b3694958fafdcc1d5f467a5289ec1cd235bd28e06bcf5c40b",
+   "sha": "fa5691c1bc3570b82ef0b4519379fbcf51a10a1c49c1147a417e5a3242cdf44b",
    "size": 10560,
-   "mtime": 1788050926,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/drivers/bgt60tr13c_freestanding.o": {
-   "sha": "62bc527452f00f2ad5d7484df4187b52f67eac6c279bad8555183062dca6183a",
+   "sha": "6dbce05581ad937b54fcc997156819b0fa804ff69e816fc2b09e16a181c71852",
    "size": 10868,
-   "mtime": 1788050926,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/drivers/vl53l8cx_freestanding.o": {
-   "sha": "9d86f348468cfcb3c71e8fbb7f9396431cb834d934ec7e7282cf97a1a71c0247",
+   "sha": "feaa35ea00263f923e7753351ba9a77dd0aedfcc34bb08a6327346d836c9c270",
    "size": 11144,
-   "mtime": 1788050926,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/drivers/ble_hal.o": {
-   "sha": "ad206a9829eba4f95894d97972aca83346f30d6e1f2a2139fc3961f6418fed43",
+   "sha": "071d12eb64614db118334a0dd04ceca9ff8a572802eab840ee1b892b35c0192d",
    "size": 8884,
-   "mtime": 1788050926,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/drivers/nrf54lm20_hal.o": {
-   "sha": "0f79050c311c08233a6ec362a579f4b936c213373c1c08a9faf6de74449e419a",
+   "sha": "fff9dcaf3de74fff60f4cf71ac75a94e1bdcbec8c8f4b4cf1842ed06520360cd",
    "size": 7224,
-   "mtime": 1788050926,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/drivers/max98357a_freestanding.o": {
-   "sha": "c35682e7924c3c9195a392bc881e03fd4f6ed689f5602259d4484b8eec22eb21",
+   "sha": "d8d2938632a66f34311b886104b86442bcd605527fe1cb75a5af0c441bdaf1f1",
    "size": 7620,
-   "mtime": 1788050926,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/drivers/st25dv.o": {
-   "sha": "a9380d8e203e4928c0236e29bf244c08cbf83f3ed45b88468fa8cdafce4503b7",
-   "size": 27340,
-   "mtime": 1788050926,
+   "sha": "eade6958bd4bb021d8109c2f066cc711366104546ffb5872843122de18f9ceb5",
+   "size": 27380,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/drivers/bme690.o": {
-   "sha": "1529ac30bb6c3d1a457a7541d771f18bf89f037397a5911fef0769d1cb23e8c8",
+   "sha": "d9f6e78ee0f20579a1c7259fae82f19a563fad277033005c3e3f5e1fa220fa0b",
    "size": 24668,
-   "mtime": 1788050926,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/drivers/halow_transport.o": {
-   "sha": "db8569085759893f4185e5bcb231cae83fc81225e3aa7619b5ad242bfa5fad8a",
+   "sha": "9ba2c15abec9b8b1cab64fc0bf0de1610f7ec180e1233743bd9471b74fc3d96d",
    "size": 17240,
-   "mtime": 1788050926,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/drivers/bhi385_fifo.o": {
-   "sha": "ad53be9367cc48f8d13ffd93f2444a5883b3f73185b924e0bc9474219a58a90f",
+   "sha": "65e0a8be17604ba6695431823c74ad61b3d3eb4d8488262f9bb0028e2f320c43",
    "size": 16076,
-   "mtime": 1788050926,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/drivers/bgt60ltr11aip.o": {
-   "sha": "249741068d26d2574b0aa58a8d08b514fb558f6601512472235f6a9662966d84",
+   "sha": "91ddcc6d80bf5ff4b609e548fd931836401c3b0c7dea16dd734db66f91e856f7",
    "size": 22804,
-   "mtime": 1788050926,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/drivers/cmsis_dsp_wrapper.o": {
-   "sha": "497f45addc89178bb909b54603b657e111d7f115b60f17b3b60ca95222f1ba42",
+   "sha": "5ff1e7151ada5929cadf289ad20fd4fbd18de5ffb0d191ce5bf717aa98c8e98c",
    "size": 5376,
-   "mtime": 1788050926,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/drivers/rf_power_mgmt.o": {
-   "sha": "1722a2d5ae05427c38ccc55e7d154999130105b73467a088ede510cdb0232046",
+   "sha": "daa319f9fa9439eb1174ea5abae74f89878e4838e4065d3fb4635711e982da5e",
    "size": 15184,
-   "mtime": 1788050926,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/drivers/radio/lr_fhss.o": {
-   "sha": "18cc7e23172ebea8bebe7c2b2de1575bbc91e80a6e646a05e1fb3c22540877bc",
+   "sha": "7bb2f80e6ccc28578ede0ddd8e6f1027294cfec99592367bc8c17ab31ecd08dd",
    "size": 20416,
-   "mtime": 1788050926,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/drivers/radio/lr2021.o": {
-   "sha": "e9c2eea38bbb5f9e4cd879473952b8340b3f4e2ea6cc8f4dfb5edb21aa50ca4d",
+   "sha": "ebea0a27aba7016859f2950811c9a4f3a9061e6fbfec2af3ea19e5158e50a64c",
    "size": 44208,
-   "mtime": 1788050926,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/drivers/radio/lr1120_scan_bounds.o": {
-   "sha": "4d02c10e1b305886c9c5907fd229f7acea29cec68a3246ef09f5de100ed12f55",
+   "sha": "baf7761d2879fab9ccf6525c0ca5fca1771d24a78d9ce3ff6307ff3288fe763c",
    "size": 15884,
-   "mtime": 1788050926,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/drivers/radio/lr1120_transport.o": {
-   "sha": "e62b7216cc2b8fb47dbaaad704a8ff4478875218bb868919d17a2b27fde20aa7",
+   "sha": "0d5145b915bb7f32dc0284784efb1fef2971f49dcdb4c824a8d819b26c52793d",
    "size": 12952,
-   "mtime": 1788050926,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/drivers/radio/lorawan_regional.o": {
-   "sha": "b8ab543440b2cac263c7fee25e3826a66df7f84921f40c9d504106d9e5435118",
+   "sha": "5bf80828615504dd33f612dbf0723eb4ea18cc836b4e2825d392bae8e2bb6d7a",
    "size": 27664,
-   "mtime": 1788050926,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/drivers/radio/lr1120.o": {
-   "sha": "55898e21ee59b0d6f08f22a91dec2f6f9cf5abb8c9dbdfc244de032723b8dfb8",
+   "sha": "90e9d6b904cf2534c12dc5cda0f64e2d49beeb3762151ba8bcceed60ad8fe1da",
    "size": 115344,
-   "mtime": 1788050926,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/drivers/radio/radio_selector.o": {
-   "sha": "5174c37e4043cf62411d4b6341e4975328ea6b1ec06363167a71c8e9893fcc2b",
+   "sha": "f9fd63323c52292268cc7b7bdb176f148b04a5cd7459a9cf29c963d7f573cf5c",
    "size": 37164,
-   "mtime": 1788050927,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/drivers/radio/mioty_tsunb.o": {
-   "sha": "70b0f917f70a0019af202984bf1f99109b752bf6289ccf2ffdb94f6161896cae",
+   "sha": "28ffefadf43493c5d7d07797354a3cc121b1d82883cbb98fc443d9dce1c2fded",
    "size": 11136,
-   "mtime": 1788050926,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/drivers/wifi/mm8108.o": {
-   "sha": "331098bb73055614435f13195f20d3b7a8abe000dc657ce7949a0157385131de",
+   "sha": "b311cf163ac6c474cd6ba49404c7b69af783a7d18e2741aa4d18be53186f7dd2",
    "size": 49176,
-   "mtime": 1788050927,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/drivers/db/logic_engine.o": {
-   "sha": "bffd6071fc0d6aeb4c354bdd556d6a4d56527a5166b6fac69aadf12736f91f58",
+   "sha": "022fdd9f084f7032126319780e8c25a35bd79ba8ef7c5e80a470311ea8a98b75",
    "size": 17948,
-   "mtime": 1788050927,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/drivers/db/swarmdb.o": {
-   "sha": "ab51a3173dff5e880a93b1e11af76a48909d66906a35698e1bf2f269cfdf97de",
+   "sha": "6d63f18f655aac20d41d8c61df02d674ed1986ba364e2f6f73b659792d8d1100",
    "size": 57072,
-   "mtime": 1788050927,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/drivers/db/sensor_attest.o": {
-   "sha": "88af028c0c7dabcb7da8cb5d6e98fa142e701d7d905bfae27fe5182e95bcaf0a",
+   "sha": "1f2829f0a4fb87ea089cdb665b9d74ee6b7047acab3230b738d005bebffd0438",
    "size": 13256,
-   "mtime": 1788050927,
+   "mtime": 1788054336,
    "machine": "H3"
   },
   "build/boot/startup_nrf54lm20.o": {
    "sha": "d4c32f5e6a0a119917c7ac977ae4f391e3073464dbe90f332e883e6851cc7c6e",
    "size": 5548,
-   "mtime": 1788050919,
+   "mtime": 1788054329,
    "machine": "H3"
   },
   ".backup/2606_h2fixes/gf256_tables.inc": {
