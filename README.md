@@ -1,181 +1,101 @@
-# Hermes Sync Motoru
+# Hermes Sync (hermes-sync)
 
-Hermes Agent'ınızı **Google Drive + GitHub üzerinden** yedekleyen ve
-**birden fazla makine arasında** gerçek zamanlı senkronize eden evrensel,
-veri kaybına karşı güvenli (non-destructive) motor.
+Hermes Agent ağları için **çok nokta yedekleme + senkronizasyon + ajan mesh** motoru.
+Non-destructive, versiyonlu, sınırsız node. **MIT** lisansı.
 
-- 🔄 **Çok nokta**: Laptop + Masaüstü + Sunucu + OpenClaw — hepsi eşit
-- 🛡️ **Non-destructive**: Asla üzerine yazmaz; çakışmalar `.conflict.TS` ile korunur
-- 📦 **Versiyonlu**: Her senkron GDrive'da timestamp'li snapshot
-- 🧠 **Sınırsız node**: İstediğiniz dizini node olarak ekleyin
-- 👥 **Paylaşım**: Node'ları diğer kullanıcılarla paylaşın
-- 🔐 **Güvenli**: `.env`, `*.key`, `id_rsa` ASLA yedeklenmez
-- 🤖 **Makine tespiti**: Her makine kendi sürüm geçmişine sahip
+> Özel CumulusNET kopyası: `cumulus-sync-motor` (private). Bu repo (public) evrensel
+> Hermes/OpenClaw kullanımı içindir.
 
-## Nasıl Çalışır?
+## v2.1 — 29 Ağu 2026: Ajan Mesh + Restic
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  GITHUB (manifest merkezi — her zaman açık)         │
-│  - sync_manifest.json (SHA256 + ts + makine)        │
-└─────────────────────────────────────────────────────┘
-        ▲                        ▲
-   push │                        │ pull (makine açılınca)
-        ▼                        ▼
-  ┌──────────┐   Tailscale   ┌──────────┐
-  │ Makine 1 │◄── 9090 ────►│ Makine 2 │
-  └──────────┘               └──────────┘
-        │                          │
-        ▼                          ▼
-  GDRIVE (versiyonlu yedek)  GDRIVE (pull)
-  hermes-sync/<user>/<machine>/versiyonlu/<node>/<ts>/
+┌────────────┐   A2A (JSON-RPC, Tailscale)   ┌────────────┐
+│  H1 Hermes │ ◄──────────────────────────► │  H3 Hermes │
+│  (VPS)     │                               │  (Proxmox) │
+└──┬─────┬───┘                               └──┬─────┬───┘
+   │     │ Syncthing (P2P dosya)               │     │
+   │     └─────────────────────────────────────┘     │
+   │              ┌────────────┐                     │
+   └─────────────►│   GDrive   │◄────────────────────┘
+                  │  restic    │  (ortak yedek repo)
+                  │  state.json│  (ortak durum)
+                  └────────────┘
+   ┌────────────┐
+   │  H2 Hermes │  (A2A + restic canlı; Syncthing/worker talimatlı)
+   │  (Windows) │
+   └────────────┘
 ```
 
-## Kurulum
+### Bileşenler
+
+| Bileşen | Dosya | Açıklama |
+|---|---|---|
+| Senkron motoru | `sync_motor.py` | push/pull/both/backup/versions/rollback + `mesh` komutu (kanal seçici) |
+| Node ajanı | `node_agent.py` | otonom eşitleme + yedek + hub raporu + ortak akıl |
+| A2A mesh server | `agent_mesh_a2a.py` | Ajanlar arası konuşma (JSON-RPC, port 8643) |
+| A2A client | `a2a_cli.py` | send/get/stream — görev gönder, sonuç al, canlı akış dinle |
+| Görev işleyici | `inbox_worker.py` | A2A inbox görevlerini çalıştırır (allowlist) |
+| Ortak akıl | `sync_common_knowledge.py` | GDrive hub'da dağıtık ortak durum + görev kuyruğu (HLC) |
+| Ortak hafıza | `sync_memory.py` | Memory DIF'leri JSONL + audit hash-chain |
+| Retention | `sync_retention.py` | Snapshot yaşam döngüsü |
+| Akıllı kurulum | `probe/propose/apply` | Kaynak farkındalıklı kurulum önerisi |
+
+### 3 Katmanlı Akıllı Kanal Mimarisi
+
+```
+Görev/cevap  → A2A      (Tailscale HTTP, anlık — saniyeler)
+Dosya değişimi → Syncthing (P2P, GDrive'suz — fsWatcher)
+Arşiv/yedek  → GDrive  (restic incremental + versiyonlu snapshot)
+```
+
+### A2A — 3 İletişim Modu
 
 ```bash
-git clone https://github.com/yolgezerahmet/hermes-sync.git
-cd hermes-sync
-cp config.example.json config.json
-# config.json'u düzenleyin: user_id, github repo, node dizinleri
+# SENKRON: anında sonuç
+python3 a2a_cli.py send-status 100.103.44.107 --token <TOKEN>
+
+# ASENKRON: görev gönder → task_id → sonra sonucu al (kalıcı task store)
+python3 a2a_cli.py send <host> "uptime" --mode async --token <TOKEN>
+python3 a2a_cli.py get <host> --task-id <TASK_ID> --token <TOKEN>
+
+# CANLI: SSE akışı (2s'de bir veri)
+python3 a2a_cli.py stream <host> "selam" --seconds 10 --token <TOKEN>
 ```
 
-**Gereksinimler:**
-- Python 3.8+
-- [GitHub CLI](https://cli.github.com/) — `gh auth login` yapılmış
-- [rclone](https://rclone.org/) — Google Drive remote (`gdrive:`)
-
-## Kullanım
+### Restic Incremental Yedek
 
 ```bash
-python3 sync_motor.py status          # durum + farkındalık
-python3 sync_motor.py both            # push + pull (önerilen)
-python3 sync_motor.py push            # yerel → GitHub + GDrive
-python3 sync_motor.py pull            # merkezden çek (çakışmasız)
-python3 sync_motor.py select          # interaktif node seçimi
-python3 sync_motor.py nodes           # node listesi + versiyonlar
-python3 sync_motor.py conflicts       # çakışmaları listele
-python3 sync_motor.py doctor          # ortam sağlığı (bağımlılık + bağlantı) — v1.4
-python3 sync_motor.py version         # sürüm
-
-# Güvenli önizleme (v1.4): ne yapılacağını göster, HİÇBİR ŞEY yazma
-python3 sync_motor.py push --dry-run
-python3 sync_motor.py both --dry-run
-
-# Sınırsız node ekleme:
-python3 sync_motor.py add-node proje-x --path ~/projeler/proje-x \
-    --include "*.md,*.py" --max-kb 2048
-
-# Node paylaşma (başka kullanıcıya):
-python3 sync_motor.py share kernel --to arkadas
-
-# === AKILLI KURULUM — Kaynak Farkındalıklı Öneri (v1.6) ===
-# Felsefe: eşitleme SIRASINDA hiçbir kurulum otomatik yapılmaz.
-# CPU/GPU/RAM/disk kontrolünden geçen ÖNERİ sunulur, onay sonrası kurulur.
-
-python3 sync_motor.py probe                # yerel kaynaklar + kurulu araçlar
-                                           # (manifest'e yazar, push ile gider)
-python3 sync_motor.py push                 # kaynak + araç durumunu otomatik taşır
-python3 sync_motor.py propose              # karşı node'un kurulu araçları → öneri
-                                           # (GPU öncelikli; engel nedeniyle ayrım)
-python3 sync_motor.py apply --tool ollama  # interaktif onay ile kur
-python3 sync_motor.py apply --tool vllm --yes   # onaysız kur (yine de RED:
-                                           # zaten kuruluysa / kaynak yetmezse)
+# rclone serve restic gdrive:restic-backup --addr 127.0.0.1:8443
+python3 sync_motor.py backup            # CDC dedup + snapshot + restore
+python3 sync_motor.py versions          # snapshot listesi
+python3 sync_motor.py rollback <node> --version <snapshot> --dry-run
 ```
 
-## Akıllı Kurulum (v1.6)
+Retention: forget keep-daily 7 / weekly 4 / monthly 6 — prune yalnız birincil makinede (04:00).
 
-Eşitleme sırasında karşı node'da kurulu olan GPU/CPU yoğun araçları
-**otomatik kurmaz** — kaynak kontrolünden geçirilmiş **öneri** olarak sunar:
-
-1. `probe` → yerel CPU/RAM/disk/GPU ölçülür, kurulu araçlar katalogdan
-   taranır, manifest'e yazılır (push ile karşı node'a gider)
-2. `propose` → karşı node'da kurulu, sizde olmayan araçlar değerlendirilir:
-   - ✅ **KURULABİLİR** — kaynaklar yeterli (GPU araçlar öncelikli listelenir)
-   - ⛔ **KAYNAK ENGELLİ** — nedenle birlikte: `GPU yok` (NVIDIA/CUDA
-     gerekliyse), `disk yetmez`, `RAM yetmez`, `CPU yetmez`
-3. `apply --tool <ad>` → kurulum komutu gösterilir, **interaktif onay**
-   alınır (veya `--yes`); onay yoksa HİÇBİR ŞEY çalışmaz
-
-**Non-destructive garantileri:** zaten kuruluysa RED; kaynak yetersizse RED;
-kurulum asla mevcut dosyanın üzerine yazmaz. Araç kataloğu `config.json`
-içindeki `tools` bölümünden gelir — her araç için `check` (varlık komutu),
-`gpu` (NVIDIA/CUDA zorunlu mu), `min_ram_gb`/`min_disk_gb`/`min_cpus`
-(eşikler) ve `install` (onay sonrası çalışacak komut) tanımlanır.
-
-## Node Yapılandırması
-
-`config.json` içinde her node:
-
-```json
-{
-  "identity": {
-    "user_id": "kullanici-adi",      // GDrive alanınız
-    "machine_id": "laptop"           // boş = otomatik (hostname)
-  },
-  "dirs": {
-    "hermes": {
-      "path": "~/.hermes",           // Hermes agent yapılandırması
-      "include": ["*.yaml", "*.md", "*.json"],
-      "exclude_dirs": ["cache", "logs", "models", "venv"],
-      "max_size_kb": 1024,           // büyükler GDrive'a
-      "gdrive": true                 // versiyonlu GDrive yedeği
-    },
-    "projem": {
-      "path": "~/projeler/projem",
-      "include": ["*.c", "*.h", "*.md"],
-      "exclude_dirs": [".git", "build"],
-      "max_size_kb": 512,
-      "gdrive": true
-    }
-  }
-}
-```
-
-## Güvenlik İlkeleri
-
-1. **Asla mevcut dosyanın üzerine yazma** — çakışma → `.conflict.<timestamp>`
-2. **Secret'lar manifest'e GİRMEZ**: `.env`, `*.key`, `*.pem`, `id_rsa`,
-   `service-account`, `credentials` otomatik atlanır
-3. **Versiyonlu GDrive**: `versiyonlu/<node>/<timestamp>/` — eski sürümler
-   asla silinmez, geri dönüş her zaman mümkün
-4. **SHA256 manifest**: GitHub'da tüm dosyaların durumu — her makine
-   diğerinin değişikliklerini görür
-
-## Paylaşım (kullanıcılar arası)
+### Kurulum (yeni node)
 
 ```bash
-# Kullanıcı A: node paylaş
-python3 sync_motor.py share kernel --to kullanici-b
-
-# Kullanıcı B: paylaşılan node'u çek
-# → gdrive:hermes-sync/kullanici-b/shared/kernel/ altına kopyalanır
+python3 sync_motor.py init              # config üret (gdrive:hermes-sync/<user>/)
+python3 sync_motor.py add-node <ad> --path <dizin> [--include '*.md'] [--max-kb 1024]
+python3 sync_motor.py both              # push + pull
+python3 sync_motor.py mesh status       # tüm node'ların A2A durumu
 ```
 
-## Otomatik Çalıştırma
+### Gereksinimler
 
-```bash
-# Linux/Mac (crontab) — her 3 saatte
-0 */3 * * * cd ~/hermes-sync && python3 sync_motor.py both >> ~/hermes-sync.log 2>&1
+- Python 3.10+, rclone (GDrive remote), restic 0.19+ (yedek), fastapi+uvicorn (A2A server)
+- Tailscale veya doğrudan erişim (A2A 8643, Syncthing 22000/8384)
 
-# Windows (Görev Zamanlayıcı)
-# pythonw ile her 3 saatte sync_motor.py both
-```
+### Güvenlik
 
-## Sorun Giderme
+- `.env`, `*.key`, `*.pem`, token içeren dosyalar ASLA kapsama alınmaz (secret filtre)
+- A2A: Bearer token + Tailscale-only (dışa kapalı)
+- Görev işleyici: allowlist komutlar (status/uptime/test:<modul>/shell:ls)
+- Non-destructive: çakışma `.conflict.TS` korunur, üzerine yazma yok
 
-- **"GitHub manifest erişilemedi"** → `gh auth login`
-- **"GDrive snapshot başarısız"** → `rclone config` + `rclone lsd gdrive:`
-- **"Karşı taraf OFFLINE"** → `tailscale status` + `tailscale up`
-- **Build FAIL** → eşitlenen kod derlenmiyor — log'u incele
+## Geçmiş
 
-## Lisans
-
-MIT — bkz. [LICENSE](LICENSE)
-
-## Katkı
-
-1. Fork edin
-2. Feature branch açın
-3. Test: `python3 -m unittest discover tests`
-4. PR gönderin
+- v1.6 (12 Ağu): akıllı kurulum (probe/propose/apply)
+- v1.3 (3 Ağu): evrensel — kullanıcı/makine kimliği, sınırsız node, share
+- v1.0 (3 Ağu): GitHub manifest + GDrive versiyonlu + OpenClaw skill
