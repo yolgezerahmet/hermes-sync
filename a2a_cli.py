@@ -21,6 +21,8 @@ import urllib.request
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+_CARD_CACHE: dict[str, tuple] = {}
+_CARD_TTL = 300
 try:
     import agent_identity as AI
     IDENTITY_OK = True
