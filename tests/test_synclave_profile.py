@@ -78,10 +78,12 @@ class TestSkills(Base):
 
 class TestMemory(Base):
     def test_bellek_koprusu(self):
-        (self.oc / "workspace" / "memory" / "2026-08-30.md").write_text("bugünkü not", encoding="utf-8")
+        import time as _t
+        bugun = _t.strftime("%Y-%m-%d")
+        (self.oc / "workspace" / "memory" / f"{bugun}.md").write_text("bugünkü not", encoding="utf-8")
         r = SP.merge_memory(self.he, self.oc)
         self.assertIn("bugün", r)
-        self.assertTrue((self.he / "memory" / "openclaw_2026-08-30.md").exists())
+        self.assertTrue((self.he / "memory" / f"openclaw_{bugun}.md").exists())
 
 
 class TestMap(Base):
