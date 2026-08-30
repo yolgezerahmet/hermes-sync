@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hermes-sync"
-version = "2.3.0"
+version = "2.3.1"
 description = "Hermes Agent sync — multi-node backup, replication, and agent mesh (A2A + Syncthing + restic + shared state)"
 readme = "README.md"
 requires-python = ">=3.10"

@@ -1,6 +1,6 @@
-"""hermes_sync — Hermes Agent sync + agent mesh paketi (v2.1)."""
+"""hermes_sync — Hermes Agent sync + agent mesh paketi (v2.3.1)."""
 
-__version__ = "2.1.1"
+__version__ = "2.3.1"
 
 from . import (
     sync_motor,

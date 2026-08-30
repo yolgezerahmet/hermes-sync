@@ -73,7 +73,7 @@ if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
 import sync_memory as smem
 
-__version__ = "2.1.1"
+__version__ = "2.3.1"
 __author__ = "CumulusNET Engineering"
 __license__ = "MIT"
 
