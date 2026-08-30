@@ -325,8 +325,8 @@ def build_app(token: str):
         # 3) Doğrulanmış kimliği göreve işle → sohbet etiketi buradan üretilir
         if isinstance(params, dict):
             md = dict(params.get("metadata", {}) or {})
-            md["from"] = vr["agent_id"] if vr["reason"] == "verified" else md.get("from", "unknown")
-            md["verified"] = vr["reason"] == "verified"
+            md["from"] = vr["agent_id"] if vr["reason"].startswith("verified") else md.get("from", "unknown")
+            md["verified"] = vr["reason"].startswith("verified")
             md.setdefault("channel", "a2a")
             if request.headers.get("x-conversation-id"):
                 md["conversation_id"] = request.headers["x-conversation-id"]
@@ -402,7 +402,13 @@ def main():
     global REQUIRE_SIG
     if args.require_signature:
         REQUIRE_SIG = True
-    import uvicorn
+    try:
+        import uvicorn
+    except ImportError:
+        # Windows (H2) dahil temiz kurulum hatası — ham traceback yerine
+        print("HATA: 'uvicorn' paketi yok — A2A mesh server başlatılamaz.\n"
+              "      Kur: pip install uvicorn  (veya pip install 'hermes-sync[server]')")
+        sys.exit(1)
     app = build_app(args.token)
     ident = identity()
     kimlik = (f"{ident.agent_id} [{ident.runtime}] klon={ident.meta.get('clone_state')}"

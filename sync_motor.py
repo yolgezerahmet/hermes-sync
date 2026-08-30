@@ -618,29 +618,89 @@ def gh_available():
     return rc == 0
 
 
-def run_cmd(cmd, timeout=60, shell=False):
+# ─── Geçici hata + idempotent okuma tespiti (v2.1.1 — 30 Ağu 2026) ──
+# run_cmd'de retry YALNIZCA idempotent OKUMA komutlarına uygulanır
+# (cat/lsf/lsjson/lsd/status). Yazma komutlarına (copy/copyto/backup)
+# ASLA retry YOK — çift yazma/kısmi durum fail-closed korunur.
+_RETRY_READ_TOKENS = {"cat", "lsf", "lsjson", "lsd", "status"}
+_RETRY_NET_MARKERS = (
+    "connection reset",
+    "connection refused",
+    "connection timed out",
+    "network is unreachable",
+    "temporary failure",
+    "tls handshake timeout",
+    "i/o timeout",
+    "service unavailable",
+    "timeout",
+)
+_RETRY_TRANSIENT = _RETRY_NET_MARKERS + ("timed out", "temporary", "reset")
+
+
+def _is_idempotent_read(cmd_text: str) -> bool:
+    """Komut metninin ilk 3 token'ında idempotent okuma alt-komutu var mı?"""
+    toks = str(cmd_text).split()
+    for t in toks[:3]:
+        if t.lower() in _RETRY_READ_TOKENS:
+            return True
+    return False
+
+
+def _is_transient_rc(rc: int, err: str) -> bool:
+    if rc == -1:
+        return True
+    e = (err or "").lower()
+    if re.search(r"\b5\d\d\b", e):
+        return True
+    return any(m in e for m in _RETRY_TRANSIENT)
+
+
+def run_cmd(cmd, timeout=60, shell=False, retries=0):
     """
     Komut çalıştır — (stdout, returncode).
     Güvenlik: shell=True KAPALI — komut enjeksiyonuna karşı.
     shell=True gereken pipe komutları için shell=True AÇIKÇA verilir
     ve giriş değerleri config'den (kullanıcının kendi dosyası) gelir.
+
+    retries>0: yalnızca idempotent OKUMA komutu (cat/lsf/status...) ve
+    geçici hata (timeout/network/5xx) durumunda 1 retry (3s bekle).
+    Yazma komutları retries>0 verilse bile retry YAPMAZ.
     """
-    try:
-        if shell:
-            r = subprocess.run(cmd, shell=True, capture_output=True,
-                               text=True, errors="replace", timeout=timeout)
-        elif isinstance(cmd, (list, tuple)):
-            # LIST komut doğrudan geç (split ETME — split list'te patlar)
-            r = subprocess.run(list(cmd), capture_output=True,
-                               text=True, errors="replace", timeout=timeout)
-        else:
-            r = subprocess.run(cmd.split(), capture_output=True,
-                               text=True, errors="replace", timeout=timeout)
-        return r.stdout.strip(), r.returncode
-    except subprocess.TimeoutExpired:
-        return "timeout", -1
-    except Exception as e:
-        return str(e), -1
+
+    def _exec():
+        try:
+            if shell:
+                r = subprocess.run(cmd, shell=True, capture_output=True,
+                                   text=True, errors="replace", timeout=timeout)
+            elif isinstance(cmd, (list, tuple)):
+                # LIST komut doğrudan geç (split ETME — split list'te patlar)
+                r = subprocess.run(list(cmd), capture_output=True,
+                                   text=True, errors="replace", timeout=timeout)
+            else:
+                r = subprocess.run(cmd.split(), capture_output=True,
+                                   text=True, errors="replace", timeout=timeout)
+            return r.stdout.strip(), r.returncode, (r.stderr or "")
+        except subprocess.TimeoutExpired:
+            return "timeout", -1, f"TIMEOUT {timeout}s"
+        except Exception as e:
+            return str(e), -1, ""
+
+    cmd_text = " ".join(cmd) if isinstance(cmd, (list, tuple)) else str(cmd)
+    can_retry = _is_idempotent_read(cmd_text)
+    for attempt in range(retries + 1):
+        t0 = time.monotonic()
+        out, rc, err = _exec()
+        dur = time.monotonic() - t0
+        if rc == 0:
+            return out, rc
+        transient = _is_transient_rc(rc, err)
+        if attempt < retries and can_retry and transient:
+            log.warning(f"sync hata: {cmd_text[:120]} rc={rc} {dur:.1f}s retry={attempt + 1}/{retries}")
+            time.sleep(3)
+            continue
+        if rc != 0:
+            log.warning(f"sync hata: {cmd_text[:120]} rc={rc} {dur:.1f}s retry={attempt}")
+        return out, rc
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -2037,7 +2097,19 @@ def _hub_base(args_hub=None):
 
 # ── v1.6.4: TEK-INSTANCE KİLİT + SON-KOŞU RAPORU ──
 
-MOTOR_LOCK = "/tmp/cumulus_sync.lock"
+def _motor_lock_path() -> str:
+    """Kilit dosyası yolu — platform farkındalıklı (v2.1.1).
+
+    Linux/macOS: /tmp/cumulus_sync.lock (eski davranış korunur).
+    Windows: %TEMP%\\cumulus_sync.lock ('/tmp' yok).
+    """
+    if os.name == "nt":
+        base = os.environ.get("TEMP") or os.environ.get("TMP") or os.path.expanduser("~")
+        return os.path.join(base, "cumulus_sync.lock")
+    return "/tmp/cumulus_sync.lock"
+
+
+MOTOR_LOCK = _motor_lock_path()
 RUN_STATE = os.path.expanduser("~/.hermes/state/sync_last_run.json")
 
 # Bu komutlar GDrive/GitHub'a YAZAR → kilit zorunlu. Okuma komutları
@@ -2476,7 +2548,7 @@ def cmd_backup(cfg, node=None, hub=None, dry_run=False):
                 rr = subprocess.run(["rclone", "lsjson",
                                      f"{hub}/{n}", "--hash", "--files-only"],
                                     capture_output=True, text=True,
-                                    errors="replace", timeout=120)
+                                    errors="replace", timeout=180)
                 if rr.returncode == 0:
                     try:
                         for f in json.loads(rr.stdout or "[]"):
@@ -2607,7 +2679,7 @@ def _tag_version(cfg, node, tag, vers, hub=None):
             f.write(meta + "\n")
         r2 = subprocess.run(["rclone", "copyto", lp, tag_file],
                             capture_output=True, text=True, errors="replace",
-                            timeout=120)
+                            timeout=180)
         if r2.returncode != 0:
             print(f"    ❌ {node}: tag yazılamadı: {r2.stderr.strip()[:120]}")
             return 1
@@ -2795,7 +2867,7 @@ def memory_push(cfg, delta_path, dry_run=False):
         return True
     r = subprocess.run(["rclone", "copy", delta_path, hub],
                        capture_output=True, text=True, errors="replace",
-                       timeout=120)
+                       timeout=180)
     if r.returncode != 0:
         print(f"    ❌ push hatası: {r.stderr.strip()[:150]}")
         return False
@@ -2832,7 +2904,7 @@ def memory_pull_import(cfg, memory_dir, dry_run=False):
         dst = os.path.join(incoming, fn)
         rr = subprocess.run(["rclone", "copyto", f"{hub}/{fn}", dst],
                             capture_output=True, text=True, errors="replace",
-                            timeout=120)
+                            timeout=180)
         if rr.returncode != 0:
             print(f"    ⚠ {fn} indirilemedi: {rr.stderr.strip()[:100]}")
             continue
