@@ -21,6 +21,7 @@ CRON (no_agent, 15 dk):
 from __future__ import annotations
 
 import argparse
+import fcntl
 import hashlib
 import json
 import os
@@ -55,6 +56,19 @@ KNOWN_USERS = {  # <kanal>:<user_id> → görünen ad (peer etiketi değil, labe
 }
 BATCH = 500
 SLEEP_PER_BATCH = 0.0
+_LOCK_FILE = os.path.expanduser("~/.hermes/state/bridge.lock")
+
+
+def _acquire_lock():  # -> int | None
+    """Tek-instance kilidi — iki köprü aynı anda conversations.db'ye yazmasın
+    (cron + manuel çakışması SQLite kilit kilitlenmesine yol açıyordu)."""
+    try:
+        Path(_LOCK_FILE).parent.mkdir(parents=True, exist_ok=True)
+        fd = os.open(_LOCK_FILE, os.O_CREAT | os.O_RDWR, 0o644)
+        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        return fd
+    except OSError:
+        return None
 
 
 def _load_wm() -> dict:
@@ -94,6 +108,11 @@ def main(argv=None):
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args(argv)
 
+    lock_fd = _acquire_lock()
+    if lock_fd is None:
+        print("[köprü] başka bir köprü çalışıyor — bu koşu ATLANDI", file=sys.stderr)
+        return 0
+
     ident = AI.AgentIdentity.load_or_create()
     print(f"[köprü] kimlik: {ident.agent_id} | {ident.runtime}")
 
@@ -117,57 +136,86 @@ def main(argv=None):
     # tek transaction + executemany. conversations.db şemasıyla BİREBİR aynı.
     conn = AI._conn(ident.runtime)  # cache'li bağlantı (agent_identity)
     cur = conn.cursor()
+    # ── v1.2: SESSION-BAŞINA-SORGU YOK — tüm mesajlar TEK geçişte çekilir.
+    #    (12.6K session × 0.037s = ~466s idi; tek sorgu + fetchmany = saniyeler)
+    # 1) Her session için conv_id haritası (idempotent open_conversation)
+    conv_map: dict[str, str] = {}
+    peer_map: dict[str, str] = {}
     for sid, (src, uid, chat_id, title) in to_proc.items():
         peer = uid or "unknown"
-        label = _label_for(src, uid)
         try:
-            conv_id = AI.open_conversation("user", peer, src, label, identity=ident)
+            conv_map[sid] = AI.open_conversation("user", peer, src,
+                                                 _label_for(src, uid), identity=ident)
+            peer_map[sid] = peer
         except Exception as e:
             print(f"  ! {sid}: conv açılamadı: {e}")
-            continue
-        last_id = wm.get(sid, 0)
-        # seq session genelinde monoton — batch'ler arası devam eder
-        seq = int(cur.execute("SELECT msg_count FROM conversations WHERE conv_id=?",
-                              (conv_id,)).fetchone()[0])
-        # mesajları artan id ile çek (state.db salt-okunur: WAL'da SELECT ucuz)
-        while True:
-            rows = state.execute(
-                "SELECT id, role, content, timestamp, token_count FROM messages "
-                "WHERE session_id=? AND id>? AND active=1 AND content IS NOT NULL "
-                "ORDER BY id ASC LIMIT ?", (sid, last_id, BATCH)).fetchall()
-            if not rows:
-                break
+    total_conv = len(conv_map)
+    # 2) Mesajları tek sorguda, tüm session'lar için (id sıralı)
+    state.row_factory = sqlite3.Row
+    q = state.execute(
+        "SELECT m.id, m.session_id, m.role, m.content, m.timestamp "
+        "FROM messages m WHERE m.active=1 AND m.content IS NOT NULL "
+        "ORDER BY m.id ASC")
+    # 3) Session başına watermark filtresi + CONV başına seq takibi.
+    #    KRİTİK: binlerce session AYNI kullanıcı+kanala (aynı conv_id'ye) akar;
+    #    seq conv genelinde monoton olmalı — yoksa msg_id çakışır ve
+    #    INSERT OR REPLACE önceki mesajları ezer (veri kaybı!).
+    seq_of: dict[str, int] = {}
+    for cid in set(conv_map.values()):
+        row = cur.execute("SELECT msg_count FROM conversations WHERE conv_id=?",
+                          (cid,)).fetchone()
+        seq_of[cid] = int(row[0]) if row and row[0] else 0
+    batch_out = []
+    last_commit = 0
+    while True:
+        rows = q.fetchmany(BATCH)
+        if not rows:
+            break
+        for r in rows:
+            sid = r["session_id"]
+            if sid not in conv_map:
+                continue
+            if r["id"] <= wm.get(sid, 0):
+                continue
+            role = (r["role"] or "").lower()
+            if role not in ("user", "assistant"):
+                continue
+            direction = "in" if role == "user" else "out"
+            raw = (r["content"] or "")[:200000]
+            conv_id = conv_map[sid]
+            seq_of[conv_id] = seq_of.get(conv_id, 0) + 1
+            seq = seq_of[conv_id]
+            batch_out.append((f"{conv_id}#{seq}", conv_id, seq, direction,
+                              r["timestamp"], peer_map.get(sid, ""),
+                              hashlib.sha256(raw.encode(errors="replace")).hexdigest(),
+                              len(raw.encode(errors="replace"))))
+            wm[sid] = r["id"]
+            total_msg += 1
+        if batch_out:
+            cur.executemany(
+                "INSERT OR REPLACE INTO messages(msg_id,conv_id,seq,direction,ts,peer_id,sha256,bytes,meta) "
+                "VALUES(?,?,?,?,?,?,?,?,NULL)", batch_out)
             batch_out = []
-            for r in rows:
-                role = (r["role"] or "").lower()
-                if role not in ("user", "assistant"):
-                    continue
-                direction = "in" if role == "user" else "out"
-                raw = (r["content"] or "")[:200000]
-                seq += 1
-                batch_out.append((f"{conv_id}#{seq}", conv_id, seq, direction,
-                                  r["timestamp"], peer,
-                                  hashlib.sha256(raw.encode(errors="replace")).hexdigest(),
-                                  len(raw.encode(errors="replace"))))
-                last_id = r["id"]
-                total_msg += 1
-            if batch_out:
-                cur.executemany(
-                    "INSERT OR REPLACE INTO messages(msg_id,conv_id,seq,direction,ts,peer_id,sha256,bytes,meta) "
-                    "VALUES(?,?,?,?,?,?,?,?,NULL)", batch_out)
-                cur.execute("UPDATE conversations SET msg_count=?, last_ts=? WHERE conv_id=?",
-                            (seq, time.time(), conv_id))
-                conn.commit()
-            wm[sid] = last_id
-            total_conv += 1
-            if total_msg % 50000 == 0:
-                _save_wm(wm)
-                print(f"  ... {total_msg} mesaj işlendi")
-            time.sleep(SLEEP_PER_BATCH)
+        # conversation msg_count'larını toplu güncelle (seq_of'tan)
+        if seq_of:
+            cur.executemany(
+                "UPDATE conversations SET msg_count=? WHERE conv_id=?",
+                [(s, cid) for cid, s in seq_of.items()])
+        if total_msg - last_commit >= 20000:
+            conn.commit()
+            _save_wm(wm)
+            last_commit = total_msg
+            print(f"  ... {total_msg} mesaj işlendi")
+        time.sleep(SLEEP_PER_BATCH)
+    conn.commit()
 
     _save_wm(wm)
     print(f"[köprü] {total_msg} mesaj, {total_conv} oturum batch, "
           f"defter: {ident.dir / 'conversations.db'}")
+    try:
+        os.close(lock_fd)
+    except Exception:
+        pass
     return 0
 
 
