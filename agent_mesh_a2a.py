@@ -281,7 +281,7 @@ def build_app(token: str):
                 env = outer.get("enc")
                 if not env:
                     raise ValueError("enc alanı yok")
-                real_raw = AI.open_secure_payload(env, ident)
+                real_raw = AI.AgentIdentity.open_secure_payload(env, ident)
                 # TOFU peer kaydı (şifreli paketteki kimlikle)
                 peers = AI.load_peers(ident.runtime)
                 peers[env["agent_id"]] = {
