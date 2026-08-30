@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hermes-sync"
+version = "2.1.0"
+description = "Hermes Agent sync — multi-node backup, replication, and agent mesh (A2A + Syncthing + restic + shared state)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Ahmet Hüdayioğlu", email = "ahmethudayioglu@cumulusnet.io" }]
+keywords = ["hermes", "sync", "backup", "a2a", "agent-mesh", "restic", "syncthing"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Topic :: System :: Archiving :: Backup",
+]
+dependencies = []
+
+[project.optional-dependencies]
+a2a = ["fastapi>=0.100", "uvicorn>=0.20"]
+test = ["pytest>=7"]
+
+[project.scripts]
+hermes-sync = "hermes_sync.cli:main"
+a2a-cli = "hermes_sync.a2a_cli:main"
+inbox-worker = "hermes_sync.inbox_worker:main"
+
+[tool.setuptools]
+packages = ["hermes_sync"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

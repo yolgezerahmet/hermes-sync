@@ -72,7 +72,7 @@ def _parse_hlc(hlc: Any):
         return 0, 0, ""
 
 
-def _hlc_value(hlc: Any) -> str:
+def _hlc_value(hlc: Any = None) -> str:
     """İlk/bağımsız HLC üret — önceki değer varsa İLERLET (OceanAPI #11).
 
     HLC: <fiziksel_ms>.<counter>-<node>. Fiziksel saat önceki HLC'den
@@ -226,25 +226,67 @@ def create_task(task_id: str, title: str, owner: Optional[str] = None,
         "task_id": task_id, "title": title, "status": "pending",
         "owner": owner or "", "hlc": _hlc_value(hlc),
         "sha": sha, "ts": _now_iso(),
+        "attempt": 0, "max_attempts": 3,
     }
     _write_remote_json(remote_path, task)
     return task
 
 
 def claim_task(task_id: str, owner: Optional[str] = None,
-               hlc: Any = None, user: Optional[str] = None) -> Dict[str, Any]:
+               hlc: Any = None, user: Optional[str] = None,
+               allow_stale: bool = False, stale_minutes: int = 30,
+               force_stale: bool = False) -> Dict[str, Any]:
     """pending görevi sahiplen → running (yalnız bir makine).
 
-    read-check-write yarışına açıktır (rclone atomik lock yok);
-    claim öncesi son-okuma çakışmayı azaltır.
+    FAILOVER (v2.2, OceanAPI tasarımı): allow_stale=True iken running
+    görevin sahibi state.json'da yoksa VEYA görev stale_minutes'dan
+    eskiyse başka node devralabilir (attempt++). Terminal state (done)
+    ASLA geri alınamaz; max_attempts aşımı → failed (loop yok).
     """
     owner = owner or _machine_name()
     remote_path = _task_remote_path(task_id, user)
     task = _read_remote_json(remote_path, None)
     if not isinstance(task, dict):
         raise CommonKnowledgeError(f"Task bulunamadı: {task_id}")
-    if task.get("status") != "pending":
-        return task
+    if task.get("status") in ("done", "failed"):
+        return task  # terminal state korunur
+    if task.get("status") == "running":
+        if not allow_stale:
+            return task
+        owner_m = task.get("owner") or ""
+        stale = force_stale
+        if not stale:
+            try:
+                state = read_state(user)
+                alive = owner_m in state.get("nodes", {})
+                age_min = 10 ** 9
+                ts = task.get("ts", "")
+                if ts:
+                    from datetime import datetime, timezone
+                    try:
+                        t0 = datetime.fromisoformat(str(ts).replace("Z", "+00:00"))
+                        age_min = (datetime.now(timezone.utc) - t0).total_seconds() / 60.0
+                    except Exception:
+                        pass
+                stale = (not alive) or (age_min > stale_minutes)
+            except Exception:
+                stale = False
+        if not stale:
+            return task
+        claimed = copy.deepcopy(task)
+        claimed["status"] = "running"
+        claimed["owner"] = owner
+        claimed["attempt"] = int(task.get("attempt", 0)) + 1
+        claimed["failover"] = True
+        claimed["failover_from"] = owner_m
+        claimed["hlc"] = _hlc_value(task.get("hlc"))
+        if int(claimed["attempt"]) >= int(task.get("max_attempts", 3)):
+            claimed["status"] = "failed"
+            claimed["reason"] = "max_attempts aşıldı"
+            _write_remote_json(remote_path, claimed)
+            return claimed
+        _write_remote_json(remote_path, claimed)
+        return claimed
     claimed = copy.deepcopy(task)
     claimed["status"] = "running"
     claimed["owner"] = owner

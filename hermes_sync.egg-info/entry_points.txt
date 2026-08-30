@@ -1,0 +1,4 @@
+[console_scripts]
+a2a-cli = hermes_sync.a2a_cli:main
+hermes-sync = hermes_sync.cli:main
+inbox-worker = hermes_sync.inbox_worker:main

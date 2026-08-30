@@ -2360,6 +2360,77 @@ def cmd_restic_backup(cfg, node=None, dry_run=False):
     elif not dry_run:
         print(f"    🧹 retention: atlandı (bu makine yedekliyor, prune {ret_machine} yapar)")
 
+def _ck_import():
+    """sync_common_knowledge'i import et (ortak akıl)."""
+    import importlib.util
+    p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sync_common_knowledge.py")
+    spec = importlib.util.spec_from_file_location("sck", p)
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    return m
+
+def cmd_discover(cfg, token="", dry_run=False):
+    """OTOMATİK KEŞİF (v2.2): state.json'dan canlı node'ları bul + A2A durumu.
+
+    Ortak durum dosyasına kim yazdıysa o ağda — sabit liste yerine
+    state.json tek gerçek kaynak. Her makine bloğundan A2A sağlık sorgusu.
+    """
+    try:
+        ck = _ck_import()
+        state = ck.read_state()
+    except Exception as e:
+        print(f"  ⚠ ortak durum okunamadı: {e}")
+        return 1
+    blocks = state.get("nodes", {})
+    print(f"\n  🔍 OTOMATİK KEŞİF — {len(blocks)} canlı makine (state.json)")
+    A2A_NODES.update({})  # keşif sonrası dinamik eşleme
+    for n in sorted(blocks):
+        blk = blocks[n]
+        ip = A2A_NODES.get(n, "")
+        durum = "state'te var"
+        if ip:
+            out, rc = run_cmd(["python3", "/root/.hermes/scripts/a2a_cli.py",
+                               "ping", ip, "--token", token or os.environ.get("A2A_TOKEN", "")],
+                              timeout=30)
+            durum = "A2A canlı" if ("ok" in str(out)) else f"A2A erişilemedi ({str(out)[:30]})"
+        print(f"  • {n:22s} hlc={blk.get('hlc','-')[:20]} {durum}")
+    return 0
+
+def cmd_task(cfg, aksiyon, task_id="", title="", token="", dry_run=False):
+    """ORTAK GÖREV DAĞITIMI (v2.2): add/list/claim/done — sync_common_knowledge."""
+    try:
+        ck = _ck_import()
+    except Exception as e:
+        print(f"  ⚠ sync_common_knowledge yüklenemedi: {e}")
+        return 1
+    if aksiyon == "list":
+        tasks = ck.list_tasks()
+        print(f"\n  📋 ORTAK GÖREVLER — {len(tasks)}")
+        for t in tasks:
+            print(f"    [{t.get('status','?'):7}] {t.get('task_id')} — {t.get('title','')} (owner={t.get('owner','-')})")
+        return 0
+    if aksiyon == "add":
+        if not task_id or not title:
+            print("Kullanım: task add --task-id <id> --path '<başlık>'")
+            return 1
+        t = ck.create_task(task_id, title)
+        print(f"  ➕ task: {t['task_id']} ({t['status']})")
+        return 0
+    if aksiyon == "claim":
+        # owner = state.json node adı (küçük harf) — "H1" state'te yok
+        owner = os.environ.get("SYNC_NODE_NAME") or os.uname().nodename.lower()
+        # FAILOVER: allow_stale=True — sahibi düştüyse/yaşlıysa devral
+        t = ck.claim_task(task_id, owner=owner, allow_stale=True)
+        print(f"  🤝 task {task_id}: {t.get('status')} (owner={owner}, attempt={t.get('attempt', 0)})")
+        return 0
+    if aksiyon == "done":
+        owner = os.environ.get("SYNC_NODE_NAME") or os.uname().nodename.lower()
+        t = ck.done_task(task_id, owner=owner)
+        print(f"  ✅ task {task_id}: {t.get('status')} (owner={owner})")
+        return 0
+    print("Kullanım: task add|list|claim|done")
+    return 1
+
 def cmd_backup(cfg, node=None, hub=None, dry_run=False):
     """GDrive versiyon takipli yedek (timestamp snapshot; silmez).
 
@@ -2889,7 +2960,7 @@ def main(argv=None):
                                  "conflicts", "init", "select", "nodes",
                                  "add-node", "share", "doctor", "version",
                                  "probe", "propose", "apply", "agent-status",
-                                 "backup", "versions", "rollback", "memory", "mesh"])
+                                 "backup", "versions", "rollback", "memory", "mesh", "discover", "task"])
     parser.add_argument("hedef", nargs="?",
                         help="add-node: node adı | share: node adı")
     parser.add_argument("--config", default=None,
@@ -2929,6 +3000,7 @@ def main(argv=None):
     parser.add_argument("--tag", default=None,
                         help="versions: en son versiyonu etiketle (örn: kernel-v2.3-dgk)")
     parser.add_argument("--token", dest="token", default="")
+    parser.add_argument("--task-id", dest="task_id", default="")
     parser.add_argument("--diff", default=None,
                         help="versions: iki versiyon arası dosya farkı (v1.tar.gz,v2.tar.gz)")
     args = parser.parse_args(argv)
@@ -2985,6 +3057,10 @@ def main(argv=None):
         cmd_conflicts(cfg)
     elif args.komut == "agent-status":
         cmd_agent_status(cfg)
+    elif args.komut == "discover":
+        rc = cmd_discover(cfg, args.token)
+    elif args.komut == "task":
+        rc = cmd_task(cfg, args.hedef or "list", args.task_id or args.node or "", args.path or "", args.token)
     elif args.komut == "mesh":
         # Kullanım: mesh status | mesh send <host> "<görev>" (--node host, --path görev)
         rc = cmd_mesh(cfg, args.hedef or "status", args.node or "", args.path or "", args.token)
