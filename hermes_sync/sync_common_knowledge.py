@@ -24,14 +24,19 @@ fail-closed (rclone hatası → raise CommonKnowledgeError).
 import argparse
 import copy
 import json
+import logging
 import os
 import re
+import shlex
 import socket
 import subprocess
 import sys
 import tempfile
+import time
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
+
+log = logging.getLogger("sync_common_knowledge")
 
 GDRIVE_HUB = "gdrive:hermes-sync"
 DEFAULT_USER = os.environ.get("SYNC_HUB_USER", "hahmet")
@@ -105,15 +110,80 @@ def _hub_base(user: Optional[str] = None) -> str:
     return f"{GDRIVE_HUB}/{u}"
 
 
-def _run_rclone(args: List[str], timeout: int = 120):
+# ─── rclone hata dayanıklılığı (v2.1.1 — 30 Ağu 2026) ───────────
+# Geçici ağ/5xx hatalarında YALNIZCA idempotent OKUMA komutlarına
+# 1 retry (3s bekle) uygulanır; yazma komutlarına (copy/copyto)
+# ASLA retry YOK — çift yazma/kısmi durum riski fail-closed korunur.
+_RCLONE_READ_COMMANDS = {"cat", "lsf", "lsjson", "lsd"}
+_HTTP_5XX_RE = re.compile(r"\b5\d\d\b")
+_NET_MARKERS = (
+    "connection reset",
+    "connection refused",
+    "connection timed out",
+    "network is unreachable",
+    "temporary failure",
+    "tls handshake timeout",
+    "i/o timeout",
+    "service unavailable",
+    "timeout",
+)
+
+
+def _rclone_command_text(args: List[str]) -> str:
     try:
-        r = subprocess.run(["rclone", *args], capture_output=True, text=True,
-                           errors="replace", timeout=timeout)
-        return r.returncode, r.stdout, r.stderr
-    except subprocess.TimeoutExpired:
-        return -1, "", f"TIMEOUT {timeout}s"
-    except Exception as e:
-        return -1, "", str(e)
+        return shlex.join(["rclone", *map(str, args)])
+    except Exception:
+        return "rclone " + " ".join(map(str, args))
+
+
+def _is_rclone_read(args: List[str]) -> bool:
+    """Yalnızca idempotent okuma komutları retry edilebilir."""
+    return bool(args) and str(args[0]).lower() in _RCLONE_READ_COMMANDS
+
+
+def _is_transient_rclone_error(rc: int, stderr: str) -> bool:
+    """Geçici hata mı? (timeout, network, HTTP 5xx). 'not found' HAYIR."""
+    if rc == -1:          # TimeoutExpired / exception → geçici
+        return True
+    if _HTTP_5XX_RE.search(stderr or ""):
+        return True
+    text = (stderr or "").lower()
+    return any(m in text for m in _NET_MARKERS)
+
+
+def _run_rclone(args: List[str], timeout: int = 180):
+    """rclone çalıştır → (rc, stdout, stderr).
+
+    Okuma komutlarında geçici hata (timeout/network/5xx) → 1 retry (3s).
+    Yazma komutlarına retry YOK. Hata durumunda stderr'e
+    'sync hata: <komut> rc=<rc> <süre>s retry=<n>' tanısı öneklenir
+    (fail-closed korunur — çağrıcı rc!=0 görür ve raise eder).
+    """
+    command = _rclone_command_text(args)
+    can_retry = _is_rclone_read(args)
+    retries = 1 if can_retry else 0
+    rc, out, err = -1, "", ""
+    for attempt in range(retries + 1):
+        t0 = time.monotonic()
+        try:
+            r = subprocess.run(["rclone", *args], capture_output=True, text=True,
+                               errors="replace", timeout=timeout)
+            rc, out, err = r.returncode, r.stdout, r.stderr
+        except subprocess.TimeoutExpired:
+            rc, out, err = -1, "", f"TIMEOUT {timeout}s"
+        except Exception as e:
+            rc, out, err = -1, "", str(e)
+        dur = time.monotonic() - t0
+        if rc == 0:
+            return rc, out, err
+        if attempt < retries and _is_transient_rclone_error(rc, err):
+            log.warning(f"sync hata: {command} rc={rc} {dur:.1f}s retry={attempt + 1}/{retries}")
+            time.sleep(3)
+            continue
+        if rc != 0 and not _is_not_found(rc, err):
+            log.error(f"sync hata: {command} rc={rc} {dur:.1f}s retry={attempt}")
+        # fail-closed: çağrıcıya tanı önekli hata (yok-ayrımı korunur)
+        return rc, out, f"sync hata: {command} rc={rc} {dur:.1f}s retry={attempt} | {err}"
 
 
 # ─── Ortak durum (state.json) ─────────────────────────────────

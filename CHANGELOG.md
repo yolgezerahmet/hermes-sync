@@ -1,5 +1,22 @@
 # CHANGELOG — Cumulus Sync Motoru / Hermes Sync
 
+## [2.1.1] — 2026-08-30
+
+### Eklenen — HATA DAYANIKLILIĞI + WINDOWS UYUM
+- `sync_common_knowledge._run_rclone`: timeout 120→180s; idempotent OKUMA
+  komutlarında (cat/lsf/lsjson/lsd) geçici hata (timeout/network/HTTP 5xx)
+  → 1 retry (3s bekle). Yazma (copy/copyto) ASLA retry — fail-closed korunur.
+- `sync_motor.run_cmd`: opsiyonel `retries` parametresi — yalnızca idempotent
+  okuma (cat/lsf/status) + geçici hatada 1 retry; yazma komutlarına retry YOK.
+- Hata logu güçlendirildi: `sync hata: <komut> rc=<rc> <süre>s retry=<n>`
+  (süre ölçümü `time.monotonic`); `_run_rclone` hatada stderr'e tanı öneki.
+- rclone doğrudan çağrılarının timeout'ları 120→180s.
+- Windows uyum: `_motor_lock_path()` — kilit `%TEMP%\cumulus_sync.lock`
+  (Windows) / `/tmp/cumulus_sync.lock` (POSIX); path'ler `os.path.join` ile.
+- A2A server: `uvicorn` yoksa net hata mesajı + exit 1 (ham traceback değil).
+- Testler: `tests/test_retry.py` (12) + `tests/test_windows_uyum.py` (8) —
+  toplam 109 PASS. README'ye Windows Kurulum bölümü eklendi.
+
 ## [1.6.0] — 2026-08-13
 
 ### Eklenen — AKILLI KURULUM (Kaynak Farkındalıklı Öneri)
