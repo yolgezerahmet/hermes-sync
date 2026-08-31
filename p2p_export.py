@@ -6,8 +6,8 @@ Kullanım: python3 p2p_export.py [node...]  (hepsi: no arg)
 """
 import os, sys, json
 
-SYNC_ROOT = "/root/cumulus-sync-motor/p2p"
-CFG = "/root/cumulus-sync-motor/config.json"
+SYNC_ROOT = os.path.expanduser("~/cumulus-sync-motor/p2p")
+CFG = os.path.expanduser("~/cumulus-sync-motor/config.json")
 
 cfg = json.load(open(CFG))
 dirs = cfg.get("dirs", {})
