@@ -402,8 +402,12 @@ def build_app(token: str):
 
     @app.get("/health")
     async def health():
+        import shutil
         ident = identity()
-        out = {"status": "ok", "tasks": len(TASKS), "host": _hostname()}
+        disk = shutil.disk_usage(_root_path())
+        out = {"status": "ok", "tasks": len(TASKS), "host": _hostname(),
+               "disk_gb": round(disk.free / 1e9, 1),
+               "uptime_s": _uptime_s()}
         if ident:
             out.update({"agent_id": ident.agent_id, "runtime": ident.runtime,
                         "clone_state": ident.meta.get("clone_state"),

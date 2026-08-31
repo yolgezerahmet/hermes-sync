@@ -21,6 +21,7 @@ import sys
 import time
 import urllib.parse
 import urllib.request
+import urllib.error
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -65,8 +66,28 @@ def peer_card(host: str, port: int = 8643):
         return hit[0] if hit else {}
 
 
+def canonical_host(host: str) -> str:
+    """Kanonik H1/H2/H3 takma adlarını tek IP'ye çevir."""
+    aliases = {
+        "h1": "100.92.2.47",
+        "cumulusnet-hermes-1": "100.92.2.47",
+        "h2": "100.76.82.46",
+        "sistemg16": "100.76.82.46",
+        "h3": "100.103.44.107",
+        "hermesagent03": "100.103.44.107",
+    }
+    return aliases.get(host.strip().lower(), host.strip())
+
+
 def rpc(host: str, method: str, params: dict, token: str, port: int = 8643,
-        sign: bool = True, conv_id: str = "", encrypt: bool = True):
+        sign: bool = True, conv_id: str = "", encrypt: bool = True,
+        retries: int = 0):
+    # Yeniden gönderim yalnızca health gibi salt-okunur RPC'lerde güvenlidir.
+    # İmzalı/şifreli task isteğinde aynı nonce ile retry çift görev veya replay
+    # reddi üretebilir; bu yol açıkça kapalı tutulur.
+    if retries and method != "ping":
+        retries = 0
+    host = canonical_host(host)
     url = f"http://{host}:{port}/"
     # GERÇEK ZAMANLI (30 Ağu 2026): async görev gönderirken kendi callback
     # adresimizi ekle → karşı taraf görev bitince BİZE push eder (polling yok).
@@ -104,8 +125,21 @@ def rpc(host: str, method: str, params: dict, token: str, port: int = 8643,
             req.add_header("X-Agent-Label", ident.meta.get("machine_label", ""))
             if conv_id:
                 req.add_header("X-Conversation-Id", conv_id)
-    with urllib.request.urlopen(req, timeout=120) as resp:
-        out = json.loads(resp.read().decode())
+    attempts = max(0, int(retries)) + 1
+    out = None
+    last_error = None
+    for attempt in range(attempts):
+        try:
+            with urllib.request.urlopen(req, timeout=120) as resp:
+                out = json.loads(resp.read().decode())
+            break
+        except (OSError, urllib.error.URLError, TimeoutError) as exc:
+            last_error = exc
+            if attempt + 1 >= attempts:
+                raise
+            time.sleep(min(2 ** attempt, 4))
+    if out is None:
+        raise RuntimeError(f"A2A yanıtı alınamadı: {last_error}")
     # Giden mesajı yerel sohbet defterine işle (karşı tarafın agent_id'si ile)
     peer = ((out.get("result") or {}).get("served_by") or "") if isinstance(out, dict) else ""
     if ident and peer.startswith(("hx-", "oc-")):
@@ -160,6 +194,7 @@ def main():
     ap.add_argument("--no-sign", action="store_true", help="imzasız gönder (eski uyum)")
     ap.add_argument("--conv", default="", help="mevcut sohbet ID'si ile devam et")
     args = ap.parse_args()
+    args.host = canonical_host(args.host)
     sign = not args.no_sign
 
     try:

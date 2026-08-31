@@ -622,7 +622,7 @@ def gh_available():
 # run_cmd'de retry YALNIZCA idempotent OKUMA komutlarına uygulanır
 # (cat/lsf/lsjson/lsd/status). Yazma komutlarına (copy/copyto/backup)
 # ASLA retry YOK — çift yazma/kısmi durum fail-closed korunur.
-_RETRY_READ_TOKENS = {"cat", "lsf", "lsjson", "lsd", "status"}
+_RETRY_READ_TOKENS = {"cat", "lsf", "lsjson", "lsd", "status", "ping"}
 _RETRY_NET_MARKERS = (
     "connection reset",
     "connection refused",
@@ -2319,6 +2319,18 @@ A2A_NODES = {  # makine → Tailscale IP (a2a_cli hedefi)
     "sistemg16": "100.76.82.46",
 }
 
+
+def unique_a2a_nodes(nodes=None):
+    """Alias IP'lerini tekilleştir; her gerçek düğümü bir kez sorgula."""
+    source = nodes or A2A_NODES
+    seen, result = set(), []
+    for name, ip in source.items():
+        if ip not in seen:
+            seen.add(ip)
+            result.append((name, ip))
+    return result
+
+
 def smart_transport(kind: str, target: str = ""):
     """Kanal seç — kind: task|file|archive."""
     if kind == "task":
@@ -2340,18 +2352,41 @@ def cmd_mesh(cfg, aksiyon, hedef="", gorev="", token="", dry_run=False):
         except Exception:
             pass
     if aksiyon == "status":
-        for name, ip in A2A_NODES.items():
+        for name, ip in unique_a2a_nodes():
+            health, hrc = run_cmd(["python3", "/root/.hermes/scripts/a2a_cli.py",
+                                   "ping", ip, "--token", token or os.environ.get("A2A_TOKEN", "")],
+                                  timeout=30, retries=1)
+            health = health or ""
+            parsed_health = False
+            try:
+                hd = json.loads(health)
+                if hrc == 0:
+                    parsed_health = True
+                    disk = hd.get("disk_gb", "?")
+                    health_mode = "legacy" if disk == "?" else "ok"
+                    print(f"  {name:14s} ({ip}): status={hd.get('status','?')} "
+                          f"host={hd.get('host','?')} disk={disk}GB health={health_mode} "
+                          f"clone={hd.get('clone_state','?')}")
+            except (TypeError, ValueError):
+                pass
+            if parsed_health:
+                continue
+            # Eski A2A sunucularında /health bulunmayabilir; salt-okunur
+            # send-status geriye dönük uyumluluk için son çaredir.
             out, rc = run_cmd(["python3", "/root/.hermes/scripts/a2a_cli.py",
                                "send-status", ip, "--token", token or os.environ.get("A2A_TOKEN", "")],
                               timeout=60)
-            txt = out if isinstance(out, str) else (json.dumps(out, ensure_ascii=False) if not isinstance(out, (list, tuple)) else "\n".join(str(x) for x in out))
+            out = out or ""
             try:
-                d = json.loads(txt)
-                r = d.get("result", {}).get("result", {})
-                ozet = f"host={r.get('host','?')} disk={r.get('disk_gb','?')}GB"
-            except Exception:
-                ozet = str(txt).strip().splitlines()[-1] if str(txt).strip() else "erişilemedi"
-            print(f"  {name:14s} ({ip}): {ozet}")
+                legacy = json.loads(out)
+                result = legacy.get("result", {}).get("result", {})
+                if rc == 0 and result:
+                    print(f"  {name:14s} ({ip}): status=legacy "
+                          f"host={result.get('host','?')} disk={result.get('disk_gb','?')}GB")
+                    continue
+            except (TypeError, ValueError):
+                pass
+            print(f"  {name:14s} ({ip}): erişilemedi")
         return 0
     if aksiyon == "send":
         ip = A2A_NODES.get(hedef, hedef)

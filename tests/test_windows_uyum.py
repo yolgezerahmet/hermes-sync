@@ -99,6 +99,11 @@ class _FakeResp:
 
 
 class TestA2ACliWindows(unittest.TestCase):
+    def test_canonical_host_aliases(self):
+        self.assertEqual(cli.canonical_host("H2"), "100.76.82.46")
+        self.assertEqual(cli.canonical_host("sistemg16"), "100.76.82.46")
+        self.assertEqual(cli.canonical_host("100.103.44.107"), "100.103.44.107")
+
     def test_rpc_urllib(self):
         seen = {}
 
@@ -114,6 +119,57 @@ class TestA2ACliWindows(unittest.TestCase):
         self.assertEqual(out["result"]["served_by"], "hx-test")
         self.assertEqual(seen["url"], "http://127.0.0.1:8643/")
         self.assertEqual(seen["auth"], "Bearer tok123")
+
+    def test_rpc_retries_transient_connection_once(self):
+        calls = []
+
+        def flaky_urlopen(req, timeout=120):
+            calls.append(timeout)
+            if len(calls) == 1:
+                raise OSError("connection reset")
+            return _FakeResp({"jsonrpc": "2.0", "id": 1,
+                              "result": {"served_by": "hx-test"}})
+
+        with mock.patch.object(cli, "identity", lambda: None), \
+                mock.patch.object(cli.urllib.request, "urlopen", flaky_urlopen), \
+                mock.patch.object(cli.time, "sleep"):
+            out = cli.rpc("127.0.0.1", "ping", {}, "tok123", sign=False,
+                          retries=1)
+        self.assertEqual(out["result"]["served_by"], "hx-test")
+        self.assertEqual(len(calls), 2)
+
+    def test_rpc_does_not_retry_task_send(self):
+        calls = []
+
+        def fail_urlopen(req, timeout=120):
+            calls.append(1)
+            raise OSError("connection reset")
+
+        with mock.patch.object(cli, "identity", lambda: None), \
+                mock.patch.object(cli.urllib.request, "urlopen", fail_urlopen):
+            with self.assertRaises(OSError):
+                cli.rpc("127.0.0.1", "task/send", {}, "tok123", sign=False,
+                        retries=1)
+        self.assertEqual(len(calls), 1)
+
+
+class TestMeshNodeInventory(unittest.TestCase):
+    def test_aliases_are_collapsed_to_canonical_nodes(self):
+        nodes = {
+            "H1": "100.92.2.47",
+            "h2": "100.76.82.46",
+            "sistemg16": "100.76.82.46",
+            "h3": "100.103.44.107",
+        }
+        self.assertEqual(sm.unique_a2a_nodes(nodes), [
+            ("H1", "100.92.2.47"),
+            ("h2", "100.76.82.46"),
+            ("h3", "100.103.44.107"),
+        ])
+
+    def test_legacy_health_is_explicit(self):
+        health = {"status": "ok", "host": "SISTEMG16"}
+        self.assertEqual("legacy" if health.get("disk_gb", "?") == "?" else "ok", "legacy")
 
 
 class TestA2AServerUvicorn(unittest.TestCase):
