@@ -39,6 +39,8 @@ ALLOWLIST = {
     "ls": ["ls", "-la"],
     "git-status": ["git", "status", "--short"],
     "git-log": ["git", "log", "--oneline", "-5"],
+    "kontrol": ["true"],   # özel işleyici: inbox özeti (kuyruk durumu sorgusu)
+    "temizle": ["true"],   # özel işleyici: eski done/rejected temizliği
 }
 
 def run(cmd, timeout=600):
@@ -59,6 +61,10 @@ def parse_task(text):
         return "status", []
     if t == "uptime":
         return "uptime", []
+    if t == "kontrol":
+        return "kontrol", []
+    if t.startswith("temizle"):
+        return "temizle", t.split()[1:]
     if t.startswith("df"):
         return "df", []
     if t.startswith("test:"):
@@ -200,6 +206,47 @@ def process_inbox():
             elif key == "agent-update":
                 d["result"] = run_agent_update(args[0]["url"], args[0]["sha256"])
                 d["status"] = "done"
+            elif key == "kontrol":
+                # AKILLI KUYRUK SORGUSU (31 Ağu 2026): inbox özeti döndürür —
+                # ajanlar kuyruk durumunu SSH'sız A2A'dan görebilir.
+                yeni = tamam = red = 0
+                son = []
+                for kf in sorted(glob.glob(os.path.join(INBOX, "*.json"))):
+                    try:
+                        kd = json.loads(open(kf, encoding="utf-8").read())
+                        st = kd.get("status", "?")
+                        if st == "new":
+                            yeni += 1
+                        elif st == "done":
+                            tamam += 1
+                        elif st == "rejected":
+                            red += 1
+                        son.append({"id": os.path.basename(kf), "status": st,
+                                    "from": kd.get("from", "")[:16],
+                                    "text": str(kd.get("text", ""))[:60]})
+                    except Exception:
+                        pass
+                son = son[-5:]
+                d["status"] = "done"
+                d["result"] = {"toplam": yeni + tamam + red, "new": yeni,
+                               "done": tamam, "rejected": red, "son_5": son}
+            elif key == "temizle":
+                # Kuyruk hijyeni (31 Ağu 2026): done/rejected dosyaları N günden
+                # eskiyse siler (varsayılan 7 gün). new ASLA silinmez.
+                gun = int(args[0]) if args and args[0].isdigit() else 7
+                esik = time.time() - gun * 86400
+                silinen = 0
+                for kf in glob.glob(os.path.join(INBOX, "*.json")):
+                    try:
+                        kd = json.loads(open(kf, encoding="utf-8").read())
+                        if kd.get("status") in ("done", "rejected") and \
+                           os.path.getmtime(kf) < esik:
+                            os.remove(kf)
+                            silinen += 1
+                    except Exception:
+                        pass
+                d["status"] = "done"
+                d["result"] = {"silinen": silinen, "esik_gun": gun}
             else:
                 cmd = list(ALLOWLIST[str(key)])
                 if key == "ls" and args:
