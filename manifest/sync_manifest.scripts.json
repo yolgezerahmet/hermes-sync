@@ -1,7 +1,7 @@
 {
  "node": "scripts",
- "ts": "2026-08-31T19:05:00",
- "revision": "c3eab28df110",
+ "ts": "2026-08-31T19:53:45",
+ "revision": "5ce48768e166",
  "file_count": 188,
  "files": {
   "mesh_report.py": {
@@ -167,9 +167,9 @@
    "machine": "H3"
   },
   "agent_mesh_a2a.py": {
-   "sha": "b9d68e67e138c93713a703ad15959772759e89b4bcbf15cdc024fe6c83049686",
-   "size": 25725,
-   "mtime": 1788180890,
+   "sha": "5d23f1af8828f62c4f170f344b4252348457b30297ee070d7794352962a51a43",
+   "size": 25924,
+   "mtime": 1788192611,
    "machine": "H3"
   },
   "tr_quality_oceanapi.py": {
@@ -193,13 +193,13 @@
   "sync_motor.py": {
    "sha": "a1e87d365bbb86a7cdd606c0ff704e6242cc3f8b4c7176ebd61a3952692ee611",
    "size": 141116,
-   "mtime": 1788180890,
+   "mtime": 1788192515,
    "machine": "H3"
   },
   "inbox_worker.py": {
-   "sha": "ab508fbdc7457083be60600bd07d0eeaa128f2550c0ee00fe56791fd4295676f",
-   "size": 12043,
-   "mtime": 1788192063,
+   "sha": "427e0b8dcc725ab6f4bd5261572d6b7ed89e306036dd5fc7278066bed993eedf",
+   "size": 13590,
+   "mtime": 1788194644,
    "machine": "H3"
   },
   "usage_scan.py": {
@@ -305,9 +305,9 @@
    "machine": "H3"
   },
   "oceanapi_watchdog_state": {
-   "sha": "c9c1c4e8acdc57c94207d521c34c3c58bf21dbe083f31770a9ae55720d731042",
+   "sha": "68c0900d9cdda726192eb04957825970483f08e24a22bec14faf5bcf3e14cee5",
    "size": 27,
-   "mtime": 1788191537,
+   "mtime": 1788194417,
    "machine": "H3"
   },
   "hermes-disk-maintenance.sh": {
