@@ -139,6 +139,7 @@ def _uptime_s():
 def agent_card(host: str, port: int) -> dict:
     card = {
         "protocolVersion": "1.0",
+        "__version__": "1.1.0",
         "name": f"cumulus-agent-{_hostname()}",
         "description": "CumulusNET agent mesh — görev alır, yerel inbox'a yazar, durum döner",
         "url": f"http://{host}:{port}/",
