@@ -28,6 +28,7 @@ from pathlib import Path
 
 INBOX = os.path.expanduser("~/.hermes/a2a_inbox")
 CUMULUS_DIR = os.path.expanduser("~/cumulusos")
+SYNC_ROOT = os.path.expanduser("~/cumulus-sync-motor/p2p")
 UPDATE_REPO = os.path.expanduser(os.environ.get("A2A_UPDATE_REPO", "~/cumulus-sync-motor"))
 UPDATE_FILES = ("a2a_cli.py", "agent_mesh_a2a.py", "sync_motor.py", "inbox_worker.py")
 UPDATE_HOSTS = {"100.92.2.47", "127.0.0.1", "localhost"}
@@ -178,6 +179,29 @@ def run_agent_update(url, expected_sha256):
             shutil.copyfileobj(response, output)
         return apply_agent_update(archive, expected_sha256)
 
+def _peer_ping():
+    """KÜME SAĞLIĞI (31 Ağu): H1/H2 A2A health'ini ping'ler ve küçük bir durum
+    dosyasına yazar. Mevcut 5-dk'lık timer'ın İÇİNDE çalışır — ek proses/timer yok.
+    Kaynak: her peer için max 3s tek HTTP isteği (~saniyede bir kez, ihmal edilebilir)."""
+    peers = {"H1": "100.92.2.47", "H2": "100.76.82.46"}
+    durum = {}
+    for ad, ip in peers.items():
+        try:
+            req = urllib.request.Request(f"http://{ip}:8643/health", method="GET")
+            with urllib.request.urlopen(req, timeout=3) as r:
+                g = json.loads(r.read())
+                durum[ad] = {"up": g.get("status") == "ok", "ts": time.time()}
+        except Exception:
+            durum[ad] = {"up": False, "ts": time.time()}
+    try:
+        p = os.path.join(SYNC_ROOT, "_mesh_status.json")
+        os.makedirs(os.path.dirname(p), exist_ok=True)
+        json.dump(durum, open(p, "w"))
+    except Exception:
+        pass
+    return durum
+
+
 def process_inbox():
     os.makedirs(INBOX, exist_ok=True)
     done = 0
@@ -228,8 +252,15 @@ def process_inbox():
                         pass
                 son = son[-5:]
                 d["status"] = "done"
-                d["result"] = {"toplam": yeni + tamam + red, "new": yeni,
-                               "done": tamam, "rejected": red, "son_5": son}
+                # Küme sağlığı da özetlenir (H1/H2 up/down + son ping)
+                try:
+                    ms = json.loads(open(os.path.join(SYNC_ROOT, "_mesh_status.json")).read())
+                    d["result"] = {"toplam": yeni + tamam + red, "new": yeni,
+                                   "done": tamam, "rejected": red, "son_5": son,
+                                   "mesh": ms}
+                except Exception:
+                    d["result"] = {"toplam": yeni + tamam + red, "new": yeni,
+                                   "done": tamam, "rejected": red, "son_5": son}
             elif key == "temizle":
                 # Kuyruk hijyeni (31 Ağu 2026): done/rejected dosyaları N günden
                 # eskiyse siler (varsayılan 7 gün). new ASLA silinmez.
@@ -280,4 +311,5 @@ def process_inbox():
     return done
 
 if __name__ == "__main__":
+    _peer_ping()      # küme sağlık kaydı (5 dk'da bir, ek kaynak yok)
     process_inbox()
