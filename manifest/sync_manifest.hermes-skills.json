@@ -1,8 +1,8 @@
 {
  "node": "hermes-skills",
- "ts": "2026-08-31T19:05:00",
- "revision": "993fb7d3d7c2",
- "file_count": 15968,
+ "ts": "2026-08-31T19:53:45",
+ "revision": "e4a7beb07556",
+ "file_count": 15969,
  "files": {
   ".curator_state": {
    "sha": "9491dd850719e8012949bd2461651299affaac3b5016b0d55fea454184ca52fa",
@@ -19,7 +19,7 @@
   ".bundled_manifest": {
    "sha": "8e9a538eaef7edb9cf8711d6c0abb50af507c69e68374143a1add2e742e796f2",
    "size": 2727,
-   "mtime": 1788191449,
+   "mtime": 1788194330,
    "machine": "H3"
   },
   "cumulus-pcb-development.md": {
@@ -35,9 +35,9 @@
    "machine": "H3"
   },
   ".usage.json": {
-   "sha": "49ea41c69676e083d181331625dc43e480b6159042e21ef844ee7c2b7d12a94f",
-   "size": 201147,
-   "mtime": 1788192198,
+   "sha": "aa56922996f04e8ebe6c7e1373f731fba8b829b9c05348c4c6f35408bb4dc50f",
+   "size": 201207,
+   "mtime": 1788193092,
    "machine": "H3"
   },
   ".archive/kicad10-headless-pcb/SKILL.md": {
@@ -3089,9 +3089,15 @@
    "machine": "H3"
   },
   "devops/cumulus-sync-motor/SKILL.md": {
-   "sha": "dc29b48fd685cd3d71799839fa13bf76d0cdbd77b9255397e343c82a9a6c497f",
-   "size": 12987,
-   "mtime": 1786791178,
+   "sha": "ff801f323397547af7fecafa46df010a99ef5546b9d1d693502bd7c019186a76",
+   "size": 13537,
+   "mtime": 1788193057,
+   "machine": "H3"
+  },
+  "devops/cumulus-sync-motor/references/a2a-mesh-v2-20260831.md": {
+   "sha": "f2d5853d83b4e0aa7add8b1c63928e7c75a0dcf5f445be43a33a591ff9ee1d4e",
+   "size": 3698,
+   "mtime": 1788193039,
    "machine": "H3"
   },
   "devops/cumulus-sync-motor/references/sync-motor-v1.1.md": {
