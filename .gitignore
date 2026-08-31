@@ -20,3 +20,6 @@ Thumbs.db
 .sync-manifest.json
 *.bak*
 *.log
+
+# A2A güvenli güncelleme yedekleri (her agent-update yeni dizin üretir)
+.a2a_backup_*/

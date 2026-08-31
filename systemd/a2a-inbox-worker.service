@@ -1,0 +1,11 @@
+[Unit]
+Description=Cumulus A2A allowlisted update worker
+After=network-online.target a2a-mesh.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+EnvironmentFile=/root/.hermes/.env
+WorkingDirectory=/root/.hermes/scripts
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/inbox_worker.py

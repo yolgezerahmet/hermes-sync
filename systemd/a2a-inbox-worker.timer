@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Cumulus A2A allowlisted update worker every 5 minutes
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=5min
+Persistent=true
+
+[Install]
+WantedBy=timers.target
