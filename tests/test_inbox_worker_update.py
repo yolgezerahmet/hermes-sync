@@ -12,6 +12,22 @@ import inbox_worker as worker
 
 
 class TestAgentUpdate(unittest.TestCase):
+    def test_build_agent_update_task(self):
+        task = worker.build_agent_update_task(
+            "http://100.92.2.47/A2A_UPDATE_20260831.tar.gz", "a" * 64)
+        self.assertTrue(task.startswith("agent-update:"))
+        self.assertIn("url=http://100.92.2.47/A2A_UPDATE_20260831.tar.gz", task)
+        self.assertIn("sha256=" + "a" * 64, task)
+
+    def test_parse_agent_update_roundtrip(self):
+        url = "http://127.0.0.1:9090/A2A_UPDATE_20260831.tar.gz"
+        digest = "b" * 64
+        task = worker.build_agent_update_task(url, digest)
+        key, args = worker.parse_task(task)
+        self.assertEqual(key, "agent-update")
+        self.assertEqual(args[0]["url"], url)
+        self.assertEqual(args[0]["sha256"], digest)
+
     def test_parse_agent_update_requires_url_and_sha256(self):
         key, args = worker.parse_task("agent-update:url=http://100.92.2.47/A2A_UPDATE_20260831.tar.gz sha256=" + "a" * 64)
         self.assertEqual(key, "agent-update")

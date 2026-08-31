@@ -153,6 +153,11 @@ def apply_agent_update(archive_path, expected_sha256, staging_dir=None):
             shutil.rmtree(stage, ignore_errors=True)
 
 
+def build_agent_update_task(url: str, sha256: str) -> str:
+    """agent-update görev metnini oluştur (H1 → uzak worker)."""
+    return f"agent-update:url={url} sha256={sha256.lower()}"
+
+
 def run_agent_update(url, expected_sha256):
     parsed = urllib.parse.urlparse(url)
     if parsed.hostname not in UPDATE_HOSTS:

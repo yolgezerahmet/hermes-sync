@@ -271,6 +271,13 @@ def dispatch(method: str, params: dict) -> dict:
         if not t:
             raise KeyError(f"task {tid} yok")
         return {"id": tid, "status": t["status"], "result": t["result"], "mode": t.get("mode", "sync")}
+    if method == "task/list":
+        # Çift taraflı görev izleme: başka node bu sunucudaki görevleri listeleyebilir.
+        return {"tasks": [
+            {"id": tid, "status": t.get("status"), "mode": t.get("mode"),
+             "created": t.get("created")}
+            for tid, t in sorted(TASKS.items(), key=lambda kv: kv[1].get("created", 0))
+        ]}
     if method == "task/cancel":
         tid = params.get("id", "")
         if tid in TASKS:

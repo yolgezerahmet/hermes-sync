@@ -2395,7 +2395,35 @@ def cmd_mesh(cfg, aksiyon, hedef="", gorev="", token="", dry_run=False):
                           timeout=120)
         print(out.strip()[-400:] if out.strip() else "(çıktı yok)")
         return rc
-    print("Kullanım: mesh send|status [hedef] [görev]")
+    if aksiyon == "update":
+        # mesh update [hedef] URL#SHA256 — tüm düğümlere (H1 hariç) güvenli
+        # agent-update görevi gönderir. Paket, uzak worker'ın allowlist'inden
+        # geçer: URL host allowlist'te, SHA-256 eşleşmeli, sabit dosya listesi.
+        if not gorev or "#" not in gorev:
+            print("Kullanım: mesh update [hedef] URL#SHA256"); return 1
+        url, sha = gorev.rsplit("#", 1)
+        from inbox_worker import build_agent_update_task
+        task_text = build_agent_update_task(url, sha)
+        if hedef:
+            targets = [(hedef, A2A_NODES.get(hedef, hedef))]
+        else:
+            try:
+                out_raw, _rc = run_cmd(["tailscale", "ip", "-4"], timeout=10)
+                text = str(out_raw or "").strip()
+                self_ip = text.split()[0] if text else "127.0.0.1"
+            except Exception:
+                self_ip = "127.0.0.1"
+            targets = [(n, ip) for n, ip in unique_a2a_nodes() if ip != self_ip]
+        rc_total = 0
+        for name, ip in targets:
+            out, rc = run_cmd(["python3", "/root/.hermes/scripts/a2a_cli.py",
+                               "send", ip, task_text,
+                               "--token", token or os.environ.get("A2A_TOKEN", "")],
+                              timeout=120)
+            print(f"  {name:14s} ({ip}): rc={rc} {str(out).strip()[-200:]}")
+            rc_total += rc
+        return 0 if rc_total == 0 else 1
+    print("Kullanım: mesh send|status|update [hedef] [görev]")
     return 1
 
 def cmd_restic_backup(cfg, node=None, dry_run=False):

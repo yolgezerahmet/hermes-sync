@@ -182,5 +182,12 @@ class TestA2AServerUvicorn(unittest.TestCase):
             self.assertEqual(cm.exception.code, 1)
 
 
+class TestA2ATaskList(unittest.TestCase):
+    def test_task_list_dispatch_returns_tasks(self):
+        result = a2a_srv.dispatch("task/list", {})
+        self.assertIn("tasks", result)
+        self.assertIsInstance(result["tasks"], list)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -183,7 +183,8 @@ def _self_addr() -> str:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("komut", choices=["send", "send-status", "get", "card", "ping", "stream"])
+    ap.add_argument("komut", choices=["send", "send-status", "get", "card", "ping", "stream",
+                                      "update", "info", "tasks"])
     ap.add_argument("host")
     ap.add_argument("gorev", nargs="?", default="")
     ap.add_argument("--task-id", default="")
@@ -219,6 +220,33 @@ def main():
             req = urllib.request.Request(f"http://{args.host}:{args.port}/health")
             with urllib.request.urlopen(req, timeout=30) as resp:
                 print(resp.read().decode())
+        elif args.komut == "update":
+            # Kullanım: update <host> URL#SHA256 — güvenli agent-update görevi gönderir.
+            if not args.gorev or "#" not in args.gorev:
+                raise SystemExit("update için URL#SHA256 gerekli: update h2 http://...tar.gz#<sha>")
+            url, sha = args.gorev.rsplit("#", 1)
+            from inbox_worker import build_agent_update_task
+            task = build_agent_update_task(url, sha)
+            r = rpc(args.host, "task/send",
+                    {"payload": {"action": "note", "text": task}, "mode": args.mode},
+                    args.token, args.port, sign=sign, conv_id=args.conv)
+            print(json.dumps(r, ensure_ascii=False, indent=2))
+        elif args.komut == "info":
+            # Kimlik + sağlık tek çıktıda (çift taraflı düğüm görünürlüğü).
+            card = peer_card(args.host, args.port)
+            health = {}
+            try:
+                req = urllib.request.Request(f"http://{args.host}:{args.port}/health")
+                with urllib.request.urlopen(req, timeout=30) as resp:
+                    health = json.loads(resp.read().decode())
+            except Exception as e:
+                health = {"error": str(e)}
+            print(json.dumps({"health": health, "card": card}, ensure_ascii=False, indent=2))
+        elif args.komut == "tasks":
+            # Uzak sunucudaki görev listesi (task/list).
+            r = rpc(args.host, "task/list", {}, args.token, args.port,
+                    sign=sign, conv_id=args.conv)
+            print(json.dumps(r, ensure_ascii=False, indent=2))
         elif args.komut == "stream":
             # Canlı SSE akışı: H1 → H3 mesaj akışını dinle
             url = f"http://{args.host}:{args.port}/stream?message={urllib.parse.quote(args.gorev or 'selam')}&seconds={args.seconds}"
