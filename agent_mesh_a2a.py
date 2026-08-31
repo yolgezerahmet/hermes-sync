@@ -269,7 +269,9 @@ def dispatch(method: str, params: dict) -> dict:
                 pass
         t = TASKS.get(tid)
         if not t:
-            raise KeyError(f"task {tid} yok")
+            # FIX (31 Ağu): bilinmeyen task 400/KeyError yerine temiz 'not_found'
+            # döner — ajanlar yanlış id sorgulayınca kafa karıştırıcı 400 almaz.
+            return {"id": tid, "status": "not_found", "result": None}
         return {"id": tid, "status": t["status"], "result": t["result"], "mode": t.get("mode", "sync")}
     if method == "task/list":
         # Çift taraflı görev izleme: başka node bu sunucudaki görevleri listeleyebilir.
