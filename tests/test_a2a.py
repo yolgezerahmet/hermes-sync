@@ -66,6 +66,19 @@ def test_cancel(iso_inbox):
     assert c["status"] == "canceled"
 
 
+def test_task_list(iso_inbox):
+    """task/list: görev listesi döner (a2a_cli 'tasks' komutu / private TestA2ATaskList)."""
+    r = a2a.dispatch("task/send", {"payload": {"action": "note", "text": "selam"}, "mode": "async"})
+    lst = a2a.dispatch("task/list", {})
+    assert "tasks" in lst
+    assert isinstance(lst["tasks"], list)
+    ids = [t["id"] for t in lst["tasks"]]
+    assert r["id"] in ids
+    # en yeni önce
+    created = [t.get("created") or 0 for t in lst["tasks"]]
+    assert created == sorted(created, reverse=True)
+
+
 def test_unknown_method(iso_inbox):
     with pytest.raises(KeyError):
         a2a.dispatch("olmayan/metod", {})

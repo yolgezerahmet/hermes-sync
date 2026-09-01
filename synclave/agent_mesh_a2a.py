@@ -296,6 +296,16 @@ def dispatch(method: str, params: dict) -> dict:
             TASKS[tid]["notified_at"] = time.time()
             _save_tasks(TASKS)
         return {"ok": True, "notified": bool(tid)}
+    if method == "task/list":
+        # Uzak sunucudaki görev listesi (a2a_cli 'tasks' komutu).
+        # TASKS: id -> {status, result, created, mode, ...}; en yeni önce.
+        items = [
+            {"id": tid, "status": t.get("status", "?"),
+             "mode": t.get("mode", "sync"), "created": t.get("created")}
+            for tid, t in TASKS.items()
+        ]
+        items.sort(key=lambda x: x.get("created") or 0, reverse=True)
+        return {"tasks": items}
     raise KeyError(f"bilinmeyen metod: {method}")
 
 # ─── FastAPI uygulaması ───────────────────────────────────────────────
