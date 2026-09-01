@@ -139,6 +139,7 @@ def _uptime_s():
 def agent_card(host: str, port: int) -> dict:
     card = {
         "protocolVersion": "1.0",
+        "__version__": "1.1.0",
         "name": f"cumulus-agent-{_hostname()}",
         "description": "CumulusNET agent mesh — görev alır, yerel inbox'a yazar, durum döner",
         "url": f"http://{host}:{port}/",
@@ -269,7 +270,9 @@ def dispatch(method: str, params: dict) -> dict:
                 pass
         t = TASKS.get(tid)
         if not t:
-            raise KeyError(f"task {tid} yok")
+            # FIX (31 Ağu): bilinmeyen task 400/KeyError yerine temiz 'not_found'
+            # döner — ajanlar yanlış id sorgulayınca kafa karıştırıcı 400 almaz.
+            return {"id": tid, "status": "not_found", "result": None}
         return {"id": tid, "status": t["status"], "result": t["result"], "mode": t.get("mode", "sync")}
     if method == "task/cancel":
         tid = params.get("id", "")
