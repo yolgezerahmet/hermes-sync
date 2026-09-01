@@ -255,7 +255,7 @@ def _task_remote_path(task_id: str, user: Optional[str] = None) -> str:
     return f"{_hub_base(user)}/{SHARED_DIR}/{TASKS_DIR}/{task_id}.json"
 
 
-def _read_remote_json(remote_path: str, default=None, timeout: int = 120):
+def _read_remote_json(remote_path: str, default=None, timeout: int = 180):
     """Uzak JSON oku — 'yok' default döner, GERÇEK hata → raise (fail-closed)."""
     rc, out, err = _run_rclone(["cat", remote_path], timeout=timeout)
     if rc == 0:
