@@ -274,13 +274,6 @@ def dispatch(method: str, params: dict) -> dict:
             # döner — ajanlar yanlış id sorgulayınca kafa karıştırıcı 400 almaz.
             return {"id": tid, "status": "not_found", "result": None}
         return {"id": tid, "status": t["status"], "result": t["result"], "mode": t.get("mode", "sync")}
-    if method == "task/list":
-        # Çift taraflı görev izleme: başka node bu sunucudaki görevleri listeleyebilir.
-        return {"tasks": [
-            {"id": tid, "status": t.get("status"), "mode": t.get("mode"),
-             "created": t.get("created")}
-            for tid, t in sorted(TASKS.items(), key=lambda kv: kv[1].get("created", 0))
-        ]}
     if method == "task/cancel":
         tid = params.get("id", "")
         if tid in TASKS:
@@ -306,6 +299,16 @@ def dispatch(method: str, params: dict) -> dict:
             TASKS[tid]["notified_at"] = time.time()
             _save_tasks(TASKS)
         return {"ok": True, "notified": bool(tid)}
+    if method == "task/list":
+        # Uzak sunucudaki görev listesi (a2a_cli 'tasks' komutu).
+        # TASKS: id -> {status, result, created, mode, ...}; en yeni önce.
+        items = [
+            {"id": tid, "status": t.get("status", "?"),
+             "mode": t.get("mode", "sync"), "created": t.get("created")}
+            for tid, t in TASKS.items()
+        ]
+        items.sort(key=lambda x: x.get("created") or 0, reverse=True)
+        return {"tasks": items}
     raise KeyError(f"bilinmeyen metod: {method}")
 
 # ─── FastAPI uygulaması ───────────────────────────────────────────────
@@ -412,12 +415,8 @@ def build_app(token: str):
 
     @app.get("/health")
     async def health():
-        import shutil
         ident = identity()
-        disk = shutil.disk_usage(_root_path())
-        out = {"status": "ok", "tasks": len(TASKS), "host": _hostname(),
-               "disk_gb": round(disk.free / 1e9, 1),
-               "uptime_s": _uptime_s()}
+        out = {"status": "ok", "tasks": len(TASKS), "host": _hostname()}
         if ident:
             out.update({"agent_id": ident.agent_id, "runtime": ident.runtime,
                         "clone_state": ident.meta.get("clone_state"),
@@ -521,7 +520,7 @@ def main():
     except ImportError:
         # Windows (H2) dahil temiz kurulum hatası — ham traceback yerine
         print("HATA: 'uvicorn' paketi yok — A2A mesh server başlatılamaz.\n"
-              "      Kur: pip install uvicorn  (veya pip install 'hermes-sync[server]')")
+              "      Kur: pip install uvicorn  (veya pip install 'synclave[a2a]')")
         sys.exit(1)
     app = build_app(args.token)
     ident = identity()

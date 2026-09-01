@@ -225,7 +225,10 @@ def main():
             if not args.gorev or "#" not in args.gorev:
                 raise SystemExit("update için URL#SHA256 gerekli: update h2 http://...tar.gz#<sha>")
             url, sha = args.gorev.rsplit("#", 1)
-            from inbox_worker import build_agent_update_task
+            try:
+                from synclave.inbox_worker import build_agent_update_task
+            except ImportError:
+                from inbox_worker import build_agent_update_task
             task = build_agent_update_task(url, sha)
             r = rpc(args.host, "task/send",
                     {"payload": {"action": "note", "text": task}, "mode": args.mode},
