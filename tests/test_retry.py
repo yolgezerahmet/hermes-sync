@@ -100,6 +100,9 @@ def test_run_rclone_default_timeout_180():
     import inspect
     sig = inspect.signature(ck._run_rclone)
     assert sig.parameters["timeout"].default == 180
+    # tüm rclone okumaları 180s altında — görev spesifikasyonu (120→180)
+    sig2 = inspect.signature(ck._read_remote_json)
+    assert sig2.parameters["timeout"].default == 180
 
 
 # ─── sync_motor.run_cmd ─────────────────────────────────────────
