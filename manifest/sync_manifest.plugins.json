@@ -1,1130 +1,1130 @@
 {
  "node": "plugins",
- "ts": "2026-09-01T04:58:36",
- "revision": "f37a097c1cda",
+ "ts": "2026-09-01T05:27:11",
+ "revision": "8430365fb660",
  "file_count": 187,
  "files": {
   "evey_utils.py": {
    "sha": "da3142b0390fbab85a3a85602ed110e8854a13919aaf1475e070eadacb726805",
    "size": 4350,
    "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-wallet/plugin.yaml": {
-   "sha": "a9a30d59ed3c27281536b72c2ed7ff233d704948cca29c017cefcbf97d12e581",
-   "size": 129,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-wallet/__init__.py": {
-   "sha": "7ab570172e36720f055b388e0658ccfc0c06eca31dd6cf1a5acbaced9a392896",
-   "size": 8506,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-memory-consolidate/plugin.yaml": {
-   "sha": "d956c69ac163485e9abe886963e15a2d8e1841623646feaec6e8924dd6b23546",
-   "size": 198,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-memory-consolidate/__init__.py": {
-   "sha": "c9c53966071a154dedf8531adaf0ffe143db3b25f522c7a03a14869a5826d046",
-   "size": 8096,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-learner/plugin.yaml": {
-   "sha": "45df7703abd8c4db17623581694e4355dcf42af3106551f4fdd2621faf14f68d",
-   "size": 190,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-learner/__init__.py": {
-   "sha": "d053a4958f681365a961323f63e318b3b88b53bdb4f9bd55234eb826f724100a",
-   "size": 10751,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-mqtt/plugin.yaml": {
-   "sha": "6248bb2242114a6a053f8132f6c0ed92a4ff82b3de4d53fd3d646791790ae3e0",
-   "size": 256,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-mqtt/__init__.py": {
-   "sha": "a43b2422ecfcfb788567b9a4923a8e494cf4cf5c8b1b99ec8ad3849d512eeba2",
-   "size": 6073,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-github/plugin.yaml": {
-   "sha": "f743cae048ae58268e80af3dd69cfdd1625982c6edcc7351e1b36ac6283e3ddd",
-   "size": 132,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-github/__init__.py": {
-   "sha": "31f09d84aeba289d85e01c6a3725c0dbe40c9be54b36c9b5a65f51e3bcd157e7",
-   "size": 4358,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-proactive/plugin.yaml": {
-   "sha": "bb5687bd0edecd300bb13abaf5b473d38ccd564d304aac0e66c853d4933d7be1",
-   "size": 241,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-proactive/__init__.py": {
-   "sha": "8f403eacad6939bc29f23c4e4c6d00ba4f920654df5e6721b920020631319884",
-   "size": 6048,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-bridge/plugin.yaml": {
-   "sha": "642da58c8386f500223bd01464171f99ff4aaee55117e8a41c45b38199a4fc83",
-   "size": 211,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-bridge/__init__.py": {
-   "sha": "5b214b35cb91d28a022b318f810465a57a1702ea51bafcc9a96cb889744cbb48",
-   "size": 7891,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-scheduler/plugin.yaml": {
-   "sha": "ab24363387a31f67a2c3d0273b70dcacad9b35110127f760df5cc9989c712637",
-   "size": 246,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-scheduler/__init__.py": {
-   "sha": "ad7d194ee4f2c1c526c894f0082d0e682c74eca972eb37458a5e18e7c6313bd2",
-   "size": 7180,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "patent-checker/plugin.yaml": {
-   "sha": "53919f7be9abe1100a3813fa00f63988163807961b771d013f37ef9690bd0da9",
-   "size": 99,
-   "mtime": 1780692865,
-   "machine": "H3"
-  },
-  "patent-checker/__init__.py": {
-   "sha": "d5ad3e650fe78212f9cf3b1989d28d39aaf5cdd4d661e6f6bfeb97fe0c30efd4",
-   "size": 3923,
-   "mtime": 1780692865,
-   "machine": "H3"
-  },
-  "patent-checker/__pycache__/__init__.cpython-311.pyc": {
-   "sha": "44b3101ad09d8a9b96b67a97ef4fb20a735662c331c748bb013a0003e51e2462",
-   "size": 6370,
-   "mtime": 1781977270,
-   "machine": "H3"
-  },
-  "cumulus-build/plugin.yaml": {
-   "sha": "dad55a449c01ce2ac781add881e5abd3c453a4b27c6514348071dd2ded5824b7",
-   "size": 98,
-   "mtime": 1780692885,
-   "machine": "H3"
-  },
-  "cumulus-build/__init__.py": {
-   "sha": "845b2142d1dfa228acba8dd072bdd066bd9b66263f293fd637e05e258ff0a128",
-   "size": 3631,
-   "mtime": 1780692885,
-   "machine": "H3"
-  },
-  "cumulus-build/__pycache__/__init__.cpython-311.pyc": {
-   "sha": "fdfe80e683264d07ddc95dff31f2eeb55332f81a9dfe675ff677c5b0b53ff7b1",
-   "size": 5816,
-   "mtime": 1781977270,
-   "machine": "H3"
-  },
-  "__pycache__/evey_utils.cpython-311.pyc": {
-   "sha": "669f78293e7dadca14b4d011b755c332728489fc2107e8ab586cb2f8a53dee27",
-   "size": 7394,
-   "mtime": 1782074493,
-   "machine": "H3"
-  },
-  "evey-cache/plugin.yaml": {
-   "sha": "1e4dbaa2698b075698f612bf87a68609da31531e2a42ac170de99d69d6fea5a3",
-   "size": 159,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-cache/__init__.py": {
-   "sha": "40ac5f0b0a3955e5c7c8e7bece8ce182299c68acda6a6cdfe5eb808eb988360b",
-   "size": 7192,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-verification/plugin.yaml": {
-   "sha": "00485a062049a18cfd9e92457a60a1de58e928cdb61aa641a2538f4651cf02ec",
-   "size": 124,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-verification/__init__.py": {
-   "sha": "2efb2ed57ebfce415e5644969dfe01644b41fbda6a78b8b44a711527af64a347",
-   "size": 6005,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-rag/plugin.yaml": {
-   "sha": "c87c0a64faadb395d581904fee70c342f11c4c9bd75436f2dce3da256406125d",
-   "size": 106,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-rag/README.md": {
-   "sha": "1d60ae70b7475d21139d8f3e815704a8237aa7c6f049dc1925d36ebcc8cb204a",
-   "size": 1015,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-rag/__init__.py": {
-   "sha": "6042f16fdce1502bb6651c2544a6e2c556af2f46eaea2cde9b5d9ca9fc1ae039",
-   "size": 5676,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "lancedb/plugin.yaml": {
-   "sha": "a0f66b5205f068937aad261c8b57140eab76dbb87aeb06add62daca1b1bb6906",
-   "size": 242,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/README.md": {
-   "sha": "469ef95e77e62582b9b9928621d954c3dbdfb7963f38ca08da1796ff50afac7a",
-   "size": 20786,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/after-install.md": {
-   "sha": "3c38b9f118e2d25975287984eecedb8a06ef0f64aba016717338b81f8714fd44",
-   "size": 2087,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/.env.example": {
-   "sha": "d0bd339c52349e1c6ba7804f4984c35a711a3441e93ad21d64a08d79e08206a9",
-   "size": 87,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/uv.lock": {
-   "sha": "a60b230aaf669aa3a65e9590eafde26b5294f4d5d1c33b17b31e975ff0d9e7af",
-   "size": 169509,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/CHANGELOG.md": {
-   "sha": "a55a67456ddc544b1adeb1da029e28cd25b82bd81e7b95a1ade50255dbb3a4c6",
-   "size": 883,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/LICENSE": {
-   "sha": "064719eab3f32b9922f8402d0e4b72e0b169fde65d9bc48a414a3c043195efba",
-   "size": 11337,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/pyproject.toml": {
-   "sha": "07533e777289714cf9d32754ea6c219bf5d61ca4c2c0254b426bedf2b00bb948",
-   "size": 836,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/.gitignore": {
-   "sha": "03a55d3a3d020e7e904b4076549e7740caa58da89eb76510703fc0e692ac43fb",
-   "size": 4867,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/.pre-commit-config.yaml": {
-   "sha": "d8f6eb542c73136e5e619156a0664085360f5d4e060af361e0d3dbf695356809",
-   "size": 211,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/__init__.py": {
-   "sha": "bee33c3aed00e626b10605c3fc6d9dbbd088e81abb237b65b38abfa269f26eed",
-   "size": 1349,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/CONTRIBUTING.md": {
-   "sha": "c7349beb31366a095e01a4aab4087b3bdfc4e2ac22ace4d7c10118f4d2fef60d",
-   "size": 1868,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/benchmarks/README.md": {
-   "sha": "4b8713474c9f8bae54d234a62d0c631a13f136dadd660ee314d5eff0f9ea26e1",
-   "size": 12804,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/benchmarks/__init__.py": {
-   "sha": "e0baeabb1b488748e76959e55cd08b4cd29552cb1d75fc503f851a59538dc819",
-   "size": 51,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/benchmarks/longmemeval/run.py": {
-   "sha": "913570ff2828bb839b7160fe1f14ba1ecede7338a94494486bf13972412787f7",
-   "size": 65659,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/benchmarks/longmemeval/inspect_results.py": {
-   "sha": "a7742a6f19e06ad73b161d37e27fd6424a16005c73c32c93bbd6c18aeaf3e323",
-   "size": 9775,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/benchmarks/longmemeval/__init__.py": {
-   "sha": "ace88294350e0a989daf8d5c509d54fa55d9f7ec640b07f3301af9b435504e54",
-   "size": 37,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/benchmarks/longmemeval/__pycache__/run.cpython-312.pyc": {
-   "sha": "0c367f8710ee6d9cba296c19c98b4630b4f50ed9c3d53f7f1e7c4f81ac807d39",
-   "size": 78356,
-   "mtime": 1786457263,
-   "machine": "H3"
-  },
-  "lancedb/benchmarks/longmemeval/__pycache__/inspect_results.cpython-312.pyc": {
-   "sha": "b7769594fbc1247c93c77fc12629b8b58e9add8c74eecd4bcf18a75b9d1fac91",
-   "size": 15530,
-   "mtime": 1786457263,
-   "machine": "H3"
-  },
-  "lancedb/src/default_config.yaml": {
-   "sha": "d6fb1543765bee55c8bc75ab7bb2df8fc6f15ee431aa2208463d6f18c5f7936f",
-   "size": 3579,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/src/embeddings.py": {
-   "sha": "2e5fa46d1dea18c2bca4d5f562bba2822b16fb44730b0116e5c60f50e24fb9ed",
-   "size": 7564,
-   "mtime": 1786457941,
-   "machine": "H3"
-  },
-  "lancedb/src/provider.py": {
-   "sha": "e3956a8ba53c230600af2933814c08e0b35e540749cd4e7ac3c5e3f8e4366b20",
-   "size": 17638,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/src/config.py": {
-   "sha": "689369a70da2d5e6d2cdced06d1404ff4de69899290ba89646cb52c86fe0111f",
-   "size": 3359,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/src/extraction.py": {
-   "sha": "3608632121f4ebc5e71930584db476674c87c5d360ac53b16393bd04a5ec7c3e",
-   "size": 3335,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/src/retrieval.py": {
-   "sha": "4672ca6860b324354a60a88f7a6cd1ac826955521db3803b273ee0418da8f9b3",
-   "size": 6442,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/src/tools.py": {
-   "sha": "26abb651faec9a904b8b9fcef998363a9aa2d4ac443861cd6fb8d5e558a8828c",
-   "size": 8044,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/src/__init__.py": {
-   "sha": "eccb536011534a99986789da776d70ad2c713bd3f42746e3aef179759ee69863",
-   "size": 460,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/src/store.py": {
-   "sha": "c017d230ae814cd450382a258f3d6d1152fa6d295e8ddab30db768fbbe757a9a",
-   "size": 14282,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/src/__pycache__/extraction.cpython-311.pyc": {
-   "sha": "dc64bb596f3f403a504a0e67060be21a3da99e515bbdde73a442c9567601991b",
-   "size": 5638,
-   "mtime": 1786352770,
-   "machine": "H3"
-  },
-  "lancedb/src/__pycache__/provider.cpython-312.pyc": {
-   "sha": "44404747978b93638b278e25b21d29e01088d6cde5a811161ded5852c3fbd224",
-   "size": 24620,
-   "mtime": 1786457263,
-   "machine": "H3"
-  },
-  "lancedb/src/__pycache__/extraction.cpython-312.pyc": {
-   "sha": "ce9f0177279e13aa7e65b4558c447ec8ecc3220a6510dcae2afb7223d1e58ad8",
-   "size": 4632,
-   "mtime": 1787909372,
-   "machine": "H3"
-  },
-  "lancedb/src/__pycache__/tools.cpython-312.pyc": {
-   "sha": "7a81805878e817fdf27dc4d34c9a075c0c0f168b736f28d96def212e343281a8",
-   "size": 10466,
-   "mtime": 1787909372,
-   "machine": "H3"
-  },
-  "lancedb/src/__pycache__/embeddings.cpython-312.pyc": {
-   "sha": "a45f1c16de4f7916d815ca79885df218778225ef579e51f1b35c89e566756e59",
-   "size": 8987,
-   "mtime": 1787909372,
-   "machine": "H3"
-  },
-  "lancedb/src/__pycache__/retrieval.cpython-311.pyc": {
-   "sha": "179db2ac44bbf31124f7b2b678fb4a372e64781fbd307a0765f34da3ba9c9b5a",
-   "size": 8102,
-   "mtime": 1786352770,
-   "machine": "H3"
-  },
-  "lancedb/src/__pycache__/config.cpython-312.pyc": {
-   "sha": "30f691eecdfa7bf1fb54e3f795fa5bb4c2da2ae412aa5e05d33fde8e52fa57dd",
-   "size": 5088,
-   "mtime": 1786457263,
-   "machine": "H3"
-  },
-  "lancedb/src/__pycache__/tools.cpython-311.pyc": {
-   "sha": "081191b379d3bda8533bf6148f84284ea88a713002d282dbd921a490ccdd713a",
-   "size": 12306,
-   "mtime": 1786352770,
-   "machine": "H3"
-  },
-  "lancedb/src/__pycache__/store.cpython-311.pyc": {
-   "sha": "b02cd0a5d311146a0de54c251056f9373368e3051f54024125d80d76c38fb7d0",
-   "size": 25810,
-   "mtime": 1786352770,
-   "machine": "H3"
-  },
-  "lancedb/src/__pycache__/embeddings.cpython-311.pyc": {
-   "sha": "14ac7b0e18fa6e7d315df039246172225b21803ba2722bcc5a5f7a8e37573ded",
-   "size": 9979,
-   "mtime": 1786457980,
-   "machine": "H3"
-  },
-  "lancedb/src/__pycache__/__init__.cpython-311.pyc": {
-   "sha": "9f431c67dde4ea272d849a6cb1538c8a8664f55cf0b626131124c1363d0751d2",
-   "size": 681,
-   "mtime": 1786352770,
-   "machine": "H3"
-  },
-  "lancedb/src/__pycache__/store.cpython-312.pyc": {
-   "sha": "bcf01db3aaebe52d3cd6c22bdf35a924d87445b2da43669ee2c819969f26b24b",
-   "size": 22525,
-   "mtime": 1786457254,
-   "machine": "H3"
-  },
-  "lancedb/src/__pycache__/config.cpython-311.pyc": {
-   "sha": "52effff047141838033c1fb0af280efd51a147c55a8a3925004e70b8db81b141",
-   "size": 5901,
-   "mtime": 1786352770,
-   "machine": "H3"
-  },
-  "lancedb/src/__pycache__/retrieval.cpython-312.pyc": {
-   "sha": "e718fae4f85540e408f42c7e28aebd6bb5d7681d2593216410c3df991dd43f4a",
-   "size": 6919,
-   "mtime": 1787909372,
-   "machine": "H3"
-  },
-  "lancedb/src/__pycache__/provider.cpython-311.pyc": {
-   "sha": "46bcee17d1d6adfb4355c02da4768a559a82ddfd50d595325f6a71b8817bc555",
-   "size": 27135,
-   "mtime": 1786352770,
-   "machine": "H3"
-  },
-  "lancedb/src/__pycache__/__init__.cpython-312.pyc": {
-   "sha": "58db223b941eca17c72b52787c680fffb1269aaa455b61c74004cd3606655c00",
-   "size": 640,
-   "mtime": 1786457263,
-   "machine": "H3"
-  },
-  "lancedb/__pycache__/__init__.cpython-311.pyc": {
-   "sha": "80011928ed4f823668ca14e4a2df4c8cfb252419ea6b16b7d49f373a878088ca",
-   "size": 1680,
-   "mtime": 1786352770,
-   "machine": "H3"
-  },
-  "lancedb/__pycache__/__init__.cpython-312.pyc": {
-   "sha": "5409255a024b12add610687af3f28c5b6325f1335e68b79bdf279c297eee803f",
-   "size": 1555,
-   "mtime": 1786457263,
-   "machine": "H3"
-  },
-  "lancedb/.pytest_cache/README.md": {
-   "sha": "73fd6fccdd802c419a6b2d983d6c3173b7da97558ac4b589edec2dfe443db9ad",
-   "size": 302,
-   "mtime": 1786457263,
-   "machine": "H3"
-  },
-  "lancedb/.pytest_cache/CACHEDIR.TAG": {
-   "sha": "37dc88ef9a0abeddbe81053a6dd8fdfb13afb613045ea1eb4a5c815a74a3bde4",
-   "size": 191,
-   "mtime": 1786457263,
-   "machine": "H3"
-  },
-  "lancedb/.pytest_cache/.gitignore": {
-   "sha": "3ed731b65d06150c138e2dadb0be0697550888a6b47eb8c45ecc9adba8b8e9bd",
-   "size": 37,
-   "mtime": 1786457263,
-   "machine": "H3"
-  },
-  "lancedb/.pytest_cache/v/cache/lastfailed": {
-   "sha": "c1f887fa3e38d854fb68cd2dc74562a2021a6f2b1c229406ac61e0d1cd521563",
-   "size": 94,
-   "mtime": 1786457263,
-   "machine": "H3"
-  },
-  "lancedb/.pytest_cache/v/cache/nodeids": {
-   "sha": "31da6ae31661efade5558cbac8cd9366df03fbf717cd4176f5f57b5709a66bea",
-   "size": 3974,
-   "mtime": 1786457263,
-   "machine": "H3"
-  },
-  "lancedb/.git/HEAD": {
-   "sha": "28d25bf82af4c0e2b72f50959b2beb859e3e60b9630a5e8c603dad4ddb2b6e80",
-   "size": 21,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/.git/index": {
-   "sha": "4162d6c98d2a7b9eef5f5bef7ec4233995890543b72949f764a69f6c92bf73e0",
-   "size": 3324,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/.git/shallow": {
-   "sha": "de9a2d5fd1cafd62483b4f079fc260def5798fc2bc94b27b0b9d377682faf0e0",
-   "size": 41,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/.git/packed-refs": {
-   "sha": "c7fe97ecbce378b63113348b99f0a6cd1dc2667f0a7b2c6fdad1f6dfdfa293cf",
-   "size": 112,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/.git/description": {
-   "sha": "85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee",
-   "size": 73,
-   "mtime": 1786352762,
-   "machine": "H3"
-  },
-  "lancedb/.git/config": {
-   "sha": "906defd2d7f6cbb4f8a2d86567bab368314804371ab2280daf632045398d7966",
-   "size": 277,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/.git/hooks/prepare-commit-msg.sample": {
-   "sha": "e9ddcaa4189fddd25ed97fc8c789eca7b6ca16390b2392ae3276f0c8e1aa4619",
-   "size": 1492,
-   "mtime": 1786352762,
-   "machine": "H3"
-  },
-  "lancedb/.git/hooks/fsmonitor-watchman.sample": {
-   "sha": "e0549964e93897b519bd8e333c037e51fff0f88ba13e086a331592bf801fa1d0",
-   "size": 4726,
-   "mtime": 1786352762,
-   "machine": "H3"
-  },
-  "lancedb/.git/hooks/applypatch-msg.sample": {
-   "sha": "0223497a0b8b033aa58a3a521b8629869386cf7ab0e2f101963d328aa62193f7",
-   "size": 478,
-   "mtime": 1786352762,
-   "machine": "H3"
-  },
-  "lancedb/.git/hooks/pre-applypatch.sample": {
-   "sha": "e15c5b469ea3e0a695bea6f2c82bcf8e62821074939ddd85b77e0007ff165475",
-   "size": 424,
-   "mtime": 1786352762,
-   "machine": "H3"
-  },
-  "lancedb/.git/hooks/sendemail-validate.sample": {
-   "sha": "44ebfc923dc5466bc009602f0ecf067b9c65459abfe8868ddc49b78e6ced7a92",
-   "size": 2308,
-   "mtime": 1786352762,
-   "machine": "H3"
-  },
-  "lancedb/.git/hooks/pre-receive.sample": {
-   "sha": "a4c3d2b9c7bb3fd8d1441c31bd4ee71a595d66b44fcf49ddb310252320169989",
-   "size": 544,
-   "mtime": 1786352762,
-   "machine": "H3"
-  },
-  "lancedb/.git/hooks/pre-rebase.sample": {
-   "sha": "4febce867790052338076f4e66cc47efb14879d18097d1d61c8261859eaaa7b3",
-   "size": 4898,
-   "mtime": 1786352762,
-   "machine": "H3"
-  },
-  "lancedb/.git/hooks/commit-msg.sample": {
-   "sha": "1f74d5e9292979b573ebd59741d46cb93ff391acdd083d340b94370753d92437",
-   "size": 896,
-   "mtime": 1786352762,
-   "machine": "H3"
-  },
-  "lancedb/.git/hooks/pre-merge-commit.sample": {
-   "sha": "d3825a70337940ebbd0a5c072984e13245920cdf8898bd225c8d27a6dfc9cb53",
-   "size": 416,
-   "mtime": 1786352762,
-   "machine": "H3"
-  },
-  "lancedb/.git/hooks/pre-push.sample": {
-   "sha": "ecce9c7e04d3f5dd9d8ada81753dd1d549a9634b26770042b58dda00217d086a",
-   "size": 1374,
-   "mtime": 1786352762,
-   "machine": "H3"
-  },
-  "lancedb/.git/hooks/pre-commit.sample": {
-   "sha": "f9af7d95eb1231ecf2eba9770fedfa8d4797a12b02d7240e98d568201251244a",
-   "size": 1643,
-   "mtime": 1786352762,
-   "machine": "H3"
-  },
-  "lancedb/.git/hooks/post-update.sample": {
-   "sha": "81765af2daef323061dcbc5e61fc16481cb74b3bac9ad8a174b186523586f6c5",
-   "size": 189,
-   "mtime": 1786352762,
-   "machine": "H3"
-  },
-  "lancedb/.git/hooks/push-to-checkout.sample": {
-   "sha": "a53d0741798b287c6dd7afa64aee473f305e65d3f49463bb9d7408ec3b12bf5f",
-   "size": 2783,
-   "mtime": 1786352762,
-   "machine": "H3"
-  },
-  "lancedb/.git/hooks/update.sample": {
-   "sha": "8d5f2fa83e103cf08b57eaa67521df9194f45cbdbcb37da52ad586097a14d106",
-   "size": 3650,
-   "mtime": 1786352762,
-   "machine": "H3"
-  },
-  "lancedb/.git/info/exclude": {
-   "sha": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
-   "size": 240,
-   "mtime": 1786352762,
-   "machine": "H3"
-  },
-  "lancedb/.git/logs/HEAD": {
-   "sha": "f457701ba26add13b3ca74b61566aa99ad046f7d69263d0ada34e417d85f3a7b",
-   "size": 217,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/.git/logs/refs/remotes/origin/HEAD": {
-   "sha": "f457701ba26add13b3ca74b61566aa99ad046f7d69263d0ada34e417d85f3a7b",
-   "size": 217,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/.git/logs/refs/heads/main": {
-   "sha": "f457701ba26add13b3ca74b61566aa99ad046f7d69263d0ada34e417d85f3a7b",
-   "size": 217,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/.git/objects/pack/pack-b71c2ec8f2036ce2a5e322381c59a463ea3e252a.pack": {
-   "sha": "b853642be74e438438a46ef730d83a48d5b1502daf6fa1b9dd0a93659b7d8d6f",
-   "size": 132643,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/.git/objects/pack/pack-b71c2ec8f2036ce2a5e322381c59a463ea3e252a.rev": {
-   "sha": "fb0b641b5035ff749037f398902c91d33c3e7e0ee571d1f2e2fdfe79c0b055e0",
-   "size": 228,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/.git/objects/pack/pack-b71c2ec8f2036ce2a5e322381c59a463ea3e252a.idx": {
-   "sha": "9807ea60a9dd78e1e151f2c57092044247463da1daf5666cf550f3f3d922e658",
-   "size": 2304,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/.git/refs/remotes/origin/HEAD": {
-   "sha": "2bb6a24aa0fc6c484100f5d51a29bbad841cd2c755f5d93faa204e5dbb4eb2b4",
-   "size": 30,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/.git/refs/heads/main": {
-   "sha": "de9a2d5fd1cafd62483b4f079fc260def5798fc2bc94b27b0b9d377682faf0e0",
-   "size": 41,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/tests/test_longmemeval_benchmark.py": {
-   "sha": "f76c5b7fdb0a5644b3d5423fd544eb92751c6e4f93be499269b571ad474fc917",
-   "size": 23771,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/tests/test_embeddings.py": {
-   "sha": "c33b3256313bbd306adc0a377c4d31aa3903a72dd8abc4519c21ffb403bdd977",
-   "size": 4854,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/tests/test_memory_loop.py": {
-   "sha": "20e1a5ac2fc5b13861d388613f4099d8a0f78c0198237e2260b5a6695f4ce2a1",
-   "size": 7143,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/tests/test_longmemeval_inspect_results.py": {
-   "sha": "7aaeabc2bb99dd194abd99e63a7f3fd96e5843f408477c46aa6307c1185837ef",
-   "size": 3201,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/tests/test_config_defaults.py": {
-   "sha": "42988919414789606591004ddb479a210b00d2b6597cd4568de6527b2da9b771",
-   "size": 1281,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/tests/__pycache__/test_memory_loop.cpython-312-pytest-9.1.1.pyc": {
-   "sha": "11996c0d1b3e06af321ae7e43dd9b9b13e21a3b9f2bd4b23ed4bdceac7a87b7f",
-   "size": 17768,
-   "mtime": 1786457263,
-   "machine": "H3"
-  },
-  "lancedb/tests/__pycache__/test_config_defaults.cpython-312-pytest-9.1.1.pyc": {
-   "sha": "0ddcfc14b0f7377934caf58d98f741a2354ffa360aa556339039aad8784eea35",
-   "size": 5801,
-   "mtime": 1786457263,
-   "machine": "H3"
-  },
-  "lancedb/tests/__pycache__/test_embeddings.cpython-312-pytest-9.1.1.pyc": {
-   "sha": "c3a2f5acf23ff74bbfdcf3189dce217ab09b9a759c6727fac4d330f4f3dd2f69",
-   "size": 28111,
-   "mtime": 1786457263,
-   "machine": "H3"
-  },
-  "lancedb/tests/__pycache__/test_longmemeval_benchmark.cpython-312-pytest-9.1.1.pyc": {
-   "sha": "7567fd9696e59cba6fccb31dca046288006b76a234244507391d596514731a26",
-   "size": 75258,
-   "mtime": 1786457263,
-   "machine": "H3"
-  },
-  "lancedb/tests/__pycache__/test_longmemeval_inspect_results.cpython-312-pytest-9.1.1.pyc": {
-   "sha": "cf63d2fa342174904aa7ce14b5afaebdcd70127577faf363b5a2be31b93a02d6",
-   "size": 9564,
-   "mtime": 1786457263,
-   "machine": "H3"
-  },
-  "lancedb/.github/PULL_REQUEST_TEMPLATE.md": {
-   "sha": "c7f9d24262af0908f6219ce8925f7373c309b5df6a7ba194253f3b499eb2b7c8",
-   "size": 515,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/.github/workflows/ci.yml": {
-   "sha": "92004e58b04469d36fb9f2bfb68d745be2d8caf20c4f0d449c43c5c3dfe5529e",
-   "size": 1880,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/.github/ISSUE_TEMPLATE/bug_report.md": {
-   "sha": "729f900cf6920a9e9fea99493a1435b57777899fb10bc58592d4c6ed686b6be5",
-   "size": 494,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "lancedb/.github/ISSUE_TEMPLATE/feature_request.md": {
-   "sha": "a21a6dbe9522bf8ec0849f44d6a22867f9071df71ab8ae505544119611576888",
-   "size": 244,
-   "mtime": 1786352763,
-   "machine": "H3"
-  },
-  "evey-commands/__init__.py": {
-   "sha": "dc3eb4ae34330d6596cb644c8ad35c066addd9b7e5b45f1a4d9d227c7d528e2b",
-   "size": 4854,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-email-guard/plugin.yaml": {
-   "sha": "4a78fdf22c2b316c0b1c08aa5e58893e3a3fbd60b7e3d704b6c36366f867cfad",
-   "size": 156,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-email-guard/__init__.py": {
-   "sha": "856419d1fa352376b3cbf659701f8c1e33c9fd51b121fc4d3857e7a3e790508b",
-   "size": 7284,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-goals/plugin.yaml": {
-   "sha": "e232f17df5a40f92f4b84d39c338828ec7716c0742cc5d51478e574dc6554003",
-   "size": 145,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-goals/__init__.py": {
-   "sha": "a865da947edc05f4aa053fde67564422eb22d866ec1397347d3c91bd57b1c495",
-   "size": 5576,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-goals/__pycache__/__init__.cpython-311.pyc": {
-   "sha": "3f81efe55ab9fcb274ca212d566358c86211ae5a0d296400275b6880fa735af9",
-   "size": 7301,
-   "mtime": 1782460836,
-   "machine": "H3"
-  },
-  "evey-delegation-score/plugin.yaml": {
-   "sha": "c59dc8bc03e743d6114403276e227dd6e976d57a0ceb4d95ad6a05b7ce05dbf0",
-   "size": 213,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-delegation-score/__init__.py": {
-   "sha": "2504d6d34805d877d93ce4edb9ffb919e99e5832f3605ba21ebef95b68e4bc26",
-   "size": 9145,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-validate/plugin.yaml": {
-   "sha": "5f8fcb814c4ee55ddb25393bc49800f710f257d0f28cab4f0637ba42797c12c3",
-   "size": 168,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-validate/__init__.py": {
-   "sha": "44389405072d6a1a70346caed494234a9cb155917e854ca1f03d6c555d163d9c",
-   "size": 4698,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-validate/__pycache__/__init__.cpython-311.pyc": {
-   "sha": "f465d4f0bfe4e8157f02c1dfdaed7cbeef1406a6d79c88b48d0b43ac667da737",
-   "size": 5659,
-   "mtime": 1782460836,
-   "machine": "H3"
-  },
-  "cumulus-quality/plugin.yaml": {
-   "sha": "2e947dbaa8959e9e875946543ea6be22add90debff8bff5ef4cc9ae8a8473d7b",
-   "size": 99,
-   "mtime": 1780693204,
-   "machine": "H3"
-  },
-  "cumulus-quality/__init__.py": {
-   "sha": "23d9666c2c5bf71e27cc32c9c95981d2b55ab12db6c475df2f450920b09249f1",
-   "size": 2946,
-   "mtime": 1780693204,
-   "machine": "H3"
-  },
-  "cumulus-quality/__pycache__/__init__.cpython-311.pyc": {
-   "sha": "b2bc351f4c713efbb2ac4f4987cb5da5be6b7e22451b6d7d8053df445dae8c4d",
-   "size": 4995,
-   "mtime": 1781977270,
-   "machine": "H3"
-  },
-  "evey-watchdog/plugin.yaml": {
-   "sha": "d38e63a0c9328a5a3f9700d25322ce6b783e6c2caea7146964a546a2d27d0328",
-   "size": 222,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-watchdog/__init__.py": {
-   "sha": "4a4c968fa2ecbee42f15dae370148752d5e87124017a758fa07e046d50bd88eb",
-   "size": 5684,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-watchdog/__pycache__/__init__.cpython-311.pyc": {
-   "sha": "3dd9fd820eeb7624b00803fd969c3b25289175c06674b773e51f605bbdb3000c",
-   "size": 8369,
-   "mtime": 1782074493,
-   "machine": "H3"
-  },
-  "evey-council/plugin.yaml": {
-   "sha": "8b98da5047637c277e0e52f35c5102e57d26530be4c0562de18bdbb7cefd7c42",
-   "size": 152,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-council/__init__.py": {
-   "sha": "039c76f4f5a7cd0919e19d0fe2cd40600f38d04b4d30ad8b6ec430ff0f6e0bff",
-   "size": 7332,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-council/__pycache__/__init__.cpython-311.pyc": {
-   "sha": "b92cb1551ea9cfdb0f4daa00ee7800f8981298189b0c6a0d847bc09d8e90fac4",
-   "size": 10939,
-   "mtime": 1782074493,
-   "machine": "H3"
-  },
-  "evey-news/plugin.yaml": {
-   "sha": "a1b60b4e0889dac68aaa20a018e8227fb0aea31fb961f32b0af01b4b36526c31",
-   "size": 178,
-   "mtime": 1780996147,
-   "machine": "H3"
+   "machine": "H1"
   },
   "evey-news/__init__.py": {
    "sha": "72d43cb5defba612700fcf0a6d54fe80fce89db2cc7478cccb4acb3047757888",
    "size": 3433,
    "mtime": 1780996147,
-   "machine": "H3"
+   "machine": "H1"
   },
-  "evey-identity/plugin.yaml": {
-   "sha": "dd29732f0c7b737e572cdbd974299715c932dcbe45f79d44c2e9f1ec316d02b1",
-   "size": 174,
+  "evey-news/plugin.yaml": {
+   "sha": "a1b60b4e0889dac68aaa20a018e8227fb0aea31fb961f32b0af01b4b36526c31",
+   "size": 178,
    "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-identity/__init__.py": {
-   "sha": "3c29190d205d55a44ea01202469f3eaa10379083da31cd91a803eef07dc7256f",
-   "size": 4144,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-telemetry/plugin.yaml": {
-   "sha": "4cca7582807aa04669ae0f3d42fa4b8fcbd83e204004ec2e9fcc7dfca8a76db1",
-   "size": 226,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-telemetry/__init__.py": {
-   "sha": "e9e4555b9ad0c8939730ea6bfc62b2ae2ec58182305528bf18b4dfa238342ff3",
-   "size": 8263,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-delegate-model/plugin.yaml": {
-   "sha": "d24f0f5df92adc6477563bc96408ed48761dae620aaba84d38ef56ba92ba294d",
-   "size": 161,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-delegate-model/__init__.py": {
-   "sha": "35fd925982c5138532f8b7d52b9af961383938b902e2729cc33f81eab811c860",
-   "size": 14657,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-delegate-model/__pycache__/__init__.cpython-311.pyc": {
-   "sha": "01ab0e0df23ee3035e6f48b946f18f7d6f3fad2d0e9d9d869f681b6df5d447d5",
-   "size": 19107,
-   "mtime": 1782460836,
-   "machine": "H3"
-  },
-  "evey-session-guard/plugin.yaml": {
-   "sha": "62c12070192c94858eb3cc4c5d30e6cba23d679c9fd459bffbbb98b9791acd6f",
-   "size": 150,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-session-guard/__init__.py": {
-   "sha": "04debcc95029a0b052373bc20c0bf64ca7c2127efdee5d045de86963931421ad",
-   "size": 4340,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-session-guard/__pycache__/__init__.cpython-311.pyc": {
-   "sha": "e3361e5468fd1251d9a25ecfe93af085557bcb9f2b66132c6e5c09d787b57205",
-   "size": 6714,
-   "mtime": 1782074493,
-   "machine": "H3"
-  },
-  "evey-reflect/plugin.yaml": {
-   "sha": "f365d1e80a4106d7d969b57e439e2eef192bd5e9e328fcaee3b303d04e6b9de4",
-   "size": 157,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-reflect/__init__.py": {
-   "sha": "cb4106b3202e02138bcdf6d47ffcbac069a8de91821fa29b3368e55d3ab7dcdb",
-   "size": 3300,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-reflect/__pycache__/__init__.cpython-311.pyc": {
-   "sha": "7fe7d6ad9589254a43dfd15cde84c2e8bc26c71a88ef170e8dd80088d67254ae",
-   "size": 4424,
-   "mtime": 1782074493,
-   "machine": "H3"
-  },
-  "evey-memory-adaptive/plugin.yaml": {
-   "sha": "ea6f333b667bf5f00b00ba09dadaa087c1126fe96f97a91c6dbe593a55733ea6",
-   "size": 155,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-memory-adaptive/__init__.py": {
-   "sha": "da289d9c2ebc42db312d6af08bad415f2193583545a7342b56bb9fdf49234036",
-   "size": 6144,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-memory-adaptive/__pycache__/__init__.cpython-311.pyc": {
-   "sha": "a6ff2145797b7ea863593425daf0974488b8e92e1ba258e499ea27d5b3515d94",
-   "size": 8378,
-   "mtime": 1782074493,
-   "machine": "H3"
-  },
-  "evey-digest/plugin.yaml": {
-   "sha": "bc3891a3e6c147966a72e071c0af8e6a5be8c26084c6e31c9c72cbe7784f11aa",
-   "size": 171,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-digest/__init__.py": {
-   "sha": "e5be476c42271f2c6a72395187820247efaa4ca35d63e24f36d276d4393685df",
-   "size": 6841,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-digest/__pycache__/__init__.cpython-311.pyc": {
-   "sha": "8a5d2d9dde10831ad4584ee971506463fcf6b3b4c81b493bbc1f640b5c95d466",
-   "size": 11147,
-   "mtime": 1782460836,
-   "machine": "H3"
-  },
-  "evey-moltbook/plugin.yaml": {
-   "sha": "1d25347bf96d1c9638e1241cece8ed9d04d58560bb444ca42d1f33b74f8ab646",
-   "size": 257,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-moltbook/__init__.py": {
-   "sha": "ca51097a708739b32ec16140661a898521fef79469c8ccb34365244842d404f6",
-   "size": 7762,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-telegram-ux/plugin.yaml": {
-   "sha": "bd43492eb5707c3930e4506c6dde74465066b0a4903bcee771019c832ac7a5e4",
-   "size": 138,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-telegram-ux/__init__.py": {
-   "sha": "eeb4aebed4d2fd088df2a2e7a47d9b1317a1e663e46bf051714a0cb9b86fef1b",
-   "size": 5204,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-telegram-ux/__pycache__/__init__.cpython-311.pyc": {
-   "sha": "f465dbb1661d91c53b14ddc78c68b3fc8114ddce132288c402e981ea15db17a5",
-   "size": 6656,
-   "mtime": 1782074493,
-   "machine": "H3"
-  },
-  "evey-habits/plugin.yaml": {
-   "sha": "d40895b7065c6d46012a88872ba1f30a1da7d64f0496a58a3a1ba5cf66781ce9",
-   "size": 191,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-habits/__init__.py": {
-   "sha": "a73f0a50d12fa3f99a6c7a70aa03fa34ea058208d6bd40599b36a7e3eb20f22e",
-   "size": 6885,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-cost-guard/plugin.yaml": {
-   "sha": "e530ee8225b4a00e93c3c9953ace5a8835ac992733dee5249ab3cc69327653ed",
-   "size": 227,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-cost-guard/__init__.py": {
-   "sha": "7d69c5b1096cb49908e0fd02cbe9d9c7c9117455bc9956453df73b7f8beee9d7",
-   "size": 14399,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-cost-guard/__pycache__/__init__.cpython-311.pyc": {
-   "sha": "87df26940faec286b72855e93508a9cef27fb340713c5edc67d0a1f8dd7fc909",
-   "size": 19267,
-   "mtime": 1782074493,
-   "machine": "H3"
-  },
-  "evey-autonomy/plugin.yaml": {
-   "sha": "f414e133b6f82e787e673404dc024b55fa2f3161e04c8df5c8efec9428794f10",
-   "size": 201,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-autonomy/__init__.py": {
-   "sha": "2a378f3f7bf6a89194cc4b5b59d8d8ed074a02127f801b751563357d4d3954da",
-   "size": 22880,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-sandbox/plugin.yaml": {
-   "sha": "a32f3b9f7c41e4d5142f6c7a4db7cd5c5e75f563ed8fecd3f24a57f072d7aeac",
-   "size": 129,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-sandbox/__init__.py": {
-   "sha": "e80f02515ee79053e1b49ec5c43689ff5e16a1284efd898e4bc650f4d2295f12",
-   "size": 10434,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "hermes-achievements/state.json": {
-   "sha": "a040b4e69f9029f97cdb61fc50b59cf9a18a053cf9b738c72d11aff0f05290db",
-   "size": 2017,
-   "mtime": 1778744487,
-   "machine": "H3"
-  },
-  "hermes-achievements/scan_snapshot.json": {
-   "sha": "f17e9b3021f67f852f970448a9d69167e98111288fb187b147204fc7bc364ea2",
-   "size": 164375,
-   "mtime": 1778744487,
-   "machine": "H3"
-  },
-  "hermes-achievements/scan_checkpoint.json": {
-   "sha": "00e0fc4ba57d9b3913ff76789f0429b1e9ae24663a069b4ba94290c49fdc3597",
-   "size": 118568,
-   "mtime": 1778744487,
-   "machine": "H3"
-  },
-  "evey-status/plugin.yaml": {
-   "sha": "df1a3e04853096e358d50312e9b0a1416ac5dc75b197fd30abbe002ee54abbd5",
-   "size": 177,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-status/__init__.py": {
-   "sha": "6ea93985323e03aec7136e28950f00d66f9b2a3ff9adfccc6dc3ed375631d937",
-   "size": 4918,
-   "mtime": 1780996147,
-   "machine": "H3"
-  },
-  "evey-research/plugin.yaml": {
-   "sha": "216ae93b252c1c18f33f281a8208aca9e92db0d296653e9cda9f59f7944ca12a",
-   "size": 135,
-   "mtime": 1780996147,
-   "machine": "H3"
+   "machine": "H1"
   },
   "evey-research/__init__.py": {
    "sha": "582fe79c18b40fd91fa41959ae8a8c61b7cfdca632e9bdd615239c63ba01ec30",
    "size": 7538,
    "mtime": 1780996147,
-   "machine": "H3"
+   "machine": "H1"
+  },
+  "evey-research/plugin.yaml": {
+   "sha": "216ae93b252c1c18f33f281a8208aca9e92db0d296653e9cda9f59f7944ca12a",
+   "size": 135,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-rag/README.md": {
+   "sha": "1d60ae70b7475d21139d8f3e815704a8237aa7c6f049dc1925d36ebcc8cb204a",
+   "size": 1015,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-rag/__init__.py": {
+   "sha": "6042f16fdce1502bb6651c2544a6e2c556af2f46eaea2cde9b5d9ca9fc1ae039",
+   "size": 5676,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-rag/plugin.yaml": {
+   "sha": "c87c0a64faadb395d581904fee70c342f11c4c9bd75436f2dce3da256406125d",
+   "size": 106,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-delegation-score/__init__.py": {
+   "sha": "2504d6d34805d877d93ce4edb9ffb919e99e5832f3605ba21ebef95b68e4bc26",
+   "size": 9145,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-delegation-score/plugin.yaml": {
+   "sha": "c59dc8bc03e743d6114403276e227dd6e976d57a0ceb4d95ad6a05b7ce05dbf0",
+   "size": 213,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-wallet/__init__.py": {
+   "sha": "7ab570172e36720f055b388e0658ccfc0c06eca31dd6cf1a5acbaced9a392896",
+   "size": 8506,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-wallet/plugin.yaml": {
+   "sha": "a9a30d59ed3c27281536b72c2ed7ff233d704948cca29c017cefcbf97d12e581",
+   "size": 129,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-status/__init__.py": {
+   "sha": "6ea93985323e03aec7136e28950f00d66f9b2a3ff9adfccc6dc3ed375631d937",
+   "size": 4918,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-status/plugin.yaml": {
+   "sha": "df1a3e04853096e358d50312e9b0a1416ac5dc75b197fd30abbe002ee54abbd5",
+   "size": 177,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-delegate-model/__init__.py": {
+   "sha": "35fd925982c5138532f8b7d52b9af961383938b902e2729cc33f81eab811c860",
+   "size": 14657,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-delegate-model/plugin.yaml": {
+   "sha": "d24f0f5df92adc6477563bc96408ed48761dae620aaba84d38ef56ba92ba294d",
+   "size": 161,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-delegate-model/__pycache__/__init__.cpython-311.pyc": {
+   "sha": "01ab0e0df23ee3035e6f48b946f18f7d6f3fad2d0e9d9d869f681b6df5d447d5",
+   "size": 19107,
+   "mtime": 1782460836,
+   "machine": "H1"
+  },
+  "evey-scheduler/__init__.py": {
+   "sha": "ad7d194ee4f2c1c526c894f0082d0e682c74eca972eb37458a5e18e7c6313bd2",
+   "size": 7180,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-scheduler/plugin.yaml": {
+   "sha": "ab24363387a31f67a2c3d0273b70dcacad9b35110127f760df5cc9989c712637",
+   "size": 246,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-moltbook/__init__.py": {
+   "sha": "ca51097a708739b32ec16140661a898521fef79469c8ccb34365244842d404f6",
+   "size": 7762,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-moltbook/plugin.yaml": {
+   "sha": "1d25347bf96d1c9638e1241cece8ed9d04d58560bb444ca42d1f33b74f8ab646",
+   "size": 257,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-telegram-ux/__init__.py": {
+   "sha": "eeb4aebed4d2fd088df2a2e7a47d9b1317a1e663e46bf051714a0cb9b86fef1b",
+   "size": 5204,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-telegram-ux/plugin.yaml": {
+   "sha": "bd43492eb5707c3930e4506c6dde74465066b0a4903bcee771019c832ac7a5e4",
+   "size": 138,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-telegram-ux/__pycache__/__init__.cpython-311.pyc": {
+   "sha": "f465dbb1661d91c53b14ddc78c68b3fc8114ddce132288c402e981ea15db17a5",
+   "size": 6656,
+   "mtime": 1782074493,
+   "machine": "H1"
+  },
+  "evey-sandbox/__init__.py": {
+   "sha": "e80f02515ee79053e1b49ec5c43689ff5e16a1284efd898e4bc650f4d2295f12",
+   "size": 10434,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-sandbox/plugin.yaml": {
+   "sha": "a32f3b9f7c41e4d5142f6c7a4db7cd5c5e75f563ed8fecd3f24a57f072d7aeac",
+   "size": 129,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-telemetry/__init__.py": {
+   "sha": "e9e4555b9ad0c8939730ea6bfc62b2ae2ec58182305528bf18b4dfa238342ff3",
+   "size": 8263,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-telemetry/plugin.yaml": {
+   "sha": "4cca7582807aa04669ae0f3d42fa4b8fcbd83e204004ec2e9fcc7dfca8a76db1",
+   "size": 226,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-github/__init__.py": {
+   "sha": "31f09d84aeba289d85e01c6a3725c0dbe40c9be54b36c9b5a65f51e3bcd157e7",
+   "size": 4358,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-github/plugin.yaml": {
+   "sha": "f743cae048ae58268e80af3dd69cfdd1625982c6edcc7351e1b36ac6283e3ddd",
+   "size": 132,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-identity/__init__.py": {
+   "sha": "3c29190d205d55a44ea01202469f3eaa10379083da31cd91a803eef07dc7256f",
+   "size": 4144,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-identity/plugin.yaml": {
+   "sha": "dd29732f0c7b737e572cdbd974299715c932dcbe45f79d44c2e9f1ec316d02b1",
+   "size": 174,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-goals/__init__.py": {
+   "sha": "a865da947edc05f4aa053fde67564422eb22d866ec1397347d3c91bd57b1c495",
+   "size": 5576,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-goals/plugin.yaml": {
+   "sha": "e232f17df5a40f92f4b84d39c338828ec7716c0742cc5d51478e574dc6554003",
+   "size": 145,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-goals/__pycache__/__init__.cpython-311.pyc": {
+   "sha": "3f81efe55ab9fcb274ca212d566358c86211ae5a0d296400275b6880fa735af9",
+   "size": 7301,
+   "mtime": 1782460836,
+   "machine": "H1"
+  },
+  "evey-validate/__init__.py": {
+   "sha": "44389405072d6a1a70346caed494234a9cb155917e854ca1f03d6c555d163d9c",
+   "size": 4698,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-validate/plugin.yaml": {
+   "sha": "5f8fcb814c4ee55ddb25393bc49800f710f257d0f28cab4f0637ba42797c12c3",
+   "size": 168,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-validate/__pycache__/__init__.cpython-311.pyc": {
+   "sha": "f465d4f0bfe4e8157f02c1dfdaed7cbeef1406a6d79c88b48d0b43ac667da737",
+   "size": 5659,
+   "mtime": 1782460836,
+   "machine": "H1"
+  },
+  "cumulus-quality/__init__.py": {
+   "sha": "23d9666c2c5bf71e27cc32c9c95981d2b55ab12db6c475df2f450920b09249f1",
+   "size": 2946,
+   "mtime": 1780693204,
+   "machine": "H1"
+  },
+  "cumulus-quality/plugin.yaml": {
+   "sha": "2e947dbaa8959e9e875946543ea6be22add90debff8bff5ef4cc9ae8a8473d7b",
+   "size": 99,
+   "mtime": 1780693204,
+   "machine": "H1"
+  },
+  "cumulus-quality/__pycache__/__init__.cpython-311.pyc": {
+   "sha": "b2bc351f4c713efbb2ac4f4987cb5da5be6b7e22451b6d7d8053df445dae8c4d",
+   "size": 4995,
+   "mtime": 1781977270,
+   "machine": "H1"
+  },
+  "evey-commands/__init__.py": {
+   "sha": "dc3eb4ae34330d6596cb644c8ad35c066addd9b7e5b45f1a4d9d227c7d528e2b",
+   "size": 4854,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-cache/__init__.py": {
+   "sha": "40ac5f0b0a3955e5c7c8e7bece8ce182299c68acda6a6cdfe5eb808eb988360b",
+   "size": 7192,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-cache/plugin.yaml": {
+   "sha": "1e4dbaa2698b075698f612bf87a68609da31531e2a42ac170de99d69d6fea5a3",
+   "size": 159,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-digest/__init__.py": {
+   "sha": "e5be476c42271f2c6a72395187820247efaa4ca35d63e24f36d276d4393685df",
+   "size": 6841,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-digest/plugin.yaml": {
+   "sha": "bc3891a3e6c147966a72e071c0af8e6a5be8c26084c6e31c9c72cbe7784f11aa",
+   "size": 171,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-digest/__pycache__/__init__.cpython-311.pyc": {
+   "sha": "8a5d2d9dde10831ad4584ee971506463fcf6b3b4c81b493bbc1f640b5c95d466",
+   "size": 11147,
+   "mtime": 1782460836,
+   "machine": "H1"
+  },
+  "cumulus-build/__init__.py": {
+   "sha": "845b2142d1dfa228acba8dd072bdd066bd9b66263f293fd637e05e258ff0a128",
+   "size": 3631,
+   "mtime": 1780692885,
+   "machine": "H1"
+  },
+  "cumulus-build/plugin.yaml": {
+   "sha": "dad55a449c01ce2ac781add881e5abd3c453a4b27c6514348071dd2ded5824b7",
+   "size": 98,
+   "mtime": 1780692885,
+   "machine": "H1"
+  },
+  "cumulus-build/__pycache__/__init__.cpython-311.pyc": {
+   "sha": "fdfe80e683264d07ddc95dff31f2eeb55332f81a9dfe675ff677c5b0b53ff7b1",
+   "size": 5816,
+   "mtime": 1781977270,
+   "machine": "H1"
+  },
+  "__pycache__/evey_utils.cpython-311.pyc": {
+   "sha": "669f78293e7dadca14b4d011b755c332728489fc2107e8ab586cb2f8a53dee27",
+   "size": 7394,
+   "mtime": 1782074493,
+   "machine": "H1"
+  },
+  "evey-session-guard/__init__.py": {
+   "sha": "04debcc95029a0b052373bc20c0bf64ca7c2127efdee5d045de86963931421ad",
+   "size": 4340,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-session-guard/plugin.yaml": {
+   "sha": "62c12070192c94858eb3cc4c5d30e6cba23d679c9fd459bffbbb98b9791acd6f",
+   "size": 150,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-session-guard/__pycache__/__init__.cpython-311.pyc": {
+   "sha": "e3361e5468fd1251d9a25ecfe93af085557bcb9f2b66132c6e5c09d787b57205",
+   "size": 6714,
+   "mtime": 1782074493,
+   "machine": "H1"
+  },
+  "evey-watchdog/__init__.py": {
+   "sha": "4a4c968fa2ecbee42f15dae370148752d5e87124017a758fa07e046d50bd88eb",
+   "size": 5684,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-watchdog/plugin.yaml": {
+   "sha": "d38e63a0c9328a5a3f9700d25322ce6b783e6c2caea7146964a546a2d27d0328",
+   "size": 222,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-watchdog/__pycache__/__init__.cpython-311.pyc": {
+   "sha": "3dd9fd820eeb7624b00803fd969c3b25289175c06674b773e51f605bbdb3000c",
+   "size": 8369,
+   "mtime": 1782074493,
+   "machine": "H1"
+  },
+  "evey-proactive/__init__.py": {
+   "sha": "8f403eacad6939bc29f23c4e4c6d00ba4f920654df5e6721b920020631319884",
+   "size": 6048,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-proactive/plugin.yaml": {
+   "sha": "bb5687bd0edecd300bb13abaf5b473d38ccd564d304aac0e66c853d4933d7be1",
+   "size": 241,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-memory-adaptive/__init__.py": {
+   "sha": "da289d9c2ebc42db312d6af08bad415f2193583545a7342b56bb9fdf49234036",
+   "size": 6144,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-memory-adaptive/plugin.yaml": {
+   "sha": "ea6f333b667bf5f00b00ba09dadaa087c1126fe96f97a91c6dbe593a55733ea6",
+   "size": 155,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-memory-adaptive/__pycache__/__init__.cpython-311.pyc": {
+   "sha": "a6ff2145797b7ea863593425daf0974488b8e92e1ba258e499ea27d5b3515d94",
+   "size": 8378,
+   "mtime": 1782074493,
+   "machine": "H1"
+  },
+  "patent-checker/__init__.py": {
+   "sha": "d5ad3e650fe78212f9cf3b1989d28d39aaf5cdd4d661e6f6bfeb97fe0c30efd4",
+   "size": 3923,
+   "mtime": 1780692865,
+   "machine": "H1"
+  },
+  "patent-checker/plugin.yaml": {
+   "sha": "53919f7be9abe1100a3813fa00f63988163807961b771d013f37ef9690bd0da9",
+   "size": 99,
+   "mtime": 1780692865,
+   "machine": "H1"
+  },
+  "patent-checker/__pycache__/__init__.cpython-311.pyc": {
+   "sha": "44b3101ad09d8a9b96b67a97ef4fb20a735662c331c748bb013a0003e51e2462",
+   "size": 6370,
+   "mtime": 1781977270,
+   "machine": "H1"
+  },
+  "evey-cost-guard/__init__.py": {
+   "sha": "7d69c5b1096cb49908e0fd02cbe9d9c7c9117455bc9956453df73b7f8beee9d7",
+   "size": 14399,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-cost-guard/plugin.yaml": {
+   "sha": "e530ee8225b4a00e93c3c9953ace5a8835ac992733dee5249ab3cc69327653ed",
+   "size": 227,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-cost-guard/__pycache__/__init__.cpython-311.pyc": {
+   "sha": "87df26940faec286b72855e93508a9cef27fb340713c5edc67d0a1f8dd7fc909",
+   "size": 19267,
+   "mtime": 1782074493,
+   "machine": "H1"
+  },
+  "evey-reflect/__init__.py": {
+   "sha": "cb4106b3202e02138bcdf6d47ffcbac069a8de91821fa29b3368e55d3ab7dcdb",
+   "size": 3300,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-reflect/plugin.yaml": {
+   "sha": "f365d1e80a4106d7d969b57e439e2eef192bd5e9e328fcaee3b303d04e6b9de4",
+   "size": 157,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-reflect/__pycache__/__init__.cpython-311.pyc": {
+   "sha": "7fe7d6ad9589254a43dfd15cde84c2e8bc26c71a88ef170e8dd80088d67254ae",
+   "size": 4424,
+   "mtime": 1782074493,
+   "machine": "H1"
+  },
+  "evey-memory-consolidate/__init__.py": {
+   "sha": "c9c53966071a154dedf8531adaf0ffe143db3b25f522c7a03a14869a5826d046",
+   "size": 8096,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-memory-consolidate/plugin.yaml": {
+   "sha": "d956c69ac163485e9abe886963e15a2d8e1841623646feaec6e8924dd6b23546",
+   "size": 198,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-email-guard/__init__.py": {
+   "sha": "856419d1fa352376b3cbf659701f8c1e33c9fd51b121fc4d3857e7a3e790508b",
+   "size": 7284,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-email-guard/plugin.yaml": {
+   "sha": "4a78fdf22c2b316c0b1c08aa5e58893e3a3fbd60b7e3d704b6c36366f867cfad",
+   "size": 156,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-bridge/__init__.py": {
+   "sha": "5b214b35cb91d28a022b318f810465a57a1702ea51bafcc9a96cb889744cbb48",
+   "size": 7891,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-bridge/plugin.yaml": {
+   "sha": "642da58c8386f500223bd01464171f99ff4aaee55117e8a41c45b38199a4fc83",
+   "size": 211,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "hermes-achievements/scan_snapshot.json": {
+   "sha": "f17e9b3021f67f852f970448a9d69167e98111288fb187b147204fc7bc364ea2",
+   "size": 164375,
+   "mtime": 1778744487,
+   "machine": "H1"
+  },
+  "hermes-achievements/state.json": {
+   "sha": "a040b4e69f9029f97cdb61fc50b59cf9a18a053cf9b738c72d11aff0f05290db",
+   "size": 2017,
+   "mtime": 1778744487,
+   "machine": "H1"
+  },
+  "hermes-achievements/scan_checkpoint.json": {
+   "sha": "00e0fc4ba57d9b3913ff76789f0429b1e9ae24663a069b4ba94290c49fdc3597",
+   "size": 118568,
+   "mtime": 1778744487,
+   "machine": "H1"
+  },
+  "evey-verification/__init__.py": {
+   "sha": "2efb2ed57ebfce415e5644969dfe01644b41fbda6a78b8b44a711527af64a347",
+   "size": 6005,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-verification/plugin.yaml": {
+   "sha": "00485a062049a18cfd9e92457a60a1de58e928cdb61aa641a2538f4651cf02ec",
+   "size": 124,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "lancedb/pyproject.toml": {
+   "sha": "07533e777289714cf9d32754ea6c219bf5d61ca4c2c0254b426bedf2b00bb948",
+   "size": 836,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/.env.example": {
+   "sha": "d0bd339c52349e1c6ba7804f4984c35a711a3441e93ad21d64a08d79e08206a9",
+   "size": 87,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/CHANGELOG.md": {
+   "sha": "a55a67456ddc544b1adeb1da029e28cd25b82bd81e7b95a1ade50255dbb3a4c6",
+   "size": 883,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/LICENSE": {
+   "sha": "064719eab3f32b9922f8402d0e4b72e0b169fde65d9bc48a414a3c043195efba",
+   "size": 11337,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/after-install.md": {
+   "sha": "3c38b9f118e2d25975287984eecedb8a06ef0f64aba016717338b81f8714fd44",
+   "size": 2087,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/README.md": {
+   "sha": "469ef95e77e62582b9b9928621d954c3dbdfb7963f38ca08da1796ff50afac7a",
+   "size": 20786,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/__init__.py": {
+   "sha": "bee33c3aed00e626b10605c3fc6d9dbbd088e81abb237b65b38abfa269f26eed",
+   "size": 1349,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/uv.lock": {
+   "sha": "a60b230aaf669aa3a65e9590eafde26b5294f4d5d1c33b17b31e975ff0d9e7af",
+   "size": 169509,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/CONTRIBUTING.md": {
+   "sha": "c7349beb31366a095e01a4aab4087b3bdfc4e2ac22ace4d7c10118f4d2fef60d",
+   "size": 1868,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/.pre-commit-config.yaml": {
+   "sha": "d8f6eb542c73136e5e619156a0664085360f5d4e060af361e0d3dbf695356809",
+   "size": 211,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/plugin.yaml": {
+   "sha": "a0f66b5205f068937aad261c8b57140eab76dbb87aeb06add62daca1b1bb6906",
+   "size": 242,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/.gitignore": {
+   "sha": "03a55d3a3d020e7e904b4076549e7740caa58da89eb76510703fc0e692ac43fb",
+   "size": 4867,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/.pytest_cache/CACHEDIR.TAG": {
+   "sha": "37dc88ef9a0abeddbe81053a6dd8fdfb13afb613045ea1eb4a5c815a74a3bde4",
+   "size": 191,
+   "mtime": 1786457263,
+   "machine": "H1"
+  },
+  "lancedb/.pytest_cache/README.md": {
+   "sha": "73fd6fccdd802c419a6b2d983d6c3173b7da97558ac4b589edec2dfe443db9ad",
+   "size": 302,
+   "mtime": 1786457263,
+   "machine": "H1"
+  },
+  "lancedb/.pytest_cache/.gitignore": {
+   "sha": "3ed731b65d06150c138e2dadb0be0697550888a6b47eb8c45ecc9adba8b8e9bd",
+   "size": 37,
+   "mtime": 1786457263,
+   "machine": "H1"
+  },
+  "lancedb/.pytest_cache/v/cache/nodeids": {
+   "sha": "31da6ae31661efade5558cbac8cd9366df03fbf717cd4176f5f57b5709a66bea",
+   "size": 3974,
+   "mtime": 1786457263,
+   "machine": "H1"
+  },
+  "lancedb/.pytest_cache/v/cache/lastfailed": {
+   "sha": "c1f887fa3e38d854fb68cd2dc74562a2021a6f2b1c229406ac61e0d1cd521563",
+   "size": 94,
+   "mtime": 1786457263,
+   "machine": "H1"
+  },
+  "lancedb/src/tools.py": {
+   "sha": "26abb651faec9a904b8b9fcef998363a9aa2d4ac443861cd6fb8d5e558a8828c",
+   "size": 8044,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/src/config.py": {
+   "sha": "689369a70da2d5e6d2cdced06d1404ff4de69899290ba89646cb52c86fe0111f",
+   "size": 3359,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/src/__init__.py": {
+   "sha": "eccb536011534a99986789da776d70ad2c713bd3f42746e3aef179759ee69863",
+   "size": 460,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/src/provider.py": {
+   "sha": "e3956a8ba53c230600af2933814c08e0b35e540749cd4e7ac3c5e3f8e4366b20",
+   "size": 17638,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/src/default_config.yaml": {
+   "sha": "d6fb1543765bee55c8bc75ab7bb2df8fc6f15ee431aa2208463d6f18c5f7936f",
+   "size": 3579,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/src/retrieval.py": {
+   "sha": "4672ca6860b324354a60a88f7a6cd1ac826955521db3803b273ee0418da8f9b3",
+   "size": 6442,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/src/embeddings.py": {
+   "sha": "2e5fa46d1dea18c2bca4d5f562bba2822b16fb44730b0116e5c60f50e24fb9ed",
+   "size": 7564,
+   "mtime": 1786457941,
+   "machine": "H1"
+  },
+  "lancedb/src/store.py": {
+   "sha": "c017d230ae814cd450382a258f3d6d1152fa6d295e8ddab30db768fbbe757a9a",
+   "size": 14282,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/src/extraction.py": {
+   "sha": "3608632121f4ebc5e71930584db476674c87c5d360ac53b16393bd04a5ec7c3e",
+   "size": 3335,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/src/__pycache__/store.cpython-312.pyc": {
+   "sha": "bcf01db3aaebe52d3cd6c22bdf35a924d87445b2da43669ee2c819969f26b24b",
+   "size": 22525,
+   "mtime": 1786457254,
+   "machine": "H1"
+  },
+  "lancedb/src/__pycache__/__init__.cpython-311.pyc": {
+   "sha": "9f431c67dde4ea272d849a6cb1538c8a8664f55cf0b626131124c1363d0751d2",
+   "size": 681,
+   "mtime": 1786352770,
+   "machine": "H1"
+  },
+  "lancedb/src/__pycache__/config.cpython-312.pyc": {
+   "sha": "30f691eecdfa7bf1fb54e3f795fa5bb4c2da2ae412aa5e05d33fde8e52fa57dd",
+   "size": 5088,
+   "mtime": 1786457263,
+   "machine": "H1"
+  },
+  "lancedb/src/__pycache__/extraction.cpython-312.pyc": {
+   "sha": "ce9f0177279e13aa7e65b4558c447ec8ecc3220a6510dcae2afb7223d1e58ad8",
+   "size": 4632,
+   "mtime": 1787909372,
+   "machine": "H1"
+  },
+  "lancedb/src/__pycache__/config.cpython-311.pyc": {
+   "sha": "52effff047141838033c1fb0af280efd51a147c55a8a3925004e70b8db81b141",
+   "size": 5901,
+   "mtime": 1786352770,
+   "machine": "H1"
+  },
+  "lancedb/src/__pycache__/provider.cpython-312.pyc": {
+   "sha": "44404747978b93638b278e25b21d29e01088d6cde5a811161ded5852c3fbd224",
+   "size": 24620,
+   "mtime": 1786457263,
+   "machine": "H1"
+  },
+  "lancedb/src/__pycache__/retrieval.cpython-312.pyc": {
+   "sha": "e718fae4f85540e408f42c7e28aebd6bb5d7681d2593216410c3df991dd43f4a",
+   "size": 6919,
+   "mtime": 1787909372,
+   "machine": "H1"
+  },
+  "lancedb/src/__pycache__/store.cpython-311.pyc": {
+   "sha": "b02cd0a5d311146a0de54c251056f9373368e3051f54024125d80d76c38fb7d0",
+   "size": 25810,
+   "mtime": 1786352770,
+   "machine": "H1"
+  },
+  "lancedb/src/__pycache__/__init__.cpython-312.pyc": {
+   "sha": "58db223b941eca17c72b52787c680fffb1269aaa455b61c74004cd3606655c00",
+   "size": 640,
+   "mtime": 1786457263,
+   "machine": "H1"
+  },
+  "lancedb/src/__pycache__/tools.cpython-312.pyc": {
+   "sha": "7a81805878e817fdf27dc4d34c9a075c0c0f168b736f28d96def212e343281a8",
+   "size": 10466,
+   "mtime": 1787909372,
+   "machine": "H1"
+  },
+  "lancedb/src/__pycache__/provider.cpython-311.pyc": {
+   "sha": "46bcee17d1d6adfb4355c02da4768a559a82ddfd50d595325f6a71b8817bc555",
+   "size": 27135,
+   "mtime": 1786352770,
+   "machine": "H1"
+  },
+  "lancedb/src/__pycache__/embeddings.cpython-312.pyc": {
+   "sha": "a45f1c16de4f7916d815ca79885df218778225ef579e51f1b35c89e566756e59",
+   "size": 8987,
+   "mtime": 1787909372,
+   "machine": "H1"
+  },
+  "lancedb/src/__pycache__/embeddings.cpython-311.pyc": {
+   "sha": "14ac7b0e18fa6e7d315df039246172225b21803ba2722bcc5a5f7a8e37573ded",
+   "size": 9979,
+   "mtime": 1786457980,
+   "machine": "H1"
+  },
+  "lancedb/src/__pycache__/tools.cpython-311.pyc": {
+   "sha": "081191b379d3bda8533bf6148f84284ea88a713002d282dbd921a490ccdd713a",
+   "size": 12306,
+   "mtime": 1786352770,
+   "machine": "H1"
+  },
+  "lancedb/src/__pycache__/retrieval.cpython-311.pyc": {
+   "sha": "179db2ac44bbf31124f7b2b678fb4a372e64781fbd307a0765f34da3ba9c9b5a",
+   "size": 8102,
+   "mtime": 1786352770,
+   "machine": "H1"
+  },
+  "lancedb/src/__pycache__/extraction.cpython-311.pyc": {
+   "sha": "dc64bb596f3f403a504a0e67060be21a3da99e515bbdde73a442c9567601991b",
+   "size": 5638,
+   "mtime": 1786352770,
+   "machine": "H1"
+  },
+  "lancedb/.git/shallow": {
+   "sha": "de9a2d5fd1cafd62483b4f079fc260def5798fc2bc94b27b0b9d377682faf0e0",
+   "size": 41,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/.git/packed-refs": {
+   "sha": "c7fe97ecbce378b63113348b99f0a6cd1dc2667f0a7b2c6fdad1f6dfdfa293cf",
+   "size": 112,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/.git/HEAD": {
+   "sha": "28d25bf82af4c0e2b72f50959b2beb859e3e60b9630a5e8c603dad4ddb2b6e80",
+   "size": 21,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/.git/index": {
+   "sha": "4162d6c98d2a7b9eef5f5bef7ec4233995890543b72949f764a69f6c92bf73e0",
+   "size": 3324,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/.git/config": {
+   "sha": "906defd2d7f6cbb4f8a2d86567bab368314804371ab2280daf632045398d7966",
+   "size": 277,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/.git/description": {
+   "sha": "85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee",
+   "size": 73,
+   "mtime": 1786352762,
+   "machine": "H1"
+  },
+  "lancedb/.git/logs/HEAD": {
+   "sha": "f457701ba26add13b3ca74b61566aa99ad046f7d69263d0ada34e417d85f3a7b",
+   "size": 217,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/.git/logs/refs/heads/main": {
+   "sha": "f457701ba26add13b3ca74b61566aa99ad046f7d69263d0ada34e417d85f3a7b",
+   "size": 217,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/.git/logs/refs/remotes/origin/HEAD": {
+   "sha": "f457701ba26add13b3ca74b61566aa99ad046f7d69263d0ada34e417d85f3a7b",
+   "size": 217,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/.git/hooks/pre-rebase.sample": {
+   "sha": "4febce867790052338076f4e66cc47efb14879d18097d1d61c8261859eaaa7b3",
+   "size": 4898,
+   "mtime": 1786352762,
+   "machine": "H1"
+  },
+  "lancedb/.git/hooks/update.sample": {
+   "sha": "8d5f2fa83e103cf08b57eaa67521df9194f45cbdbcb37da52ad586097a14d106",
+   "size": 3650,
+   "mtime": 1786352762,
+   "machine": "H1"
+  },
+  "lancedb/.git/hooks/pre-receive.sample": {
+   "sha": "a4c3d2b9c7bb3fd8d1441c31bd4ee71a595d66b44fcf49ddb310252320169989",
+   "size": 544,
+   "mtime": 1786352762,
+   "machine": "H1"
+  },
+  "lancedb/.git/hooks/commit-msg.sample": {
+   "sha": "1f74d5e9292979b573ebd59741d46cb93ff391acdd083d340b94370753d92437",
+   "size": 896,
+   "mtime": 1786352762,
+   "machine": "H1"
+  },
+  "lancedb/.git/hooks/pre-commit.sample": {
+   "sha": "f9af7d95eb1231ecf2eba9770fedfa8d4797a12b02d7240e98d568201251244a",
+   "size": 1643,
+   "mtime": 1786352762,
+   "machine": "H1"
+  },
+  "lancedb/.git/hooks/prepare-commit-msg.sample": {
+   "sha": "e9ddcaa4189fddd25ed97fc8c789eca7b6ca16390b2392ae3276f0c8e1aa4619",
+   "size": 1492,
+   "mtime": 1786352762,
+   "machine": "H1"
+  },
+  "lancedb/.git/hooks/post-update.sample": {
+   "sha": "81765af2daef323061dcbc5e61fc16481cb74b3bac9ad8a174b186523586f6c5",
+   "size": 189,
+   "mtime": 1786352762,
+   "machine": "H1"
+  },
+  "lancedb/.git/hooks/applypatch-msg.sample": {
+   "sha": "0223497a0b8b033aa58a3a521b8629869386cf7ab0e2f101963d328aa62193f7",
+   "size": 478,
+   "mtime": 1786352762,
+   "machine": "H1"
+  },
+  "lancedb/.git/hooks/fsmonitor-watchman.sample": {
+   "sha": "e0549964e93897b519bd8e333c037e51fff0f88ba13e086a331592bf801fa1d0",
+   "size": 4726,
+   "mtime": 1786352762,
+   "machine": "H1"
+  },
+  "lancedb/.git/hooks/sendemail-validate.sample": {
+   "sha": "44ebfc923dc5466bc009602f0ecf067b9c65459abfe8868ddc49b78e6ced7a92",
+   "size": 2308,
+   "mtime": 1786352762,
+   "machine": "H1"
+  },
+  "lancedb/.git/hooks/push-to-checkout.sample": {
+   "sha": "a53d0741798b287c6dd7afa64aee473f305e65d3f49463bb9d7408ec3b12bf5f",
+   "size": 2783,
+   "mtime": 1786352762,
+   "machine": "H1"
+  },
+  "lancedb/.git/hooks/pre-applypatch.sample": {
+   "sha": "e15c5b469ea3e0a695bea6f2c82bcf8e62821074939ddd85b77e0007ff165475",
+   "size": 424,
+   "mtime": 1786352762,
+   "machine": "H1"
+  },
+  "lancedb/.git/hooks/pre-merge-commit.sample": {
+   "sha": "d3825a70337940ebbd0a5c072984e13245920cdf8898bd225c8d27a6dfc9cb53",
+   "size": 416,
+   "mtime": 1786352762,
+   "machine": "H1"
+  },
+  "lancedb/.git/hooks/pre-push.sample": {
+   "sha": "ecce9c7e04d3f5dd9d8ada81753dd1d549a9634b26770042b58dda00217d086a",
+   "size": 1374,
+   "mtime": 1786352762,
+   "machine": "H1"
+  },
+  "lancedb/.git/info/exclude": {
+   "sha": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+   "size": 240,
+   "mtime": 1786352762,
+   "machine": "H1"
+  },
+  "lancedb/.git/objects/pack/pack-b71c2ec8f2036ce2a5e322381c59a463ea3e252a.rev": {
+   "sha": "fb0b641b5035ff749037f398902c91d33c3e7e0ee571d1f2e2fdfe79c0b055e0",
+   "size": 228,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/.git/objects/pack/pack-b71c2ec8f2036ce2a5e322381c59a463ea3e252a.idx": {
+   "sha": "9807ea60a9dd78e1e151f2c57092044247463da1daf5666cf550f3f3d922e658",
+   "size": 2304,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/.git/objects/pack/pack-b71c2ec8f2036ce2a5e322381c59a463ea3e252a.pack": {
+   "sha": "b853642be74e438438a46ef730d83a48d5b1502daf6fa1b9dd0a93659b7d8d6f",
+   "size": 132643,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/.git/refs/heads/main": {
+   "sha": "de9a2d5fd1cafd62483b4f079fc260def5798fc2bc94b27b0b9d377682faf0e0",
+   "size": 41,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/.git/refs/remotes/origin/HEAD": {
+   "sha": "2bb6a24aa0fc6c484100f5d51a29bbad841cd2c755f5d93faa204e5dbb4eb2b4",
+   "size": 30,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/.github/PULL_REQUEST_TEMPLATE.md": {
+   "sha": "c7f9d24262af0908f6219ce8925f7373c309b5df6a7ba194253f3b499eb2b7c8",
+   "size": 515,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/.github/workflows/ci.yml": {
+   "sha": "92004e58b04469d36fb9f2bfb68d745be2d8caf20c4f0d449c43c5c3dfe5529e",
+   "size": 1880,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/.github/ISSUE_TEMPLATE/bug_report.md": {
+   "sha": "729f900cf6920a9e9fea99493a1435b57777899fb10bc58592d4c6ed686b6be5",
+   "size": 494,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/.github/ISSUE_TEMPLATE/feature_request.md": {
+   "sha": "a21a6dbe9522bf8ec0849f44d6a22867f9071df71ab8ae505544119611576888",
+   "size": 244,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/__pycache__/__init__.cpython-311.pyc": {
+   "sha": "80011928ed4f823668ca14e4a2df4c8cfb252419ea6b16b7d49f373a878088ca",
+   "size": 1680,
+   "mtime": 1786352770,
+   "machine": "H1"
+  },
+  "lancedb/__pycache__/__init__.cpython-312.pyc": {
+   "sha": "5409255a024b12add610687af3f28c5b6325f1335e68b79bdf279c297eee803f",
+   "size": 1555,
+   "mtime": 1786457263,
+   "machine": "H1"
+  },
+  "lancedb/tests/test_longmemeval_benchmark.py": {
+   "sha": "f76c5b7fdb0a5644b3d5423fd544eb92751c6e4f93be499269b571ad474fc917",
+   "size": 23771,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/tests/test_longmemeval_inspect_results.py": {
+   "sha": "7aaeabc2bb99dd194abd99e63a7f3fd96e5843f408477c46aa6307c1185837ef",
+   "size": 3201,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/tests/test_config_defaults.py": {
+   "sha": "42988919414789606591004ddb479a210b00d2b6597cd4568de6527b2da9b771",
+   "size": 1281,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/tests/test_memory_loop.py": {
+   "sha": "20e1a5ac2fc5b13861d388613f4099d8a0f78c0198237e2260b5a6695f4ce2a1",
+   "size": 7143,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/tests/test_embeddings.py": {
+   "sha": "c33b3256313bbd306adc0a377c4d31aa3903a72dd8abc4519c21ffb403bdd977",
+   "size": 4854,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/tests/__pycache__/test_memory_loop.cpython-312-pytest-9.1.1.pyc": {
+   "sha": "11996c0d1b3e06af321ae7e43dd9b9b13e21a3b9f2bd4b23ed4bdceac7a87b7f",
+   "size": 17768,
+   "mtime": 1786457263,
+   "machine": "H1"
+  },
+  "lancedb/tests/__pycache__/test_longmemeval_benchmark.cpython-312-pytest-9.1.1.pyc": {
+   "sha": "7567fd9696e59cba6fccb31dca046288006b76a234244507391d596514731a26",
+   "size": 75258,
+   "mtime": 1786457263,
+   "machine": "H1"
+  },
+  "lancedb/tests/__pycache__/test_longmemeval_inspect_results.cpython-312-pytest-9.1.1.pyc": {
+   "sha": "cf63d2fa342174904aa7ce14b5afaebdcd70127577faf363b5a2be31b93a02d6",
+   "size": 9564,
+   "mtime": 1786457263,
+   "machine": "H1"
+  },
+  "lancedb/tests/__pycache__/test_config_defaults.cpython-312-pytest-9.1.1.pyc": {
+   "sha": "0ddcfc14b0f7377934caf58d98f741a2354ffa360aa556339039aad8784eea35",
+   "size": 5801,
+   "mtime": 1786457263,
+   "machine": "H1"
+  },
+  "lancedb/tests/__pycache__/test_embeddings.cpython-312-pytest-9.1.1.pyc": {
+   "sha": "c3a2f5acf23ff74bbfdcf3189dce217ab09b9a759c6727fac4d330f4f3dd2f69",
+   "size": 28111,
+   "mtime": 1786457263,
+   "machine": "H1"
+  },
+  "lancedb/benchmarks/README.md": {
+   "sha": "4b8713474c9f8bae54d234a62d0c631a13f136dadd660ee314d5eff0f9ea26e1",
+   "size": 12804,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/benchmarks/__init__.py": {
+   "sha": "e0baeabb1b488748e76959e55cd08b4cd29552cb1d75fc503f851a59538dc819",
+   "size": 51,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/benchmarks/longmemeval/run.py": {
+   "sha": "913570ff2828bb839b7160fe1f14ba1ecede7338a94494486bf13972412787f7",
+   "size": 65659,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/benchmarks/longmemeval/__init__.py": {
+   "sha": "ace88294350e0a989daf8d5c509d54fa55d9f7ec640b07f3301af9b435504e54",
+   "size": 37,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/benchmarks/longmemeval/inspect_results.py": {
+   "sha": "a7742a6f19e06ad73b161d37e27fd6424a16005c73c32c93bbd6c18aeaf3e323",
+   "size": 9775,
+   "mtime": 1786352763,
+   "machine": "H1"
+  },
+  "lancedb/benchmarks/longmemeval/__pycache__/inspect_results.cpython-312.pyc": {
+   "sha": "b7769594fbc1247c93c77fc12629b8b58e9add8c74eecd4bcf18a75b9d1fac91",
+   "size": 15530,
+   "mtime": 1786457263,
+   "machine": "H1"
+  },
+  "lancedb/benchmarks/longmemeval/__pycache__/run.cpython-312.pyc": {
+   "sha": "0c367f8710ee6d9cba296c19c98b4630b4f50ed9c3d53f7f1e7c4f81ac807d39",
+   "size": 78356,
+   "mtime": 1786457263,
+   "machine": "H1"
+  },
+  "evey-habits/__init__.py": {
+   "sha": "a73f0a50d12fa3f99a6c7a70aa03fa34ea058208d6bd40599b36a7e3eb20f22e",
+   "size": 6885,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-habits/plugin.yaml": {
+   "sha": "d40895b7065c6d46012a88872ba1f30a1da7d64f0496a58a3a1ba5cf66781ce9",
+   "size": 191,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-mqtt/__init__.py": {
+   "sha": "a43b2422ecfcfb788567b9a4923a8e494cf4cf5c8b1b99ec8ad3849d512eeba2",
+   "size": 6073,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-mqtt/plugin.yaml": {
+   "sha": "6248bb2242114a6a053f8132f6c0ed92a4ff82b3de4d53fd3d646791790ae3e0",
+   "size": 256,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-learner/__init__.py": {
+   "sha": "d053a4958f681365a961323f63e318b3b88b53bdb4f9bd55234eb826f724100a",
+   "size": 10751,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-learner/plugin.yaml": {
+   "sha": "45df7703abd8c4db17623581694e4355dcf42af3106551f4fdd2621faf14f68d",
+   "size": 190,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-autonomy/__init__.py": {
+   "sha": "2a378f3f7bf6a89194cc4b5b59d8d8ed074a02127f801b751563357d4d3954da",
+   "size": 22880,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-autonomy/plugin.yaml": {
+   "sha": "f414e133b6f82e787e673404dc024b55fa2f3161e04c8df5c8efec9428794f10",
+   "size": 201,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-council/__init__.py": {
+   "sha": "039c76f4f5a7cd0919e19d0fe2cd40600f38d04b4d30ad8b6ec430ff0f6e0bff",
+   "size": 7332,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-council/plugin.yaml": {
+   "sha": "8b98da5047637c277e0e52f35c5102e57d26530be4c0562de18bdbb7cefd7c42",
+   "size": 152,
+   "mtime": 1780996147,
+   "machine": "H1"
+  },
+  "evey-council/__pycache__/__init__.cpython-311.pyc": {
+   "sha": "b92cb1551ea9cfdb0f4daa00ee7800f8981298189b0c6a0d847bc09d8e90fac4",
+   "size": 10939,
+   "mtime": 1782074493,
+   "machine": "H1"
   }
  }
 }
