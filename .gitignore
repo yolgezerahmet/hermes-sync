@@ -2,13 +2,23 @@
 __pycache__/
 *.pyc
 *.pyo
+*.egg-info/
+dist/
+build/
 
-# Yapılandırma (kişisel)
+# Yapılandırma (kişisel — asla public'e)
 config.json
+config.local.json
 
-# Durum / log
+# Durum / log / manifest (gizli envanter — asla public'e)
 *.log
 sync_motor_manifest.json
+sync_manifest.json
+
+# Kimlik / anahtar (agent_identity üretir)
+identity/
+*.key
+*.pem
 
 # İşletim sistemi
 .DS_Store

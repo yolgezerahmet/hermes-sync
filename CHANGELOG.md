@@ -1,4 +1,64 @@
-# CHANGELOG — Cumulus Sync Motoru / Hermes Sync
+# CHANGELOG — Synclave (eski ad: hermes-sync)
+
+## [1.0.0] — 2026-08-30 (REBRAND: hermes-sync → Synclave)
+
+- Yeni isim: **Synclave** (sync + enclave — sifreli guvenli bolge)
+- PyPI: `pip install synclave` - CLI: `synclave`, `synclave-a2a`, `synclave-worker`
+- Modul: `synclave/` (eski `hermes_sync/`)
+- Icerik: v2.3.1'in birebir aynisi + OceanAPI guvenlik denetim fix'leri
+- Eski paket `hermes-sync` PyPI'da deprecated olarak durur
+
+
+## [2.1.1] — 2026-08-30
+
+### Eklenen — HATA DAYANIKLILIĞI + WINDOWS UYUM
+- `sync_common_knowledge._run_rclone`: timeout 120→180s; idempotent OKUMA
+  komutlarında (cat/lsf/lsjson/lsd) geçici hata (timeout/network/HTTP 5xx)
+  → 1 retry (3s bekle). Yazma (copy/copyto) ASLA retry — fail-closed korunur.
+- `sync_motor.run_cmd`: opsiyonel `retries` parametresi — yalnızca idempotent
+  okuma (cat/lsf/status) + geçici hatada 1 retry; yazma komutlarına retry YOK.
+- Hata logu güçlendirildi: `sync hata: <komut> rc=<rc> <süre>s retry=<n>`
+  (süre ölçümü `time.monotonic`); `_run_rclone` hatada stderr'e tanı öneki.
+- rclone doğrudan çağrılarının timeout'ları 120→180s.
+- Windows uyum: `_motor_lock_path()` — kilit `%TEMP%\cumulus_sync.lock`
+  (Windows) / `/tmp/cumulus_sync.lock` (POSIX); path'ler `os.path.join` ile.
+- A2A server: `uvicorn` yoksa net hata mesajı + exit 1 (ham traceback değil).
+- Testler: `tests/test_retry.py` (12) + `tests/test_windows_uyum.py` (8) —
+  toplam 109 PASS. README'ye Windows Kurulum bölümü eklendi.
+
+## [1.6.0] — 2026-08-13
+
+### Eklenen — AKILLI KURULUM (Kaynak Farkındalıklı Öneri)
+- `probe` komutu: yerel CPU/RAM/disk/GPU kaynaklarını ölçer (nvidia-smi →
+  lspci → vulkaninfo), tools kataloğunu tarar, manifest'e `resources` +
+  `tools_state` yazar → push ile karşı node'a gider
+- `propose` komutu: karşı node'da kurulu araçları KAYNAK KONTROLLÜ öneri
+  listesine çevirir. GPU öncelikli sıralama; NVIDIA GPU'suz makinede CUDA
+  zorunlu araçlar engelliye düşer; disk/RAM/CPU eşikleri denetlenir
+  (DISK_INSUFFICIENT / RAM_INSUFFICIENT / CPU_INSUFFICIENT / GPU_MISSING)
+- `apply --tool <ad> [--yes]` komutu: onay sonrası kurulum. Non-destructive
+  garantileri: zaten kuruluysa RED (üzerine asla yazma), kaynak yetersizse
+  RED, `--yes` yoksa interaktif onay (reddedilirse HİÇBİR ŞEY çalışmaz)
+- Config `tools` kataloğu: check/gpu/min_ram_gb/min_disk_gb/min_cpus/install
+  alanları (cuda-toolkit, vllm, ollama, docker, zephyr-sdk, kicad-cli,
+  arm-none-eabi-gcc, qemu-system-arm, ns3)
+- `push` artık kaynak + araç durumunu manifest'e otomatik ekler (eşitleme
+  sırasında akıllılık; kurulum asla otomatik değildir)
+
+### Düzeltilen
+- GPU tespiti iki katmanlı: genel GPU (lspci/vulkan) ayrı, NVIDIA/CUDA
+  (nvidia-smi) ayrı — virtio/VGA gibi CUDA uyumsuz GPU'lar CUDA araçlarını
+  önerilmez yapar (fail-closed)
+
+## [1.5.0] — 2026-08-12
+
+### Eklenen — Hermes Agent Eşitleri
+- `hermes-sessions` node: bir ajanın oturum bilgisi (PROJECT_STATE + kapanış
+  özeti, `scripts/hermes_session_digest.py`) eşlere paylaşılır — diğer ajan
+  çekip öğrenir
+- `hermes-profile` node: config + cron + plugin manifest (SECRETS hariç)
+- `validate_skills.py`: skill aktarım kapısı — SKILL.md varlığı + frontmatter +
+  references bütünlüğü (kicad skill'inde 4 kırık referans yakaladı)
 
 ## [2.2.0] — 2026-08-30 (Ajan Kimliği + Sohbet Etiketleme)
 
@@ -221,3 +281,12 @@
 ## [1.0.x] — 2026-08-02
 
 - İlk sürüm: GitHub manifest merkezi + GDrive versiyonlu yedek + H1↔H2 sync.
+
+## v2.1.0 (29 Ağu 2026)
+- restic incremental backup engine (CDC dedup, snapshot, restore, retention)
+- A2A mesh: agent-to-agent (JSON-RPC) — sync/async/canlı(SSE) 3 mod
+- Syncthing P2P kanal + akıllı kanal seçici (görev→A2A, dosya→Syncthing, arşiv→GDrive)
+- Inbox worker (allowlist görev işleyici) + ortak görev dağıtımı (claim/failover)
+- Otomatik keşif (state.json) + ortak akıl (HLC) + ortak hafıza
+- FAILOVER: stale task devralma, max_attempts, terminal state koruma
+- Paketleme: pip (hermes_sync + CLI), 56 test, GitHub Actions CI

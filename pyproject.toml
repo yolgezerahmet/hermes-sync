@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "synclave"
+version = "1.0.1"
+description = "Synclave — encrypted multi-node backup, replication, and agent mesh (A2A + Syncthing + restic + shared state). Formerly hermes-sync."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Ahmet Hüdayioğlu", email = "ahmethudayioglu@cumulusnet.io" }]
+keywords = ["synclave", "hermes", "sync", "backup", "a2a", "agent-mesh", "restic", "syncthing", "ed25519", "encryption"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS",
+    "Programming Language :: Python :: 3",
+    "Topic :: System :: Archiving :: Backup",
+    "Topic :: System :: Networking",
+]
+dependencies = ["cryptography>=42"]
+
+[project.optional-dependencies]
+a2a = ["fastapi>=0.100", "uvicorn>=0.20"]
+test = ["pytest>=7"]
+
+[project.scripts]
+synclave = "synclave.cli:main"
+synclave-a2a = "synclave.a2a_cli:main"
+synclave-worker = "synclave.inbox_worker:main"
+
+[tool.setuptools]
+packages = ["synclave"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
