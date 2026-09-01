@@ -127,6 +127,10 @@ _NET_MARKERS = (
     "service unavailable",
     "timeout",
 )
+# rc==-1 (exception) durumunda KALICI hatalar geçici sayılmaz
+# (rclone executable yok, dosya yok, izin reddi — retry anlamsız).
+_FATAL_RC_MINUS1 = ("no such file", "not found", "command not found",
+                    "permission denied", "is a directory")
 
 
 def _rclone_command_text(args: List[str]) -> str:
@@ -143,11 +147,13 @@ def _is_rclone_read(args: List[str]) -> bool:
 
 def _is_transient_rclone_error(rc: int, stderr: str) -> bool:
     """Geçici hata mı? (timeout, network, HTTP 5xx). 'not found' HAYIR."""
-    if rc == -1:          # TimeoutExpired / exception → geçici
-        return True
-    if _HTTP_5XX_RE.search(stderr or ""):
-        return True
     text = (stderr or "").lower()
+    if _is_not_found(rc, text):
+        return False
+    if rc == -1:          # TimeoutExpired / exception
+        return not any(m in text for m in _FATAL_RC_MINUS1)
+    if _HTTP_5XX_RE.search(text):
+        return True
     return any(m in text for m in _NET_MARKERS)
 
 

@@ -622,7 +622,16 @@ def gh_available():
 # run_cmd'de retry YALNIZCA idempotent OKUMA komutlarına uygulanır
 # (cat/lsf/lsjson/lsd/status). Yazma komutlarına (copy/copyto/backup)
 # ASLA retry YOK — çift yazma/kısmi durum fail-closed korunur.
-_RETRY_READ_TOKENS = {"cat", "lsf", "lsjson", "lsd", "status"}
+_RETRY_READ_TOKENS = {"cat", "lsf", "lsjson", "lsd", "status", "ping"}
+# Yazma alt-komutları — dosya adı okuma kelimesine benzese bile (örn.
+# 'rclone copy status <dest>') asla retry açılmaz (çift yazma fail-closed).
+_RETRY_WRITE_TOKENS = {
+    "copy", "copyto", "move", "mv", "backup", "push", "sync",
+    "delete", "purge", "rm", "upload", "put", "send", "restore",
+}
+# rc==-1 (exception) durumunda KALICI hatalar geçici sayılmaz.
+_RETRY_FATAL = ("no such file", "not found", "command not found",
+                "permission denied", "is a directory")
 _RETRY_NET_MARKERS = (
     "connection reset",
     "connection refused",
@@ -638,8 +647,17 @@ _RETRY_TRANSIENT = _RETRY_NET_MARKERS + ("timed out", "temporary", "reset")
 
 
 def _is_idempotent_read(cmd_text: str) -> bool:
-    """Komut metninin ilk 3 token'ında idempotent okuma alt-komutu var mı?"""
+    """Komut metninin ilk 3 token'ında idempotent okuma alt-komutu var mı?
+
+    Güvenlik: alt komut (2. token) bir YAZMA kelimesiyse asla retry açılmaz —
+    'rclone copy status dest' gibi dosya adı okuma kelimesine benzeyen
+    yazma komutları retry kapsamına girmez (OceanAPI denetimi #2/#3).
+    """
     toks = str(cmd_text).split()
+    if not toks:
+        return False
+    if len(toks) >= 2 and toks[1].lower() in _RETRY_WRITE_TOKENS:
+        return False
     for t in toks[:3]:
         if t.lower() in _RETRY_READ_TOKENS:
             return True
@@ -647,9 +665,10 @@ def _is_idempotent_read(cmd_text: str) -> bool:
 
 
 def _is_transient_rc(rc: int, err: str) -> bool:
-    if rc == -1:
-        return True
     e = (err or "").lower()
+    if rc == -1:
+        # exception — dosya/komut yokluğu gibi KALICI hatalar geçici değil
+        return not any(m in e for m in _RETRY_FATAL)
     if re.search(r"\b5\d\d\b", e):
         return True
     return any(m in e for m in _RETRY_TRANSIENT)

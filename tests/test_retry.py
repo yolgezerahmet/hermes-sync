@@ -96,6 +96,17 @@ def test_run_rclone_not_found_no_retry(monkeypatch, no_sleep):
     assert "sync hata:" in err
 
 
+def test_run_rclone_fatal_exception_no_retry(monkeypatch, no_sleep):
+    """OceanAPI #4: rc==-1 kalıcı exception (rclone executable yok) → retry YOK."""
+    calls = []
+    fake = _make_fake_run([(-1, "", "rclone: command not found")], calls)
+    monkeypatch.setattr(ck, "subprocess", types.SimpleNamespace(run=fake))
+    rc, out, err = ck._run_rclone(["cat", "gdrive:hermes-sync/hahmet/shared/state.json"])
+    assert rc != 0
+    assert len(calls) == 1  # kalıcı hata → retry YOK
+    assert "sync hata:" in err
+
+
 def test_run_rclone_default_timeout_180():
     import inspect
     sig = inspect.signature(ck._run_rclone)
@@ -125,6 +136,32 @@ def test_run_cmd_write_never_retries(monkeypatch, no_sleep):
     out, rc = sm.run_cmd("rclone copy /tmp/a gdrive:hermes-sync/hahmet", retries=1)
     assert rc == 1
     assert len(calls) == 1
+
+
+def test_run_cmd_write_with_readlike_token_no_retry(monkeypatch, no_sleep):
+    """OceanAPI #2/#3: dosya adı okuma kelimesine benzese bile yazma retry YOK.
+
+    'rclone copy status <dest>' — 'status' 2. token'da ama alt komut 'copy'
+    (YAZMA) → can_retry=False olmalı.
+    """
+    calls = []
+    fake = _make_fake_run([(1, "", "connection reset")], calls)
+    monkeypatch.setattr(sm, "subprocess", types.SimpleNamespace(run=fake))
+    out, rc = sm.run_cmd("rclone copy status gdrive:hermes-sync/hahmet", retries=1)
+    assert rc == 1
+    assert len(calls) == 1  # yazma → retry YOK
+    assert not sm._is_idempotent_read("rclone copy status gdrive:x")
+    assert not sm._is_idempotent_read("rclone move cat gdrive:x gdrive:y")
+
+
+def test_run_cmd_fatal_exception_no_retry(monkeypatch, no_sleep):
+    """OceanAPI #4: rc==-1 kalıcı exception (dosya yok) → retry YOK."""
+    calls = []
+    fake = _make_fake_run([(-1, "", "No such file or directory")], calls)
+    monkeypatch.setattr(sm, "subprocess", types.SimpleNamespace(run=fake))
+    out, rc = sm.run_cmd("rclone cat gdrive:x/y", retries=1)
+    assert rc == -1
+    assert len(calls) == 1  # kalıcı hata → retry YOK
 
 
 def test_run_cmd_default_no_retry(monkeypatch, no_sleep):
@@ -170,8 +207,13 @@ def test_is_transient_classification():
     assert sm._is_transient_rc(1, "i/o timeout")
     assert not sm._is_transient_rc(1, "directory not found")
     assert not sm._is_transient_rc(2, "file does not exist")
+    # OceanAPI #4: kalıcı exception'lar geçici sayılmaz
+    assert not sm._is_transient_rc(-1, "No such file or directory")
+    assert not sm._is_transient_rc(-1, "rclone: command not found")
+    assert not sm._is_transient_rc(-1, "Permission denied")
     assert ck._is_transient_rclone_error(-1, "")
     assert ck._is_transient_rclone_error(1, "HTTP 500 Internal Server Error")
     assert ck._is_transient_rclone_error(1, "connection refused")
     assert not ck._is_transient_rclone_error(1, "not found")
     assert not ck._is_transient_rclone_error(1, "invalid object name")
+    assert not ck._is_transient_rclone_error(-1, "rclone: command not found")
