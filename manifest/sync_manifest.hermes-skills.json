@@ -1,8 +1,8 @@
 {
  "node": "hermes-skills",
- "ts": "2026-09-01T11:55:33",
- "revision": "0f71ed1340d5",
- "file_count": 15969,
+ "ts": "2026-09-01T12:31:36",
+ "revision": "402321505b92",
+ "file_count": 15971,
  "files": {
   ".curator_state": {
    "sha": "9491dd850719e8012949bd2461651299affaac3b5016b0d55fea454184ca52fa",
@@ -19,7 +19,7 @@
   ".bundled_manifest": {
    "sha": "8e9a538eaef7edb9cf8711d6c0abb50af507c69e68374143a1add2e742e796f2",
    "size": 2727,
-   "mtime": 1788252683,
+   "mtime": 1788254507,
    "machine": "H3"
   },
   "cumulus-pcb-development.md": {
@@ -35,9 +35,9 @@
    "machine": "H3"
   },
   ".usage.json": {
-   "sha": "d7d312757a85e09c7f5a1b6b455e2463201566fd5a1bc37f7fac2e3a49fef55f",
-   "size": 201209,
-   "mtime": 1788217222,
+   "sha": "dd262159a0c1e9bf3294ff9e6963400f0495f0824cf4f85e27cf16d8f34e160d",
+   "size": 201636,
+   "mtime": 1788253899,
    "machine": "H3"
   },
   ".archive/kicad10-headless-pcb/SKILL.md": {
@@ -5702,6 +5702,18 @@
    "sha": "6d081a3e08ed2405d4200e8f5fefcef3284eccf4c55cb3ab7ccc9c83defde274",
    "size": 4030,
    "mtime": 1784153106,
+   "machine": "H3"
+  },
+  "meta/cift-model-kod-denetimi/SKILL.md": {
+   "sha": "5150a460d557656246994efa9f955ec3420168b7ec195730bc8fef3ab98e63b6",
+   "size": 3504,
+   "mtime": 1788253884,
+   "machine": "H3"
+  },
+  "meta/cift-model-kod-denetimi/references/ornek-bulgu-arsivi.md": {
+   "sha": "d674863f7577245621c6faeab8840498013132ee46fb0327f3c9f06d48199593",
+   "size": 3348,
+   "mtime": 1788253899,
    "machine": "H3"
   },
   "meta/smart-delegation/SKILL.md": {
