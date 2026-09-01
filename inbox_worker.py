@@ -62,6 +62,10 @@ def parse_task(text):
         return "status", []
     if t == "uptime":
         return "uptime", []
+    if t == "ping" or t == "pong":
+        return "ping", []
+    if "disk" in t and "uptime" in t:
+        return "metric", []
     if t == "kontrol":
         return "kontrol", []
     if t.startswith("temizle"):
@@ -230,6 +234,18 @@ def process_inbox():
             elif key == "agent-update":
                 d["result"] = run_agent_update(args[0]["url"], args[0]["sha256"])
                 d["status"] = "done"
+            elif key == "ping":
+                # H1/H2 sağlık testi (1 Eyl 2026): pong + temel durum döner
+                d["status"] = "done"
+                d["result"] = {"pong": True, "host": __import__("socket").gethostname(),
+                               "ts": time.strftime("%Y-%m-%dT%H:%M:%S")}
+            elif key == "metric":
+                # Metrik sorgusu: disk + uptime birlikte raporlanır (H1'in
+                # 'metric-test-*' deseni; allowlist dışı kalmaması için eklendi)
+                d1 = run(["df", "-h", "/"])
+                d2 = run(["uptime"])
+                d["status"] = "done"
+                d["result"] = {"disk": d1[-800:], "uptime": d2[-300:]}
             elif key == "kontrol":
                 # AKILLI KUYRUK SORGUSU (31 Ağu 2026): inbox özeti döndürür —
                 # ajanlar kuyruk durumunu SSH'sız A2A'dan görebilir.
