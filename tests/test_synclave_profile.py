@@ -57,11 +57,18 @@ class TestSkills(Base):
         (self.oc / "skills" / "demo").mkdir(parents=True, exist_ok=True)
         (self.he / "skills" / "demo" / "SKILL.md").write_text("---\nname: demo\n---\nHermes içerik", encoding="utf-8")
         (self.oc / "skills" / "demo" / "SKILL.md").write_text("---\nname: demo\n---\nOpenClaw içerik", encoding="utf-8")
+        # merge_skills mtime'a göre kazananı seçer — test ortamında iki yazma
+        # aynı nanosaniyeye denk gelebilir, bu yüzden kazananı (hermes) açıkça
+        # daha yeni yaparak deterministik hale getir: openclaw sürümü yedeklenir.
+        oc_st = (self.oc / "skills" / "demo" / "SKILL.md").stat().st_mtime + 10
+        os.utime(self.he / "skills" / "demo" / "SKILL.md", (oc_st, oc_st))
         r = SP.merge_skills(self.he / "skills", self.oc / "skills")
         self.assertIn("birlesen", r)
         # conflict yedek dosyası oluşmuş olmalı
         conf = list((self.oc / "skills" / "demo").glob("SKILL.md.conflict.*"))
         self.assertEqual(len(conf), 1)
+        # kazanan hermes içeriği iki tarafa da yazılmış olmalı
+        self.assertIn("Hermes içerik", (self.oc / "skills" / "demo" / "SKILL.md").read_text(encoding="utf-8"))
 
     def test_tek_tarafli_skill_kopyalanir(self):
         (self.he / "skills" / "sadece_h").mkdir(parents=True, exist_ok=True)
